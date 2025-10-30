@@ -8,20 +8,48 @@ import { Input } from '@heroui/input';
 import { Link } from '@heroui/link';
 import { Button } from '@heroui/button';
 
+import { useForm } from "react-hook-form"
+import { yupResolver } from "@hookform/resolvers/yup"
+import * as yup from "yup"
+
 import { EyeFilledIcon, EyeSlashFilledIcon } from '@/shared/components/icon/eyePassword';
 import { useAuthLogin } from '@/shared/hooks/authentication';
+export interface ILoginData {
+  email: string;
+  password: string;
+}
+
+const schema = yup.object({
+  email: yup.string().email().required(),
+  password: yup.string().required(),
+}).required();
 
 export default function ExamplePage() {
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ILoginData>({
+    resolver: yupResolver(schema)
+  });
+
   const { mutate: authLogin, isPending } = useAuthLogin();
   const [isVisible, setIsVisible] = React.useState(false);
   const toggleVisibility = () => setIsVisible(!isVisible);
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const data = Object.fromEntries(formData) as { email: string; password: string };
+  const onSubmit = (data: ILoginData) => {
+    console.log('Form data:', data)
+    // e.preventDefault();
+    // const formData = new FormData(e.currentTarget);
+    // const data = Object.fromEntries(formData) as { email: string; password: string };
+    console.log({
+              GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID!,
+        GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET!
 
-    authLogin({ email: data.email, password: data.password });
+    })
+
+    // authLogin({ email: data.email, password: data.password });
   };
 
   return (
@@ -42,15 +70,10 @@ export default function ExamplePage() {
         </div>
       </CardHeader>
       <CardBody>
-        <Form className="flex flex-col gap-4 mb-8" validationBehavior="aria" onSubmit={onSubmit}>
-          <Input
-            id="email"
-            label="Email"
-            labelPlacement="outside"
-            name="email"
-            placeholder="Enter your email"
-            type="email"
-            variant="bordered"
+        <Form className="flex flex-col gap-4 mb-8" validationBehavior="aria" onSubmit={handleSubmit(onSubmit)}>
+          <Input {...register('email')}
+            isInvalid={!!errors.email}
+            errorMessage={errors.email?.message}
           />
           <Input
             endContent={
@@ -67,24 +90,31 @@ export default function ExamplePage() {
                 )}
               </button>
             }
-            id="password"
-            label="Password"
-            labelPlacement="outside"
-            name="password"
-            placeholder="Enter your password"
             type={isVisible ? 'text' : 'password'}
             variant="bordered"
+            {...register('password')}
+            // id="password"
+            // label="Password"
+            // labelPlacement="outside"
+            // name="password"
+            // placeholder="Enter your password"
+            isInvalid={!!errors.password}
+            errorMessage={errors.password?.message}
           />
           <Button fullWidth color="primary" isDisabled={isPending} type="submit">
             Submit
           </Button>
         </Form>
+        {/* {JSON.stringify(errors)} */}
       </CardBody>
       <CardFooter className="flex flex-col gap-2 justify-center items-center">
         <p>
           {"Don't have an account?"} <Link href="/register">Register here</Link>
         </p>
         <Link href="/forgot">forgot password?</Link>
+
+        {/* <SignInButton /> */}
+        <Button onClick={() => window.location.href = process.env.NEXT_PUBLIC_BACKEND_URL + '/api/auth/google'}>Google Oauth</Button>
       </CardFooter>
     </Card>
   );

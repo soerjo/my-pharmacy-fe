@@ -1,4 +1,5 @@
 export interface IUserDetailResponse {
+  id: string;
   _id: string;
   email: string;
   isAdmin: boolean;

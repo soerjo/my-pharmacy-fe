@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { getUserDetail } from '../services/users.service';
 
 import { ILoginResponse } from '@/types/authentication';
+import { IUserDetailResponse } from '@/types/user';
 
 interface IUserPayload {
   userId?: string;
@@ -17,6 +18,7 @@ interface IAuthenticationState {
   payload: IUserPayload;
   isLogin: boolean;
   login: (dto: ILoginResponse) => Promise<void>;
+  setToken: (dto: {userDetail: IUserDetailResponse, token: string}) => void;
   logout: () => void;
   initializeAuth: () => void;
 }
@@ -52,6 +54,38 @@ export const useAuthenticationStore = create<IAuthenticationState>((set) => ({
         email: userDetail.email,
         isAdmin: userDetail.isAdmin,
         name: userDetail.name,
+      },
+      isLogin: true,
+    }));
+  },
+  setToken: async (dto) => {
+    Cookies.set('token', dto.token!, {
+      expires: 1 / 3, // 8 hours
+      secure: true,
+      sameSite: 'Strict',
+    });
+
+    Cookies.set(
+      'user',
+      JSON.stringify({
+        userId: dto.userDetail._id,
+        email: dto.userDetail.email,
+        isAdmin: dto.userDetail.isAdmin,
+        name: dto.userDetail.name,
+      }),
+      {
+        expires: 1 / 3, // 8 hours
+        secure: true,
+        sameSite: 'Strict',
+      },
+    );
+
+    set(() => ({
+      payload: {
+        userId: dto.userDetail._id,
+        email: dto.userDetail.email,
+        isAdmin: dto.userDetail.isAdmin,
+        name: dto.userDetail.name,
       },
       isLogin: true,
     }));
