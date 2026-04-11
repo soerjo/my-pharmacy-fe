@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Spinner } from "@heroui/react";
 import { useAuth as useAuthContext } from "@/features/auth/providers/auth-provider";
@@ -10,9 +10,18 @@ export function useAuth() {
   return useAuthContext();
 }
 
+function useIsMounted() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  return mounted;
+}
+
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
+  const mounted = useIsMounted();
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -20,7 +29,7 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
     }
   }, [isAuthenticated, isLoading, router]);
 
-  if (isLoading || !isAuthenticated) {
+  if (!mounted || isLoading || !isAuthenticated) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <Spinner size="lg" />
@@ -31,17 +40,24 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-export function SuspenseBoundary({ children }: { children: React.ReactNode }) {
-  return (
-    <Suspense
-      fallback={
-        <div className="flex min-h-screen items-center justify-center">
-          <Spinner size="lg" />
-        </div>
-      }
-    >
-      {children}
-    </Suspense>
-  );
-}
+export function GuestRoute({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, isLoading } = useAuth();
+  const router = useRouter();
+  const mounted = useIsMounted();
 
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      router.push(ROUTES.home);
+    }
+  }, [isAuthenticated, isLoading, router]);
+
+  if (!mounted || isLoading || isAuthenticated) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
+
+  return <>{children}</>;
+}

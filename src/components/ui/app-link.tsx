@@ -36,5 +36,3 @@ export function AppLink({
     </Link>
   );
 }
-
-export type { AppLinkProps };

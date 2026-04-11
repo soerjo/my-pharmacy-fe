@@ -65,11 +65,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
     onMutate: () => {
       TokenManager.clearTokens();
     },
-    onSuccess: () => {
-      verifyTokenQuery.refetch();
-      if (pathname !== ROUTES.login) {
-        router.push(ROUTES.login);
-      }
+    onSettled: async () => {
+      await verifyTokenQuery.refetch();
+      router.push(ROUTES.login);
     },
   });
 
@@ -137,12 +135,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     await logoutMutation.mutateAsync();
   }, [logoutMutation]);
 
-  const isAuthenticated = useMemo(() => {
-    const hasToken = !!TokenManager.getAccessToken();
-    const isValid = TokenManager.isAccessTokenValid();
-    const isVerified = verifyTokenQuery.data?.data?.valid !== false;
-    return hasToken && isValid && isVerified;
-  }, [verifyTokenQuery.data]);
+  const hasToken = !!TokenManager.getAccessToken();
+  const isValid = TokenManager.isAccessTokenValid();
+  const isVerified = verifyTokenQuery.data?.data?.valid !== false;
+  const isAuthenticated = hasToken && isValid && isVerified;
 
   const isLoading = useMemo(() => {
     if (typeof window === 'undefined') return true;

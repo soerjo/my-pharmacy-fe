@@ -1,1 +1,1 @@
-export { useAuth, ProtectedRoute, SuspenseBoundary } from "./use-auth";
+export { useAuth, ProtectedRoute, GuestRoute } from "./use-auth";
