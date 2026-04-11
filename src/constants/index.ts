@@ -6,10 +6,10 @@ export const ROUTES = {
 } as const;
 
 export const API_ROUTES = {
-  health: "/api/v1/health",
-  login: "/api/v1/auth/login",
-  logout: "/api/v1/auth/logout",
-  refreshToken: "/api/v1/auth/refresh-token",
-  verifyToken: "/api/v1/auth/verify-token",
-  me: "/api/v1/auth/me",
+  health: "/api/health",
+  login: "/api/auth/login",
+  logout: "/api/auth/logout",
+  refreshToken: "/api/auth/refresh-token",
+  verifyToken: "/api/auth/verify-token",
+  me: "/api/auth/me",
 } as const;

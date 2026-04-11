@@ -9,21 +9,6 @@ import { TokenManager } from "@/features/auth/services/token-manager";
 import type { LoginResponse, LoginFormValues } from "@/features/auth/types";
 import type { ApiResponse } from "@/types";
 
-function generateDummyToken(expireInMinutes: number): string {
-  const header = btoa(JSON.stringify({ alg: "HS256", typ: "JWT" }));
-  const now = Math.floor(Date.now() / 1000);
-  const payload = btoa(JSON.stringify({
-    exp: now + (expireInMinutes * 60),
-    iat: now,
-    sub: "user123",
-    username: "dev-user",
-  }));
-  const signature = btoa("dummy-signature");
-  return `${header}.${payload}.${signature}`;
-}
-
-const isDevelopment = process.env.NODE_ENV === "development";
-
 interface AuthContextValue {
   isAuthenticated: boolean;
   isLoading: boolean;
@@ -44,24 +29,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const verifyTokenQuery = useQuery<ApiResponse<{ valid: boolean }>>({
     queryKey: ["auth", "verify"],
-    queryFn: async () => {
-      if (isDevelopment) {
-        return { data: { valid: true } };
-      }
-      return apiClient.get(API_ROUTES.verifyToken);
-    },
+    queryFn: () => apiClient.get(API_ROUTES.verifyToken),
     retry: false,
     enabled: typeof window !== "undefined" && TokenManager.isAccessTokenValid(),
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 60 * 5,
   });
 
   const logoutMutation = useMutation({
-    mutationFn: async () => {
-      if (isDevelopment) {
-        return;
-      }
-      return apiClient.post<void>(API_ROUTES.logout);
-    },
+    mutationFn: () => apiClient.post<void>(API_ROUTES.logout),
     onMutate: () => {
       TokenManager.clearTokens();
     },
@@ -72,21 +47,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
   });
 
   const refreshTokenMutation = useMutation({
-    mutationFn: async () => {
-      if (isDevelopment) {
-        const newAccessToken = generateDummyToken(15);
-        const newRefreshToken = generateDummyToken(60 * 24 * 7);
-        return {
-          data: {
-            accessToken: newAccessToken,
-            refreshToken: newRefreshToken,
-          },
-        };
-      }
-      return apiClient.post<ApiResponse<LoginResponse>>(API_ROUTES.refreshToken, { 
-        refreshToken: TokenManager.getRefreshToken() 
-      }, { skipAuth: true });
-    },
+    mutationFn: () =>
+      apiClient.post<ApiResponse<LoginResponse>>(API_ROUTES.refreshToken, {
+        refreshToken: TokenManager.getRefreshToken(),
+      }, { skipAuth: true }),
     onSuccess: (response) => {
       if (response.data?.accessToken) {
         TokenManager.setAccessToken(response.data.accessToken);
@@ -110,29 +74,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const login = useCallback(async (data: LoginFormValues) => {
     try {
-      if (isDevelopment) {
-        const dummyAccessToken = generateDummyToken(15);
-        const dummyRefreshToken = generateDummyToken(60 * 24 * 7);
-        
-        TokenManager.setAccessToken(dummyAccessToken);
-        TokenManager.setRefreshToken(dummyRefreshToken);
-        
-        verifyTokenQuery.refetch();
-        router.push(ROUTES.home);
-      } else {
-        const response = await loginMutation.mutateAsync(data);
-        if (response.data?.accessToken) {
-          verifyTokenQuery.refetch();
-          router.push(ROUTES.home);
-        }
-      }
+      await loginMutation.mutateAsync(data);
+      verifyTokenQuery.refetch();
     } catch (error) {
       throw error;
     }
   }, [loginMutation, verifyTokenQuery, router]);
 
   const logout = useCallback(async () => {
-    await logoutMutation.mutateAsync();
+    TokenManager.clearTokens();
+    router.push(ROUTES.login);
   }, [logoutMutation]);
 
   const hasToken = !!TokenManager.getAccessToken();

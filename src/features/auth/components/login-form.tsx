@@ -24,7 +24,7 @@ export function LoginForm() {
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      username: "",
+      email: "",
       password: "",
     },
   });
@@ -71,16 +71,17 @@ export function LoginForm() {
           )}
 
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="username" className="text-sm font-medium">
-              Username <span className="text-danger">*</span>
+            <label htmlFor="email" className="text-sm font-medium">
+              Email <span className="text-danger">*</span>
             </label>
             <Input
-              id="username"
-              placeholder="Enter your username"
-              {...register("username")}
+              id="email"
+              type="email"
+              placeholder="Enter your email"
+              {...register("email")}
             />
-            {errors.username && (
-              <p className="text-sm text-danger">{errors.username.message}</p>
+            {errors.email && (
+              <p className="text-sm text-danger">{errors.email.message}</p>
             )}
           </div>
 
