@@ -1,29 +1,25 @@
 "use client";
 
-import { createContext, useContext, useCallback, useEffect, useMemo, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, type ReactNode } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { ROUTES, API_ROUTES } from "@/constants";
 import { apiClient } from "@/lib";
 import { TokenManager } from "@/features/auth/services/token-manager";
-import type { LoginResponse, LoginFormValues } from "@/features/auth/types";
+import type { LoginResponse } from "@/features/auth/types";
 import type { ApiResponse } from "@/types";
 
 interface AuthContextValue {
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (data: LoginFormValues) => Promise<void>;
+  isAuthLoading: boolean;
   logout: () => Promise<void>;
   error: Error | null;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-interface AuthProviderProps {
-  children: ReactNode;
-}
-
-export function AuthProvider({ children }: AuthProviderProps) {
+export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
 
@@ -61,57 +57,36 @@ export function AuthProvider({ children }: AuthProviderProps) {
     },
   });
 
-  const loginMutation = useMutation({
-    mutationFn: (data: LoginFormValues) => 
-      apiClient.post<ApiResponse<LoginResponse>>(API_ROUTES.login, data),
-    onSuccess: (response) => {
-      if (response.data?.accessToken) {
-        TokenManager.setAccessToken(response.data.accessToken);
-        TokenManager.setRefreshToken(response.data.refreshToken);
-      }
-    },
-  });
-
-  const login = useCallback(async (data: LoginFormValues) => {
-    try {
-      await loginMutation.mutateAsync(data);
-      verifyTokenQuery.refetch();
-    } catch (error) {
-      throw error;
-    }
-  }, [loginMutation, verifyTokenQuery, router]);
-
   const logout = useCallback(async () => {
     TokenManager.clearTokens();
     router.push(ROUTES.login);
-  }, [logoutMutation]);
+  }, [router]);
 
   const hasToken = !!TokenManager.getAccessToken();
   const isValid = TokenManager.isAccessTokenValid();
   const isVerified = verifyTokenQuery.data?.data?.valid !== false;
   const isAuthenticated = hasToken && isValid && isVerified;
 
-  const isLoading = useMemo(() => {
+  const isAuthLoading = useMemo(() => {
     if (typeof window === 'undefined') return true;
-    return (
-      verifyTokenQuery.isLoading ||
-      loginMutation.isPending ||
-      logoutMutation.isPending
-    );
-  }, [verifyTokenQuery.isLoading, loginMutation.isPending, logoutMutation.isPending]);
+    return verifyTokenQuery.isLoading;
+  }, [verifyTokenQuery.isLoading]);
+
+  const isLoading = useMemo(() => {
+    return isAuthLoading || logoutMutation.isPending;
+  }, [isAuthLoading, logoutMutation.isPending]);
 
   const error = useMemo(() => {
     if (verifyTokenQuery.error) return verifyTokenQuery.error;
-    if (loginMutation.error) return loginMutation.error;
     if (logoutMutation.error) return logoutMutation.error;
     return null;
-  }, [verifyTokenQuery.error, loginMutation.error, logoutMutation.error]);
+  }, [verifyTokenQuery.error, logoutMutation.error]);
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated && pathname !== ROUTES.login) {
+    if (!isAuthLoading && !isAuthenticated && pathname !== ROUTES.login && pathname !== ROUTES.register && pathname !== ROUTES.forgotPassword && pathname !== ROUTES.resetPassword) {
       router.push(ROUTES.login);
     }
-  }, [isAuthenticated, isLoading, pathname, router]);
+  }, [isAuthenticated, isAuthLoading, pathname, router]);
 
   useEffect(() => {
     if (!isAuthenticated || !TokenManager.getAccessToken()) return;
@@ -147,10 +122,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const value = useMemo<AuthContextValue>(() => ({
     isAuthenticated,
     isLoading,
-    login,
+    isAuthLoading,
     logout,
     error,
-  }), [isAuthenticated, isLoading, login, logout, error]);
+  }), [isAuthenticated, isLoading, isAuthLoading, logout, error]);
 
   return (
     <AuthContext.Provider value={value}>

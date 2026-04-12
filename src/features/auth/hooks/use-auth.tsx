@@ -19,17 +19,17 @@ function useIsMounted() {
 }
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isAuthLoading } = useAuth();
   const router = useRouter();
   const mounted = useIsMounted();
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
+    if (!isAuthLoading && !isAuthenticated) {
       router.push(ROUTES.login);
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [isAuthenticated, isAuthLoading, router]);
 
-  if (!mounted || isLoading || !isAuthenticated) {
+  if (!mounted || isAuthLoading || !isAuthenticated) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <Spinner size="lg" />
@@ -41,17 +41,17 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
 }
 
 export function GuestRoute({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isAuthLoading } = useAuth();
   const router = useRouter();
   const mounted = useIsMounted();
 
   useEffect(() => {
-    if (!isLoading && isAuthenticated) {
+    if (!isAuthLoading && isAuthenticated) {
       router.push(ROUTES.home);
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [isAuthenticated, isAuthLoading, router]);
 
-  if (!mounted || isLoading || isAuthenticated) {
+  if (!mounted || isAuthLoading || isAuthenticated) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <Spinner size="lg" />

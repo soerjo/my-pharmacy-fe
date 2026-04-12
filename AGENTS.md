@@ -53,7 +53,7 @@ Every module directory has a barrel `index.ts` — import via `@/features/home/c
 
 ## Package manager
 
-Bun (`bun.lock`, `.npmrc` sets `package-lock=false`). npm scripts still work via bun.
+Bun is preferred (`bun.lock` present, `.npmrc` sets `package-lock=false`). npm scripts work via both npm and bun.
 
 ## Auth System
 

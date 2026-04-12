@@ -1,2 +1,2 @@
-export { apiClient } from "./api-client";
+export { apiClient, ApiError } from "./api-client";
 export { queryKeys } from "./query-keys";
