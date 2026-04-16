@@ -33,6 +33,7 @@ export function RegisterForm() {
       password: "",
       firstName: "",
       lastName: "",
+      confirmPassword: "",
     },
   });
 
@@ -173,6 +174,17 @@ export function RegisterForm() {
               placeholder="Enter your password"
               register={register}
               error={errors.password?.message}
+              required
+            />
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <PasswordInput
+              name="confirmPassword"
+              label="Confirm Password"
+              placeholder="Confirm new password"
+              register={register}
+              error={errors.confirmPassword?.message}
               required
             />
           </div>

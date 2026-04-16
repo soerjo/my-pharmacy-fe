@@ -2,29 +2,48 @@
 
 import Link from "next/link";
 import { Button, Spinner } from "@heroui/react";
+import { Bars } from "@gravity-ui/icons";
 import { useAuth } from "@/features/auth/hooks";
+import { ROUTES } from "@/constants";
+import { useAppStore } from "@/stores";
 
 export function AppHeader() {
   const { logout, isLoading } = useAuth();
+  const { toggleSidebar } = useAppStore();
 
   return (
-    <header className="flex items-center justify-between px-6 py-4 border-b border-zinc-200 dark:border-zinc-800">
-      <Link href="/" className="text-lg font-semibold">
+    <header className="flex h-14 items-center gap-3 border-b border-zinc-200 px-6 dark:border-zinc-800 lg:px-4">
+      <Button
+        isIconOnly
+        variant="tertiary"
+        className="lg:hidden"
+        onPress={toggleSidebar}
+      >
+        <Bars className="size-5" />
+      </Button>
+      <Link href="/" className="text-lg font-semibold lg:hidden">
         My App
       </Link>
-      <nav className="flex items-center gap-4">
-        <Link href="/" className="text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-50">
+      <div className="hidden lg:block" />
+      <div className="ml-auto flex items-center gap-4">
+        <Link href={ROUTES.home} className="text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-50">
           Home
         </Link>
-        <Button 
-          size="sm" 
-          variant="ghost" 
+        <Link href={ROUTES.patients} className="text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-50">
+          Patients
+        </Link>
+        <Link href={ROUTES.dispenseOrders} className="text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-50">
+          Dispense Orders
+        </Link>
+        <Button
+          size="sm"
+          variant="ghost"
           onPress={logout}
           isDisabled={isLoading}
         >
           {isLoading ? <Spinner size="sm" /> : "Logout"}
         </Button>
-      </nav>
+      </div>
     </header>
   );
 }

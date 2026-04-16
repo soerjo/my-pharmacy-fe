@@ -58,6 +58,9 @@ export const registerSchema = z.object({
     .string()
     .min(1, "Email is required")
     .email("Invalid email address"),
+  confirmPassword: z
+    .string()
+    .min(1, "Please confirm your password"),
   password: z
     .string()
     .min(1, "Password is required")
@@ -68,10 +71,22 @@ export const registerSchema = z.object({
   lastName: z
     .string()
     .min(1, "Last name is required"),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"],
 });
 
 export type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export interface RegisterResponse {
   message: string;
+}
+
+export interface UserProfile {
+  id: string;
+  email: string;
+  userName: string;
+  organizationName: string;
+  role: string;
+  organizationId: string;
 }

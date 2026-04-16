@@ -28,7 +28,10 @@ export function LoginProvider({ children }: { children: ReactNode }) {
       if (response.data?.accessToken) {
         TokenManager.setAccessToken(response.data.accessToken);
         TokenManager.setRefreshToken(response.data.refreshToken);
-        queryClient.invalidateQueries({ queryKey: ["auth", "verify"] });
+        queryClient.setQueryData<ApiResponse<{ valid: boolean }>>(
+          ["auth", "verify"],
+          { statusCode: 200, data: { valid: true } },
+        );
         router.push(ROUTES.home);
       }
     },

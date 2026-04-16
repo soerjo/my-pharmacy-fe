@@ -6,6 +6,10 @@ export const ROUTES = {
   register: "/register",
   forgotPassword: "/forgot-password",
   resetPassword: "/reset-password",
+  patients: "/patients",
+  admissions: "/admissions",
+  dispenseOrders: "/dispense-order",
+  settings: "/settings",
 } as const;
 
 export const API_ROUTES = {
@@ -14,8 +18,11 @@ export const API_ROUTES = {
   logout: "/api/auth/logout",
   refreshToken: "/api/auth/refresh-token",
   verifyToken: "/api/auth/verify-token",
-  me: "/api/auth/me",
+  me: "/api/users/me",
   forgotPassword: "/api/auth/forgot-password",
   resetPassword: "/api/auth/reset-password",
   register: "/api/auth/register",
+  patients: "/api/patients",
+  admissions: "/api/admissions",
+  dispenseOrders: "/api/dispense-orders",
 } as const;
