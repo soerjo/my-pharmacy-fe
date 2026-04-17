@@ -4,17 +4,14 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: pharmacy-frontend
-    ports:
-      - "${PORT:-3000}:3000"
     environment:
       - NODE_ENV=${NODE_ENV:-production}
-      - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
       - NEXT_PUBLIC_API_AUTH_SERVICE=${NEXT_PUBLIC_API_AUTH_SERVICE}
       - NEXT_PUBLIC_API_WAREHOUSE_SERVICE=${NEXT_PUBLIC_API_WAREHOUSE_SERVICE}
       - NEXT_PUBLIC_API_DEPO_SERVICE=${NEXT_PUBLIC_API_DEPO_SERVICE}
       - NEXT_PUBLIC_MAX_TOKEN_RETRY_ATTEMPTS=${NEXT_PUBLIC_MAX_TOKEN_RETRY_ATTEMPTS:-3}
     networks:
-      - pharmacy-network
+      - internal_net
     restart: unless-stopped
     deploy:
       resources:
@@ -36,5 +33,5 @@ services:
       - no-new-privileges:true
 
 networks:
-  pharmacy-network:
-    driver: bridge
+  internal_net:
+    external: true
