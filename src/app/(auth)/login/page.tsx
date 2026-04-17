@@ -1,6 +1,6 @@
-import { LoginForm } from "@/features/auth/components";
-import { GuestRoute } from "@/features/auth/hooks";
-import { LoginProvider } from "@/features/auth/providers/login-provider";
+import { LoginForm } from "@/components/auth/login-form";
+import { GuestRoute } from "@/hooks/use-auth";
+import { LoginProvider } from "@/providers/login-provider";
 
 export default function LoginPage() {
   return (

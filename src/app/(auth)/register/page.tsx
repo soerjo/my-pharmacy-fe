@@ -1,6 +1,6 @@
-import { RegisterForm } from "@/features/auth/components";
-import { GuestRoute } from "@/features/auth/hooks";
-import { RegisterProvider } from "@/features/auth/providers/register-provider";
+import { RegisterForm } from "@/components/auth/register-form";
+import { GuestRoute } from "@/hooks/use-auth";
+import { RegisterProvider } from "@/providers/register-provider";
 
 export default function RegisterPage() {
   return (

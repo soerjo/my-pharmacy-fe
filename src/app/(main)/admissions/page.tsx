@@ -1,5 +1,5 @@
-import { AdmissionsTable } from "@/features/admission/components";
-import { AdmissionsProvider } from "@/features/admission/hooks";
+import { AdmissionsTable } from "@/components/admissions/admissions-table";
+import { AdmissionsProvider } from "@/hooks/use-admissions";
 
 export default function AdmissionsPage() {
   return (

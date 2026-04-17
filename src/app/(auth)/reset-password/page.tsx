@@ -1,6 +1,6 @@
-import { ResetPasswordForm } from "@/features/auth/components";
-import { GuestRoute } from "@/features/auth/hooks";
-import { ResetPasswordProvider } from "@/features/auth/providers/reset-password-provider";
+import { ResetPasswordForm } from "@/components/auth/reset-password-form";
+import { GuestRoute } from "@/hooks/use-auth";
+import { ResetPasswordProvider } from "@/providers/reset-password-provider";
 
 export default function ResetPasswordPage() {
   return (

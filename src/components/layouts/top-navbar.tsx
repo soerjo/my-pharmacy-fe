@@ -3,7 +3,8 @@
 import { Avatar, Button, Dropdown, Spinner } from "@heroui/react";
 import { ArrowRightFromSquare, Bars, Bell, Person } from "@gravity-ui/icons";
 
-import { useAuth, useUserProfile } from "@/features/auth/hooks";
+import { useAuth } from "@/providers/auth-provider";
+import { useUserProfile } from "@/hooks/use-user-profile";
 import { useAppStore } from "@/stores";
 import { ROUTES } from "@/constants";
 import { cn } from "@/utils";
@@ -35,7 +36,7 @@ export function TopNavbar() {
 
         <Dropdown>
           <Dropdown.Trigger>
-            <button
+            <div
               className={cn(
                 "flex items-center gap-2 rounded-full outline-none ring-offset-background transition-opacity hover:opacity-80",
                 "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
@@ -46,7 +47,7 @@ export function TopNavbar() {
                   {isUserLoading ? <Spinner size="sm" /> : initials ?? "U"}
                 </Avatar.Fallback>
               </Avatar>
-            </button>
+            </div>
           </Dropdown.Trigger>
           <Dropdown.Popover>
             {user && (

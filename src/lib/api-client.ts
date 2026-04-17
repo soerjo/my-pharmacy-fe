@@ -1,4 +1,4 @@
-import { TokenManager } from "@/features/auth/services/token-manager";
+import { TokenManager } from "@/lib/token-manager";
 import { API_ROUTES } from "@/constants";
 
 type RequestOptions = {
@@ -14,7 +14,7 @@ class ApiClient {
   private refreshSubscribers: Array<(token: string) => void> = [];
   private static readonly MAX_RETRY_ATTEMPTS = Number(process.env.NEXT_PUBLIC_MAX_TOKEN_RETRY_ATTEMPTS) || 3;
 
-  constructor(baseUrl = process.env.NEXT_PUBLIC_API_URL ?? "") {
+  constructor(baseUrl = process.env.NEXT_PUBLIC_API_AUTH_SERVICE ?? "") {
     this.baseUrl = baseUrl;
   }
 
@@ -190,6 +190,47 @@ export class ApiError extends Error {
   }
 }
 
-export const apiClient = new ApiClient(process.env.NEXT_PUBLIC_API_AUTH_SERVICE ?? "");
+type ServiceName = "auth" | "depo" | "warehouse";
 
-export const depoClient = new ApiClient(process.env.NEXT_PUBLIC_API_DEPO_SERVICE ?? "");
+const serviceConfig: Record<ServiceName, { envVar: string; baseUrl: string }> = {
+  auth: {
+    envVar: "NEXT_PUBLIC_API_AUTH_SERVICE",
+    baseUrl: process.env.NEXT_PUBLIC_API_AUTH_SERVICE ?? "",
+  },
+  depo: {
+    envVar: "NEXT_PUBLIC_API_DEPO_SERVICE",
+    baseUrl: process.env.NEXT_PUBLIC_API_DEPO_SERVICE ?? "",
+  },
+  warehouse: {
+    envVar: "NEXT_PUBLIC_API_WAREHOUSE_SERVICE",
+    baseUrl: process.env.NEXT_PUBLIC_API_WAREHOUSE_SERVICE ?? "",
+  },
+};
+
+const clientsCache = new Map<ServiceName, ApiClient>();
+
+function createClient(serviceName: ServiceName): ApiClient {
+  const cachedClient = clientsCache.get(serviceName);
+  if (cachedClient) {
+    return cachedClient;
+  }
+
+  const config = serviceConfig[serviceName];
+  const client = new ApiClient(config.baseUrl);
+  clientsCache.set(serviceName, client);
+  return client;
+}
+
+export const apiClient = createClient("auth");
+export const depoClient = createClient("depo");
+export const warehouseClient = createClient("warehouse");
+
+export const clients = {
+  auth: apiClient,
+  depo: depoClient,
+  warehouse: warehouseClient,
+} as const satisfies Record<ServiceName, ApiClient>;
+
+export function getClient(serviceName: ServiceName): ApiClient {
+  return createClient(serviceName);
+}

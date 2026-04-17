@@ -1,6 +1,6 @@
-import { ForgotPasswordForm } from "@/features/auth/components";
-import { GuestRoute } from "@/features/auth/hooks";
-import { ForgotPasswordProvider } from "@/features/auth/providers/forgot-password-provider";
+import { ForgotPasswordForm } from "@/components/auth/forgot-password-form";
+import { GuestRoute } from "@/hooks/use-auth";
+import { ForgotPasswordProvider } from "@/providers/forgot-password-provider";
 
 export default function ForgotPasswordPage() {
   return (

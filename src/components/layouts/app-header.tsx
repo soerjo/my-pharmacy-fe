@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Button, Spinner } from "@heroui/react";
 import { Bars } from "@gravity-ui/icons";
-import { useAuth } from "@/features/auth/hooks";
+import { useAuth } from "@/providers/auth-provider";
 import { ROUTES } from "@/constants";
 import { useAppStore } from "@/stores";
 

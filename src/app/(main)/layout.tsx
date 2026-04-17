@@ -1,5 +1,5 @@
 import { MainLayout } from "@/components/layouts";
-import { ProtectedRoute } from "@/features/auth/hooks";
+import { ProtectedRoute } from "@/hooks/use-auth";
 
 export default function MainLayoutWrapper({ children }: { children: React.ReactNode }) {
   return (
