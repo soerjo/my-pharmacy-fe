@@ -32,9 +32,9 @@ services:
       - /tmp
     security_opt:
       - no-new-privileges:true
-    # networks:
-    #   - internal_net
+    networks:
+      - internal_net
 
-# networks:
-#   internal_net:
-#     external: true
+networks:
+  internal_net:
+    external: true
