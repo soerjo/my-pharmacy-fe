@@ -23,7 +23,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 - `tailwind.config.js` — v3 leftover; Tailwind v4 uses CSS-based config
 - `.eslintrc.json`, `.eslintignore` — legacy format; ESLint 9 uses `eslint.config.mjs`
-- `next.config.js` — `.ts` version is the active one
+- `next.config.js` — removed; `.ts` version is the active one
 
 ## Architecture
 

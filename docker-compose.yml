@@ -3,16 +3,17 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_AUTH_SERVICE=${NEXT_PUBLIC_API_AUTH_SERVICE}
+        - NEXT_PUBLIC_API_WAREHOUSE_SERVICE=${NEXT_PUBLIC_API_WAREHOUSE_SERVICE}
+        - NEXT_PUBLIC_API_DEPO_SERVICE=${NEXT_PUBLIC_API_DEPO_SERVICE}
+        - NEXT_PUBLIC_MAX_TOKEN_RETRY_ATTEMPTS=${NEXT_PUBLIC_MAX_TOKEN_RETRY_ATTEMPTS:-3}
     container_name: pharmacy-frontend
     environment:
       - NODE_ENV=${NODE_ENV:-production}
-      - NEXT_PUBLIC_API_AUTH_SERVICE=${NEXT_PUBLIC_API_AUTH_SERVICE}
-      - NEXT_PUBLIC_API_WAREHOUSE_SERVICE=${NEXT_PUBLIC_API_WAREHOUSE_SERVICE}
-      - NEXT_PUBLIC_API_DEPO_SERVICE=${NEXT_PUBLIC_API_DEPO_SERVICE}
-      - NEXT_PUBLIC_MAX_TOKEN_RETRY_ATTEMPTS=${NEXT_PUBLIC_MAX_TOKEN_RETRY_ATTEMPTS:-3}
-    networks:
-      - internal_net
     restart: unless-stopped
+    ports:
+      - "3000:3000"
     deploy:
       resources:
         limits:
@@ -31,7 +32,9 @@ services:
       - /tmp
     security_opt:
       - no-new-privileges:true
+    # networks:
+    #   - internal_net
 
-networks:
-  internal_net:
-    external: true
+# networks:
+#   internal_net:
+#     external: true
