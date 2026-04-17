@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pharmacy-frontend
+    ports:
+      - "${PORT}:3000"
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+    networks:
+      - pharmacy-network
+    restart: unless-stopped
+
+networks:
+  pharmacy-network:
+    driver: bridge
