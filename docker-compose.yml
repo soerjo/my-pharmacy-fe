@@ -7,11 +7,14 @@ services:
       dockerfile: Dockerfile
     container_name: pharmacy-frontend
     ports:
-      - "${PORT}:3000"
-    env_file:
-      - .env
+      - "${PORT:-3000}:3000"
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=${NODE_ENV:-production}
+      - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+      - NEXT_PUBLIC_API_AUTH_SERVICE=${NEXT_PUBLIC_API_AUTH_SERVICE}
+      - NEXT_PUBLIC_API_WAREHOUSE_SERVICE=${NEXT_PUBLIC_API_WAREHOUSE_SERVICE}
+      - NEXT_PUBLIC_API_DEPO_SERVICE=${NEXT_PUBLIC_API_DEPO_SERVICE}
+      - NEXT_PUBLIC_MAX_TOKEN_RETRY_ATTEMPTS=${NEXT_PUBLIC_MAX_TOKEN_RETRY_ATTEMPTS:-3}
     networks:
       - pharmacy-network
     restart: unless-stopped
