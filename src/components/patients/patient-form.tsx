@@ -1,10 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input, Button, Spinner, TextArea } from "@heroui/react";
 import { patientSchema, type PatientFormValues, type Patient } from "@/types";
 import { usePatients } from "@/hooks/use-patients";
+import { onServerError } from "@/providers/error-provider";
 import { cn } from "@/utils";
 
 interface PatientFormProps {
@@ -23,6 +25,7 @@ export function PatientForm({ patient, onClose }: PatientFormProps) {
   const { createPatient, updatePatient, isCreating, isUpdating } = usePatients();
   const isEditing = !!patient;
   const isSubmitting = isCreating || isUpdating;
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const {
     register,
@@ -54,6 +57,7 @@ export function PatientForm({ patient, onClose }: PatientFormProps) {
   });
 
   async function onSubmit(data: PatientFormValues) {
+    setSubmitError(null);
     const payload = {
       ...data,
       dateOfBirth: data.dateOfBirth || undefined,
@@ -64,12 +68,19 @@ export function PatientForm({ patient, onClose }: PatientFormProps) {
       notes: data.notes || undefined,
     };
 
-    if (isEditing && patient) {
-      await updatePatient(patient.id, payload);
-    } else {
-      await createPatient(payload);
+    try {
+      if (isEditing && patient) {
+        await updatePatient(patient.id, payload);
+      } else {
+        await createPatient(payload);
+      }
+      onClose();
+    } catch (err) {
+      onServerError(err);
+      setSubmitError(
+        isEditing ? "Failed to update patient. Please try again." : "Failed to create patient. Please try again."
+      );
     }
-    onClose();
   }
 
   return (
@@ -183,6 +194,10 @@ export function PatientForm({ patient, onClose }: PatientFormProps) {
           {...register("notes")}
         />
       </div>
+
+      {submitError && (
+        <p className="text-sm text-danger">{submitError}</p>
+      )}
 
       <div className="flex justify-end gap-2 pt-2">
         <Button variant="ghost" onPress={onClose}>

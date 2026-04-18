@@ -1,5 +1,5 @@
 import { clients } from "@/lib/api-client";
-import type { ApiResponse } from "@/types";
+import type { ApiResponse, PaginatedResponse } from "@/types";
 import type {
   Patient,
   PatientFormValues,
@@ -8,12 +8,14 @@ import type {
 } from "@/types";
 
 export const depoService = {
-  getPatients: (params?: { isActive?: boolean; search?: string }) => {
+  getPatients: (params?: { isActive?: boolean; search?: string; page?: number; limit?: number }) => {
     const searchParams = new URLSearchParams();
     if (params?.isActive !== undefined) searchParams.set("isActive", String(params.isActive));
     if (params?.search) searchParams.set("search", params.search);
+    if (params?.page !== undefined) searchParams.set("page", String(params.page));
+    if (params?.limit !== undefined) searchParams.set("limit", String(params.limit));
 
-    return clients.depo.get<ApiResponse<Patient[]>>(
+    return clients.depo.get<ApiResponse<PaginatedResponse<Patient>>>(
       searchParams.toString() ? `/api/patients?${searchParams.toString()}` : "/api/patients"
     );
   },
@@ -30,12 +32,14 @@ export const depoService = {
   deletePatient: (id: string) =>
     clients.depo.delete<ApiResponse<void>>(`/api/patients/${id}`),
 
-  getAdmissions: (params?: { isActive?: boolean; search?: string }) => {
+  getAdmissions: (params?: { isActive?: boolean; search?: string; page?: number; limit?: number }) => {
     const searchParams = new URLSearchParams();
     if (params?.isActive !== undefined) searchParams.set("isActive", String(params.isActive));
     if (params?.search) searchParams.set("search", params.search);
+    if (params?.page !== undefined) searchParams.set("page", String(params.page));
+    if (params?.limit !== undefined) searchParams.set("limit", String(params.limit));
 
-    return clients.depo.get<ApiResponse<Admission[]>>(
+    return clients.depo.get<ApiResponse<PaginatedResponse<Admission>>>(
       searchParams.toString() ? `/api/admissions?${searchParams.toString()}` : "/api/admissions"
     );
   },

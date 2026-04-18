@@ -1,5 +1,8 @@
 import { z } from "zod";
 
+export const GENDER_VALUES = ["MALE", "FEMALE", "OTHER"] as const;
+export type Gender = (typeof GENDER_VALUES)[number];
+
 export const patientSchema = z.object({
   mrn: z.string().min(1, "MRN is required"),
   name: z.string().min(1, "Name is required"),
@@ -19,7 +22,7 @@ export interface Patient {
   mrn: string;
   name: string;
   dateOfBirth?: string;
-  gender?: string;
+  gender?: Gender;
   phone?: string;
   address?: string;
   allergies?: string;

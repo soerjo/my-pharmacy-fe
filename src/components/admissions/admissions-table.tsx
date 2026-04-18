@@ -1,54 +1,70 @@
 "use client";
 
-import { useState } from "react";
-import { Button, Input, Spinner, Chip } from "@heroui/react";
+import { useShallow } from "zustand/react/shallow";
+import { Button, Spinner } from "@heroui/react";
 import {
   Table,
   TableHeader,
   TableColumn,
   TableBody,
-  TableRow,
-  TableCell,
   TableContent,
+  TableFooter,
 } from "@heroui/react";
-import { Magnifier } from "@gravity-ui/icons";
 import { useAdmissions } from "@/hooks/use-admissions";
+import { useAdmissionsStore } from "@/stores/admissions-store";
+import { onServerError } from "@/providers/error-provider";
 import { AdmissionForm } from "./admission-form";
-import { formatDate } from "@/utils";
+import { AdmissionsToolbar } from "./admissions-toolbar";
+import { AdmissionRow } from "./admission-row";
+import { AdmissionsPagination } from "./admissions-pagination";
 import type { Admission } from "@/types";
-
-const statusStyles: Record<string, "default" | "warning" | "danger" | "success" | "accent"> = {
-  admitted: "accent",
-  discharged: "success",
-  transferred: "warning",
-};
 
 export function AdmissionsTable() {
   const {
     admissions,
     isLoading,
-    filters,
-    setSearch,
+    isFetching,
+    error,
     deleteAdmission,
+    pagination,
+    paginationMeta,
+    setPage,
+    setPageSize,
   } = useAdmissions();
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingAdmission, setEditingAdmission] = useState<Admission | undefined>(undefined);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  function handleEdit(admission: Admission) {
-    setEditingAdmission(admission);
-    setIsFormOpen(true);
-  }
+  const {
+    filters,
+    setFilters,
+    isFormOpen,
+    editingAdmission,
+    deletingId,
+    openCreateForm,
+    openEditForm,
+    closeForm,
+    setDeletingId,
+  } = useAdmissionsStore(
+    useShallow((state) => ({
+      filters: state.filters,
+      setFilters: state.setFilters,
+      isFormOpen: state.isFormOpen,
+      editingAdmission: state.editingAdmission,
+      deletingId: state.deletingId,
+      openCreateForm: state.openCreateForm,
+      openEditForm: state.openEditForm,
+      closeForm: state.closeForm,
+      setDeletingId: state.setDeletingId,
+    })),
+  );
 
-  function handleCloseForm() {
-    setIsFormOpen(false);
-    setEditingAdmission(undefined);
-  }
+  const totalPages = paginationMeta?.totalPages ?? 1;
+  const totalItems = paginationMeta?.total ?? 0;
 
   async function handleDelete(id: string) {
     setDeletingId(id);
     try {
       await deleteAdmission(id);
+    } catch (err) {
+      onServerError(err);
     } finally {
       setDeletingId(null);
     }
@@ -62,32 +78,28 @@ export function AdmissionsTable() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-4 rounded-xl border border-danger/20 bg-danger/5 py-12">
+        <p className="text-sm text-danger">Failed to load admissions. Please try again.</p>
+        <Button
+          variant="secondary"
+          size="sm"
+          onPress={() => window.location.reload()}
+        >
+          Retry
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="text-xl font-semibold">Admissions</h2>
-        <div className="flex items-center gap-3">
-          <div className="relative w-full sm:w-64">
-            <Magnifier className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-default-400" />
-            <Input
-              placeholder="Search admissions..."
-              value={filters.search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-8"
-              aria-label="Search admissions"
-            />
-          </div>
-          <Button
-            variant="primary"
-            onPress={() => {
-              setEditingAdmission(undefined);
-              setIsFormOpen(true);
-            }}
-          >
-            + Add Admission
-          </Button>
-        </div>
-      </div>
+      <AdmissionsToolbar
+        searchValue={filters.search}
+        onSearchChange={(value) => setFilters({ search: value })}
+        onAdd={openCreateForm}
+      />
 
       {isFormOpen && (
         <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6">
@@ -96,7 +108,7 @@ export function AdmissionsTable() {
           </h3>
           <AdmissionForm
             admission={editingAdmission}
-            onClose={handleCloseForm}
+            onClose={closeForm}
           />
         </div>
       )}
@@ -120,43 +132,26 @@ export function AdmissionsTable() {
             </TableHeader>
             <TableBody items={admissions}>
               {(admission: Admission) => (
-                <TableRow key={admission.id}>
-                  <TableCell>{admission.patientName}</TableCell>
-                  <TableCell>{admission.wardName}</TableCell>
-                  <TableCell>{admission.diagnosis}</TableCell>
-                  <TableCell>{formatDate(admission.admissionDate)}</TableCell>
-                  <TableCell>
-                    <Chip
-                      size="sm"
-                      variant="soft"
-                      color={statusStyles[admission.status] ?? "default"}
-                    >
-                      {admission.status}
-                    </Chip>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        onPress={() => handleEdit(admission)}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="danger"
-                        onPress={() => handleDelete(admission.id)}
-                        isDisabled={deletingId === admission.id}
-                      >
-                        {deletingId === admission.id ? <Spinner size="sm" /> : "Delete"}
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
+                <AdmissionRow
+                  key={admission.id}
+                  admission={admission}
+                  isDeleting={deletingId === admission.id}
+                  onEdit={openEditForm}
+                  onDelete={handleDelete}
+                />
               )}
             </TableBody>
           </TableContent>
+          <TableFooter>
+            <AdmissionsPagination
+              page={pagination.page}
+              pageSize={pagination.pageSize}
+              totalItems={totalItems}
+              totalPages={totalPages}
+              onPageChange={setPage}
+              onPageSizeChange={setPageSize}
+            />
+          </TableFooter>
         </Table>
       )}
     </div>

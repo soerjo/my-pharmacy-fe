@@ -67,8 +67,8 @@ export function DispenseOrdersProvider({ children }: { children: ReactNode }) {
 
   const value: DispenseOrdersContextValue = {
     dispenseOrders: ordersQuery.data?.data ?? [],
-    totalOrders: ordersQuery.data?.total ?? 0,
-    totalPages: ordersQuery.data?.totalPages ?? 0,
+    totalOrders: ordersQuery.data?.meta.total ?? 0,
+    totalPages: ordersQuery.data?.meta.totalPages ?? 0,
     isLoading: ordersQuery.isLoading,
     error: ordersQuery.error,
     createOrder,

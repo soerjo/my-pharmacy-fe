@@ -1,56 +1,72 @@
 "use client";
 
 import { useShallow } from "zustand/react/shallow";
-import { Button, Input, Spinner } from "@heroui/react";
+import { Button, Spinner } from "@heroui/react";
 import {
   Table,
   TableHeader,
   TableColumn,
   TableBody,
-  TableRow,
-  TableCell,
   TableContent,
+  TableFooter,
 } from "@heroui/react";
-import { Magnifier } from "@gravity-ui/icons";
 import { usePatients } from "@/hooks/use-patients";
 import { usePatientsStore } from "@/stores/patients-store";
+import { onServerError } from "@/providers/error-provider";
 import { PatientForm } from "./patient-form";
-import { formatDate } from "@/utils";
+import { PatientsToolbar } from "./patients-toolbar";
+import { PatientRow } from "./patient-row";
+import { PatientsPagination } from "./patients-pagination";
 import type { Patient } from "@/types";
 
 export function PatientsTable() {
-  const { patients, isLoading, deletePatient } = usePatients();
+  const {
+    patients,
+    isLoading,
+    isFetching,
+    error,
+    deletePatient,
+    pagination,
+    paginationMeta,
+    setPage,
+    setPageSize,
+  } = usePatients();
 
   const {
     filters,
+    setFilters,
     isFormOpen,
     editingPatient,
     deletingId,
+    openCreateForm,
+    openEditForm,
+    closeForm,
+    setDeletingId,
   } = usePatientsStore(
     useShallow((state) => ({
       filters: state.filters,
+      setFilters: state.setFilters,
       isFormOpen: state.isFormOpen,
       editingPatient: state.editingPatient,
       deletingId: state.deletingId,
+      openCreateForm: state.openCreateForm,
+      openEditForm: state.openEditForm,
+      closeForm: state.closeForm,
+      setDeletingId: state.setDeletingId,
     })),
   );
 
-  const store = usePatientsStore.getState();
-
-  function handleEdit(patient: Patient) {
-    store.openEditForm(patient);
-  }
-
-  function handleCloseForm() {
-    store.closeForm();
-  }
+  const totalPages = paginationMeta?.totalPages ?? 1;
+  const totalItems = paginationMeta?.total ?? 0;
 
   async function handleDelete(id: string) {
-    store.setDeletingId(id);
+    setDeletingId(id);
     try {
       await deletePatient(id);
+    } catch (err) {
+      onServerError(err);
     } finally {
-      store.setDeletingId(null);
+      setDeletingId(null);
     }
   }
 
@@ -62,41 +78,41 @@ export function PatientsTable() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-4 rounded-xl border border-danger/20 bg-danger/5 py-12">
+        <p className="text-sm text-danger">Failed to load patients. Please try again.</p>
+        <Button
+          variant="secondary"
+          size="sm"
+          onPress={() => window.location.reload()}
+        >
+          Retry
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="text-xl font-semibold">Patients</h2>
-        <div className="flex items-center gap-3">
-          <div className="relative w-full sm:w-64">
-            <Magnifier className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-default-400" />
-            <Input
-              placeholder="Search patients..."
-              value={filters.search}
-              onChange={(e) =>
-                store.setFilters({ search: e.target.value })
-              }
-              className="pl-8"
-              aria-label="Search patients"
-            />
-          </div>
-          <Button
-            variant="primary"
-            onPress={() => store.openCreateForm()}
-          >
-            + Add Patient
-          </Button>
+      {/* {isFetching && (
+        <div className="h-0.5 w-full overflow-hidden">
+          <div className="h-full w-full animate-pulse bg-primary" />
         </div>
-      </div>
+      )} */}
+
+      <PatientsToolbar
+        searchValue={filters.search}
+        onSearchChange={(value) => setFilters({ search: value })}
+        onAdd={openCreateForm}
+      />
 
       {isFormOpen && (
         <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6">
           <h3 className="text-lg font-semibold mb-4">
             {editingPatient ? "Edit Patient" : "New Patient"}
           </h3>
-          <PatientForm
-            patient={editingPatient}
-            onClose={handleCloseForm}
-          />
+          <PatientForm patient={editingPatient} onClose={closeForm} />
         </div>
       )}
 
@@ -119,43 +135,26 @@ export function PatientsTable() {
             </TableHeader>
             <TableBody items={patients}>
               {(patient: Patient) => (
-                <TableRow key={patient.id}>
-                  <TableCell>{patient.mrn}</TableCell>
-                  <TableCell>{patient.name}</TableCell>
-                  <TableCell>{patient.gender ?? "-"}</TableCell>
-                  <TableCell>
-                    {patient.dateOfBirth
-                      ? formatDate(patient.dateOfBirth)
-                      : "-"}
-                  </TableCell>
-                  <TableCell>{patient.phone ?? "-"}</TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        onPress={() => handleEdit(patient)}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="danger"
-                        onPress={() => handleDelete(patient.id)}
-                        isDisabled={deletingId === patient.id}
-                      >
-                        {deletingId === patient.id ? (
-                          <Spinner size="sm" />
-                        ) : (
-                          "Delete"
-                        )}
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
+                <PatientRow
+                  key={patient.id}
+                  patient={patient}
+                  isDeleting={deletingId === patient.id}
+                  onEdit={openEditForm}
+                  onDelete={handleDelete}
+                />
               )}
             </TableBody>
           </TableContent>
+          <TableFooter>
+            <PatientsPagination
+              page={pagination.page}
+              pageSize={pagination.pageSize}
+              totalItems={totalItems}
+              totalPages={totalPages}
+              onPageChange={setPage}
+              onPageSizeChange={setPageSize}
+            />
+          </TableFooter>
         </Table>
       )}
     </div>
