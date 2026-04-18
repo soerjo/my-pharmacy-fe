@@ -1,0 +1,117 @@
+"use client";
+
+import { type ReactNode, useState } from "react";
+import {
+  Autocomplete,
+  Spinner,
+  ListBox,
+  Label,
+  SearchField,
+  EmptyState,
+} from "@heroui/react";
+import { cn } from "@/utils";
+
+interface UseSearchResult<T> {
+  data: T[] | undefined;
+  isLoading: boolean;
+}
+
+interface AsyncAutocompleteProps<T extends object> {
+  useSearch: (search: string) => UseSearchResult<T>;
+  selectedKey: string | null;
+  onSelectionChange: (key: string | null) => void;
+  renderItem: (item: T) => ReactNode;
+  getId: (item: T) => string;
+  getTextValue: (item: T) => string;
+  label?: string;
+  placeholder?: string;
+  emptyText?: string;
+  className?: string;
+  error?: string;
+  required?: boolean;
+}
+
+export function AsyncAutocomplete<T extends object>({
+  useSearch,
+  selectedKey,
+  onSelectionChange,
+  renderItem,
+  getId,
+  getTextValue,
+  label = "Search",
+  placeholder = "Search...",
+  emptyText = "No results found",
+  className,
+  error,
+  required,
+}: AsyncAutocompleteProps<T>) {
+  const [inputValue, setInputValue] = useState("");
+  const { data: items = [], isLoading } = useSearch(inputValue);
+
+  return (
+    <div className="flex flex-col gap-1.5">
+      <Autocomplete
+        allowsEmptyCollection
+        className={className}
+        selectionMode="single"
+        value={selectedKey}
+        onChange={(key) => onSelectionChange(key as string | null)}
+      >
+        <Label>
+          {label}
+          {required && <span className="text-danger"> *</span>}
+        </Label>
+        <Autocomplete.Trigger>
+          <Autocomplete.Value />
+          <Autocomplete.ClearButton />
+          <Autocomplete.Indicator />
+        </Autocomplete.Trigger>
+        <Autocomplete.Popover>
+          <Autocomplete.Filter
+            inputValue={inputValue}
+            onInputChange={setInputValue}
+          >
+            <SearchField
+              autoFocus
+              className="sticky top-0 z-10"
+              name="async-search"
+              variant="secondary"
+            >
+              <SearchField.Group>
+                <SearchField.SearchIcon />
+                <SearchField.Input placeholder={placeholder} />
+                <Spinner
+                  size="sm"
+                  className={cn(
+                    "absolute top-1/2 right-2 -translate-y-1/2",
+                    {
+                      "pointer-events-none opacity-0": !isLoading,
+                    },
+                  )}
+                />
+                <SearchField.ClearButton
+                  className={cn({
+                    "pointer-events-none opacity-0": isLoading,
+                  })}
+                />
+              </SearchField.Group>
+            </SearchField>
+            <ListBox
+              className="max-h-[420px] overflow-y-auto"
+              items={items}
+              renderEmptyState={() => <EmptyState>{emptyText}</EmptyState>}
+            >
+              {(item: T) => (
+                <ListBox.Item id={getId(item)} textValue={getTextValue(item)}>
+                  {renderItem(item)}
+                  <ListBox.ItemIndicator />
+                </ListBox.Item>
+              )}
+            </ListBox>
+          </Autocomplete.Filter>
+        </Autocomplete.Popover>
+      </Autocomplete>
+      {error && <p className="text-sm text-danger">{error}</p>}
+    </div>
+  );
+}

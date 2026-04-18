@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input, Button, Spinner, TextArea } from "@heroui/react";
 import { patientSchema, type PatientFormValues, type Patient } from "@/types";
+import { GENDER_VALUES } from "@/types";
 import { usePatients } from "@/hooks/use-patients";
 import { onServerError } from "@/providers/error-provider";
 import { cn } from "@/utils";
@@ -14,18 +15,12 @@ interface PatientFormProps {
   onClose: () => void;
 }
 
-const genderOptions = [
-  { value: "", label: "Select gender" },
-  { value: "MALE", label: "Male" },
-  { value: "FEMALE", label: "Female" },
-  { value: "OTHER", label: "Other" },
-] as const;
-
 export function PatientForm({ patient, onClose }: PatientFormProps) {
-  const { createPatient, updatePatient, isCreating, isUpdating } = usePatients();
+  const { createPatient, updatePatient, isCreating, isUpdating } =
+    usePatients();
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const isEditing = !!patient;
   const isSubmitting = isCreating || isUpdating;
-  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const {
     register,
@@ -37,7 +32,7 @@ export function PatientForm({ patient, onClose }: PatientFormProps) {
       ? {
           mrn: patient.mrn,
           name: patient.name,
-          dateOfBirth: patient.dateOfBirth?.split("T")[0] ?? "",
+          dateOfBirth: patient.dateOfBirth ?? "",
           gender: patient.gender ?? "",
           phone: patient.phone ?? "",
           address: patient.address ?? "",
@@ -60,8 +55,6 @@ export function PatientForm({ patient, onClose }: PatientFormProps) {
     setSubmitError(null);
     const payload = {
       ...data,
-      dateOfBirth: data.dateOfBirth || undefined,
-      gender: data.gender || undefined,
       phone: data.phone || undefined,
       address: data.address || undefined,
       allergies: data.allergies || undefined,
@@ -78,7 +71,9 @@ export function PatientForm({ patient, onClose }: PatientFormProps) {
     } catch (err) {
       onServerError(err);
       setSubmitError(
-        isEditing ? "Failed to update patient. Please try again." : "Failed to create patient. Please try again."
+        isEditing
+          ? "Failed to update patient. Please try again."
+          : "Failed to create patient. Please try again.",
       );
     }
   }
@@ -92,7 +87,7 @@ export function PatientForm({ patient, onClose }: PatientFormProps) {
           </label>
           <Input
             id="mrn"
-            placeholder="Enter medical record number"
+            placeholder="Enter MRN"
             {...register("mrn")}
           />
           {errors.mrn && (
@@ -118,18 +113,21 @@ export function PatientForm({ patient, onClose }: PatientFormProps) {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
           <label htmlFor="dateOfBirth" className="text-sm font-medium">
-            Date of Birth
+            Date of Birth <span className="text-danger">*</span>
           </label>
           <Input
             id="dateOfBirth"
             type="date"
             {...register("dateOfBirth")}
           />
+          {errors.dateOfBirth && (
+            <p className="text-sm text-danger">{errors.dateOfBirth.message}</p>
+          )}
         </div>
 
         <div className="flex flex-col gap-1.5">
           <label htmlFor="gender" className="text-sm font-medium">
-            Gender
+            Gender <span className="text-danger">*</span>
           </label>
           <select
             id="gender"
@@ -138,39 +136,44 @@ export function PatientForm({ patient, onClose }: PatientFormProps) {
               "flex h-9 w-full rounded-lg border border-default-300 bg-transparent px-3 py-1 text-sm shadow-sm outline-none transition-colors",
               "focus:border-primary focus:ring-1 focus:ring-primary",
               "data-[hover=true]:border-default-400",
-              "dark:border-default-200"
+              "dark:border-default-200",
             )}
           >
-            {genderOptions.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
+            <option value="">Select gender</option>
+            {GENDER_VALUES.map((g) => (
+              <option key={g} value={g}>
+                {g.charAt(0) + g.slice(1).toLowerCase()}
               </option>
             ))}
           </select>
+          {errors.gender && (
+            <p className="text-sm text-danger">{errors.gender.message}</p>
+          )}
         </div>
       </div>
 
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="phone" className="text-sm font-medium">
-          Phone
-        </label>
-        <Input
-          id="phone"
-          type="tel"
-          placeholder="Enter phone number"
-          {...register("phone")}
-        />
-      </div>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="phone" className="text-sm font-medium">
+            Phone
+          </label>
+          <Input
+            id="phone"
+            placeholder="Enter phone number"
+            {...register("phone")}
+          />
+        </div>
 
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="address" className="text-sm font-medium">
-          Address
-        </label>
-        <TextArea
-          id="address"
-          placeholder="Enter address"
-          {...register("address")}
-        />
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="address" className="text-sm font-medium">
+            Address
+          </label>
+          <Input
+            id="address"
+            placeholder="Enter address"
+            {...register("address")}
+          />
+        </div>
       </div>
 
       <div className="flex flex-col gap-1.5">
@@ -195,9 +198,7 @@ export function PatientForm({ patient, onClose }: PatientFormProps) {
         />
       </div>
 
-      {submitError && (
-        <p className="text-sm text-danger">{submitError}</p>
-      )}
+      {submitError && <p className="text-sm text-danger">{submitError}</p>}
 
       <div className="flex justify-end gap-2 pt-2">
         <Button variant="ghost" onPress={onClose}>
@@ -213,8 +214,10 @@ export function PatientForm({ patient, onClose }: PatientFormProps) {
               <Spinner size="sm" />
               {isEditing ? "Updating..." : "Creating..."}
             </span>
+          ) : isEditing ? (
+            "Update Patient"
           ) : (
-            isEditing ? "Update Patient" : "Create Patient"
+            "Create Patient"
           )}
         </Button>
       </div>

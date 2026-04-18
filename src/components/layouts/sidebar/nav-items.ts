@@ -1,5 +1,5 @@
 import type { ComponentType, SVGProps } from "react";
-import { House, Person, Pill, Gear, HeartPulse } from "@gravity-ui/icons";
+import { House, Person, Pill, Gear, HeartPulse, GeoPin, Cube } from "@gravity-ui/icons";
 
 export type NavItem = {
   id: string;
@@ -40,6 +40,18 @@ export const NAV_SECTIONS: NavSection[] = [
         label: "Dispense Orders",
         href: "/dispense-order",
         icon: Pill,
+      },
+      {
+        id: "rooms",
+        label: "Rooms",
+        href: "/rooms",
+        icon: GeoPin,
+      },
+      {
+        id: "products",
+        label: "Products",
+        href: "/products",
+        icon: Cube,
       },
     ],
   },

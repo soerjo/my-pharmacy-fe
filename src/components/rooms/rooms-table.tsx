@@ -10,44 +10,44 @@ import {
   TableContent,
   TableFooter,
 } from "@heroui/react";
-import { usePatients } from "@/hooks/use-patients";
-import { usePatientsStore } from "@/stores/patients-store";
+import { useRooms } from "@/hooks/use-rooms";
+import { useRoomsStore } from "@/stores/rooms-store";
 import { onServerError } from "@/providers/error-provider";
-import { PatientForm } from "./patient-form";
-import { PatientsToolbar } from "./patients-toolbar";
-import { PatientRow } from "./patient-row";
-import { PatientsPagination } from "./patients-pagination";
-import type { Patient } from "@/types";
+import { RoomForm } from "./room-form";
+import { RoomsToolbar } from "./rooms-toolbar";
+import { RoomRow } from "./room-row";
+import { RoomsPagination } from "./rooms-pagination";
+import type { Room } from "@/types";
 
-export function PatientsTable() {
+export function RoomsTable() {
   const {
-    patients,
+    rooms,
     isLoading,
     isFetching,
     error,
-    deletePatient,
+    deleteRoom,
     pagination,
     paginationMeta,
     setPage,
     setPageSize,
-  } = usePatients();
+  } = useRooms();
 
   const {
     filters,
     setFilters,
     isFormOpen,
-    editingPatient,
+    editingRoom,
     deletingId,
     openCreateForm,
     openEditForm,
     closeForm,
     setDeletingId,
-  } = usePatientsStore(
+  } = useRoomsStore(
     useShallow((state) => ({
       filters: state.filters,
       setFilters: state.setFilters,
       isFormOpen: state.isFormOpen,
-      editingPatient: state.editingPatient,
+      editingRoom: state.editingRoom,
       deletingId: state.deletingId,
       openCreateForm: state.openCreateForm,
       openEditForm: state.openEditForm,
@@ -62,7 +62,7 @@ export function PatientsTable() {
   async function handleDelete(id: string) {
     setDeletingId(id);
     try {
-      await deletePatient(id);
+      await deleteRoom(id);
     } catch (err) {
       onServerError(err);
     } finally {
@@ -81,7 +81,7 @@ export function PatientsTable() {
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center gap-4 rounded-xl border border-danger/20 bg-danger/5 py-12">
-        <p className="text-sm text-danger">Failed to load patients. Please try again.</p>
+        <p className="text-sm text-danger">Failed to load rooms. Please try again.</p>
         <Button
           variant="secondary"
           size="sm"
@@ -95,13 +95,7 @@ export function PatientsTable() {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* {isFetching && (
-        <div className="h-0.5 w-full overflow-hidden">
-          <div className="h-full w-full animate-pulse bg-primary" />
-        </div>
-      )} */}
-
-      <PatientsToolbar
+      <RoomsToolbar
         searchValue={filters.search}
         onSearchChange={(value) => setFilters({ search: value })}
         onAdd={openCreateForm}
@@ -110,35 +104,33 @@ export function PatientsTable() {
       {isFormOpen && (
         <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6">
           <h3 className="text-lg font-semibold mb-4">
-            {editingPatient ? `Edit ${editingPatient.name}` : "New Patient"}
+            {editingRoom ? `Edit ${editingRoom.name}` : "New Room"}
           </h3>
-          <PatientForm patient={editingPatient} onClose={closeForm} />
+          <RoomForm room={editingRoom} onClose={closeForm} />
         </div>
       )}
 
-      {patients.length === 0 ? (
+      {rooms.length === 0 ? (
         <div className="rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 py-12 text-center text-zinc-500">
           {filters.search
-            ? `No patients found for "${filters.search}".`
-            : "No patients found. Click \"+ Add Patient\" to create one."}
+            ? `No rooms found for "${filters.search}".`
+            : "No rooms found. Click \"+ Add Room\" to create one."}
         </div>
       ) : (
-        <Table aria-label="Patients table">
+        <Table aria-label="Rooms table">
           <TableContent>
             <TableHeader>
-              <TableColumn>MRN</TableColumn>
+              <TableColumn>Code</TableColumn>
               <TableColumn>Name</TableColumn>
-              <TableColumn>Gender</TableColumn>
-              <TableColumn>Date of Birth</TableColumn>
-              <TableColumn>Phone</TableColumn>
+              <TableColumn>Category</TableColumn>
               <TableColumn>Actions</TableColumn>
             </TableHeader>
-            <TableBody items={patients}>
-              {(patient: Patient) => (
-                <PatientRow
-                  key={patient.id}
-                  patient={patient}
-                  isDeleting={deletingId === patient.id}
+            <TableBody items={rooms}>
+              {(room: Room) => (
+                <RoomRow
+                  key={room.id}
+                  room={room}
+                  isDeleting={deletingId === room.id}
                   onEdit={openEditForm}
                   onDelete={handleDelete}
                 />
@@ -146,7 +138,7 @@ export function PatientsTable() {
             </TableBody>
           </TableContent>
           <TableFooter>
-            <PatientsPagination
+            <RoomsPagination
               page={pagination.page}
               pageSize={pagination.pageSize}
               totalItems={totalItems}

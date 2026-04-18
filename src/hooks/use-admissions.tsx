@@ -4,7 +4,7 @@ import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tansta
 import { queryKeys } from "@/lib/query-keys";
 import { depoService } from "@/services/depo-service";
 import { useAdmissionsStore } from "@/stores/admissions-store";
-import type { AdmissionFormValues } from "@/types";
+import type { AdmissionFormValues, CreateAdmissionFormValues } from "@/types";
 
 export function useAdmissions() {
   const filters = useAdmissionsStore((s) => s.filters);
@@ -36,7 +36,7 @@ export function useAdmissions() {
     : null;
 
   const createMutation = useMutation({
-    mutationFn: (data: AdmissionFormValues) =>
+    mutationFn: (data: CreateAdmissionFormValues) =>
       depoService.createAdmission(data),
     onSuccess: () =>
       queryClient.invalidateQueries({

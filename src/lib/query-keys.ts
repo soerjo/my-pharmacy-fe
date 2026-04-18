@@ -21,4 +21,19 @@ export const queryKeys = {
     list: (params?: Record<string, unknown>) => ["dispenseOrders", "list", params] as const,
     detail: (id: string) => ["dispenseOrders", "detail", id] as const,
   },
+  rooms: {
+    all: ["rooms"] as const,
+    list: (params?: Record<string, unknown>) => ["rooms", "list", params] as const,
+    detail: (id: string) => ["rooms", "detail", id] as const,
+  },
+  roomCategories: {
+    all: ["roomCategories"] as const,
+    list: (params?: Record<string, unknown>) => ["roomCategories", "list", params] as const,
+    detail: (id: string) => ["roomCategories", "detail", id] as const,
+  },
+  products: {
+    all: ["products"] as const,
+    list: (params?: Record<string, unknown>) => ["products", "list", params] as const,
+    detail: (id: string) => ["products", "detail", id] as const,
+  },
 } as const;

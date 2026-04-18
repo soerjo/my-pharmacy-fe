@@ -5,6 +5,10 @@ import type {
   PatientFormValues,
   Admission,
   AdmissionFormValues,
+  CreateAdmissionFormValues,
+  Room,
+  RoomFormValues,
+  RoomCategory,
 } from "@/types";
 
 export const depoService = {
@@ -47,7 +51,7 @@ export const depoService = {
   getAdmission: (id: string) =>
     clients.depo.get<ApiResponse<Admission>>(`/api/admissions/${id}`),
 
-  createAdmission: (data: AdmissionFormValues) =>
+  createAdmission: (data: CreateAdmissionFormValues) =>
     clients.depo.post<ApiResponse<Admission>>("/api/admissions", data),
 
   updateAdmission: (id: string, data: AdmissionFormValues) =>
@@ -55,4 +59,39 @@ export const depoService = {
 
   deleteAdmission: (id: string) =>
     clients.depo.delete<ApiResponse<void>>(`/api/admissions/${id}`),
+
+  getRoomCategories: (params?: { search?: string; page?: number; limit?: number }) => {
+    const searchParams = new URLSearchParams();
+    if (params?.search) searchParams.set("search", params.search);
+    if (params?.page !== undefined) searchParams.set("page", String(params.page));
+    if (params?.limit !== undefined) searchParams.set("limit", String(params.limit));
+
+    return clients.depo.get<ApiResponse<PaginatedResponse<RoomCategory>>>(
+      searchParams.toString() ? `/api/room-categories?${searchParams.toString()}` : "/api/room-categories"
+    );
+  },
+
+  getRooms: (params?: { isActive?: boolean; search?: string; page?: number; limit?: number }) => {
+    const searchParams = new URLSearchParams();
+    if (params?.isActive !== undefined) searchParams.set("isActive", String(params.isActive));
+    if (params?.search) searchParams.set("search", params.search);
+    if (params?.page !== undefined) searchParams.set("page", String(params.page));
+    if (params?.limit !== undefined) searchParams.set("limit", String(params.limit));
+
+    return clients.depo.get<ApiResponse<PaginatedResponse<Room>>>(
+      searchParams.toString() ? `/api/rooms?${searchParams.toString()}` : "/api/rooms"
+    );
+  },
+
+  getRoom: (id: string) =>
+    clients.depo.get<ApiResponse<Room>>(`/api/rooms/${id}`),
+
+  createRoom: (data: RoomFormValues) =>
+    clients.depo.post<ApiResponse<Room>>("/api/rooms", data),
+
+  updateRoom: (id: string, data: RoomFormValues) =>
+    clients.depo.put<ApiResponse<Room>>(`/api/rooms/${id}`, data),
+
+  deleteRoom: (id: string) =>
+    clients.depo.delete<ApiResponse<void>>(`/api/rooms/${id}`),
 };

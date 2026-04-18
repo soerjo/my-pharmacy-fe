@@ -9,6 +9,8 @@ export const ROUTES = {
   patients: "/patients",
   admissions: "/admissions",
   dispenseOrders: "/dispense-order",
+  rooms: "/rooms",
+  products: "/products",
   settings: "/settings",
 } as const;
 
@@ -25,4 +27,6 @@ export const API_ROUTES = {
   patients: "/api/patients",
   admissions: "/api/admissions",
   dispenseOrders: "/api/dispense-orders",
+  rooms: "/api/rooms",
+  products: "/api/products",
 } as const;

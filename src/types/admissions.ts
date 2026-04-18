@@ -1,11 +1,21 @@
 import { z } from "zod";
 
+export const createAdmissionSchema = z.object({
+  patientId: z.string().min(1, "Patient is required"),
+  wardId: z.string().min(1, "Ward is required"),
+  admissionDate: z.string().min(1, "Admission date is required"),
+  diagnosis: z.string().optional(),
+  notes: z.string().optional(),
+});
+
+export type CreateAdmissionFormValues = z.infer<typeof createAdmissionSchema>;
+
 export const admissionSchema = z.object({
   patientId: z.string().min(1, "Patient is required"),
+  wardId: z.string().min(1, "Ward is required"),
   admissionDate: z.string().min(1, "Admission date is required"),
   dischargeDate: z.string().optional(),
-  wardId: z.string().min(1, "Ward is required"),
-  diagnosis: z.string().min(1, "Diagnosis is required"),
+  diagnosis: z.string().optional(),
   status: z.enum(["admitted", "discharged", "transferred"]).optional(),
   notes: z.string().optional(),
 });

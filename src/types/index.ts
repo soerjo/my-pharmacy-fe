@@ -5,7 +5,14 @@ export type { LoginFormValues, RegisterFormValues, ForgotPasswordFormValues, Res
 export { patientSchema } from "./patients";
 export type { Patient, PatientFormValues, Gender } from "./patients";
 export { GENDER_VALUES } from "./patients";
-export { admissionSchema } from "./admissions";
-export type { Admission, AdmissionFormValues, AdmissionStatus } from "./admissions";
+export { admissionSchema, createAdmissionSchema } from "./admissions";
+export type { Admission, AdmissionFormValues, AdmissionStatus, CreateAdmissionFormValues } from "./admissions";
 export { dispenseOrderSchema } from "./dispense-orders";
 export type { DispenseOrder, DispenseOrderFormValues, DispenseOrderStatus } from "./dispense-orders";
+export { roomSchema } from "./rooms";
+export type { Room, RoomFormValues } from "./rooms";
+export { roomCategorySchema } from "./room-categories";
+export type { RoomCategory } from "./room-categories";
+export { productSchema } from "./products";
+export type { Product, ProductFormValues, DosageForm } from "./products";
+export { DOSAGE_FORM_VALUES } from "./products";
