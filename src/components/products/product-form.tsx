@@ -34,7 +34,7 @@ export function ProductForm({ product, onClose }: ProductFormProps) {
           name: product.name,
           genericName: product.genericName ?? "",
           manufacturer: product.manufacturer ?? "",
-          category: product.category ?? "",
+          category: product.categoryName ?? "",
           dosageForm: product.dosageForm ?? "",
           strength: product.strength ?? "",
           unitPrice: product.unitPrice ?? undefined,
