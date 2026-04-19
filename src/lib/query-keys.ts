@@ -36,4 +36,20 @@ export const queryKeys = {
     list: (params?: Record<string, unknown>) => ["products", "list", params] as const,
     detail: (id: string) => ["products", "detail", id] as const,
   },
+  productTypes: {
+    all: ["productTypes"] as const,
+    list: (params?: Record<string, unknown>) => ["productTypes", "list", params] as const,
+  },
+  unitOfMeasures: {
+    all: ["unitOfMeasures"] as const,
+    list: (params?: Record<string, unknown>) => ["unitOfMeasures", "list", params] as const,
+  },
+  productCategories: {
+    all: ["productCategories"] as const,
+    list: (params?: Record<string, unknown>) => ["productCategories", "list", params] as const,
+  },
+  manufacturers: {
+    all: ["manufacturers"] as const,
+    list: (params?: Record<string, unknown>) => ["manufacturers", "list", params] as const,
+  },
 } as const;

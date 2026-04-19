@@ -4,3 +4,7 @@ export { AsyncAutocomplete } from "./async-autocomplete";
 export { PatientAutocomplete } from "./patient-autocomplete";
 export { RoomCategoryAutocomplete } from "./room-category-autocomplete";
 export { WardAutocomplete } from "./ward-autocomplete";
+export { ProductTypeAutocomplete } from "./product-type-autocomplete";
+export { UnitOfMeasureAutocomplete } from "./unit-of-measure-autocomplete";
+export { ProductCategoryAutocomplete } from "./product-category-autocomplete";
+export { ManufacturerAutocomplete } from "./manufacturer-autocomplete";

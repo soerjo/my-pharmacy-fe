@@ -101,14 +101,14 @@ export function ProductsTable() {
         onAdd={openCreateForm}
       />
 
-      {/* {isFormOpen && (
+      {isFormOpen && (
         <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6">
           <h3 className="text-lg font-semibold mb-4">
             {editingProduct ? `Edit ${editingProduct.name}` : "New Product"}
           </h3>
           <ProductForm product={editingProduct} onClose={closeForm} />
         </div>
-      )} */}
+      )}
 
       {products.length === 0 ? (
         <div className="rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 py-12 text-center text-zinc-500">
@@ -120,8 +120,8 @@ export function ProductsTable() {
         <Table aria-label="Products table">
           <TableContent>
             <TableHeader>
-              <TableColumn>SKU</TableColumn>
-              <TableColumn>Name</TableColumn>
+              {/* <TableColumn>SKU</TableColumn> */}
+              <TableColumn isRowHeader>Name</TableColumn>
               <TableColumn>Category</TableColumn>
               <TableColumn>Dosage Form</TableColumn>
               <TableColumn>Strength</TableColumn>

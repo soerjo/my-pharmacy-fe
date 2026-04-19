@@ -5,6 +5,10 @@ import type {
   DispenseOrderFormValues,
   Product,
   ProductFormValues,
+  ProductTypeEntity,
+  UnitOfMeasure,
+  ProductCategory,
+  Manufacturer,
 } from "@/types";
 
 export const warehouseService = {
@@ -46,4 +50,48 @@ export const warehouseService = {
 
   deleteProduct: (id: string) =>
     clients.warehouse.delete<ApiResponse<void>>(`/api/products/${id}`),
+
+  getProductTypes: (params?: { search?: string; page?: number; limit?: number }) => {
+    const searchParams = new URLSearchParams();
+    if (params?.search) searchParams.set("search", params.search);
+    if (params?.page !== undefined) searchParams.set("page", String(params.page));
+    if (params?.limit !== undefined) searchParams.set("limit", String(params.limit));
+
+    return clients.warehouse.get<ApiResponse<ProductTypeEntity[]>>(
+      searchParams.toString() ? `/api/products/type?${searchParams.toString()}` : "/api/products/type"
+    );
+  },
+
+  getUnitOfMeasures: (params?: { search?: string; page?: number; limit?: number }) => {
+    const searchParams = new URLSearchParams();
+    if (params?.search) searchParams.set("search", params.search);
+    if (params?.page !== undefined) searchParams.set("page", String(params.page));
+    if (params?.limit !== undefined) searchParams.set("limit", String(params.limit));
+
+    return clients.warehouse.get<ApiResponse<PaginatedResponse<UnitOfMeasure>>>(
+      searchParams.toString() ? `/api/unit-of-measures?${searchParams.toString()}` : "/api/unit-of-measures"
+    );
+  },
+
+  getProductCategories: (params?: { search?: string; page?: number; limit?: number }) => {
+    const searchParams = new URLSearchParams();
+    if (params?.search) searchParams.set("search", params.search);
+    if (params?.page !== undefined) searchParams.set("page", String(params.page));
+    if (params?.limit !== undefined) searchParams.set("limit", String(params.limit));
+
+    return clients.warehouse.get<ApiResponse<PaginatedResponse<ProductCategory>>>(
+      searchParams.toString() ? `/api/product-categories?${searchParams.toString()}` : "/api/product-categories"
+    );
+  },
+
+  getManufacturers: (params?: { search?: string; page?: number; limit?: number }) => {
+    const searchParams = new URLSearchParams();
+    if (params?.search) searchParams.set("search", params.search);
+    if (params?.page !== undefined) searchParams.set("page", String(params.page));
+    if (params?.limit !== undefined) searchParams.set("limit", String(params.limit));
+
+    return clients.warehouse.get<ApiResponse<PaginatedResponse<Manufacturer>>>(
+      searchParams.toString() ? `/api/manufacturers?${searchParams.toString()}` : "/api/manufacturers"
+    );
+  },
 };

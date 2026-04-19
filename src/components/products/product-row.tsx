@@ -14,17 +14,23 @@ interface ProductRowProps {
 export function ProductRow({ product, isDeleting, onEdit, onDelete }: ProductRowProps) {
   return (
     <TableRow key={product.id}>
-      <TableCell>{product.sku}</TableCell>
-      <TableCell>{product.name}</TableCell>
+      <TableCell>
+        <div>
+          <p className="font-bold">{product.name}</p>
+          <p className="text-xs text-default-400" >{product.categoryName}</p>
+          {/* <p className="text-xs text-default-400">{product.code}</p> */}
+        </div>
+      </TableCell>
       <TableCell>{product.categoryName ?? "-"}</TableCell>
+      {/* <TableCell>{product.manufacturerName ?? "-"}</TableCell> */}
       <TableCell>{product.dosageForm ?? "-"}</TableCell>
       <TableCell>{product.strength ?? "-"}</TableCell>
       <TableCell>
         <div className="flex gap-2">
           <Button size="sm" variant="secondary" onPress={() => onEdit(product)}>Edit</Button>
-          <Button size="sm" variant="danger" onPress={() => onDelete(product.id)} isDisabled={isDeleting}>
+          {/* <Button size="sm" variant="danger" onPress={() => onDelete(product.id)} isDisabled={isDeleting}>
             {isDeleting ? <Spinner size="sm" /> : "Delete"}
-          </Button>
+          </Button> */}
         </div>
       </TableCell>
     </TableRow>

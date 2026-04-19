@@ -1,13 +1,23 @@
 "use client";
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input, Button, Spinner, TextArea } from "@heroui/react";
-import { productSchema, type ProductFormValues, type Product } from "@/types";
-import { DOSAGE_FORM_VALUES } from "@/types";
+import {
+  productSchema,
+  type ProductFormValues,
+  type Product,
+  DOSAGE_FORM_VALUES,
+} from "@/types";
 import { useProducts } from "@/hooks/use-products";
 import { onServerError } from "@/providers/error-provider";
+import {
+  ProductTypeAutocomplete,
+  UnitOfMeasureAutocomplete,
+  ProductCategoryAutocomplete,
+  ManufacturerAutocomplete,
+} from "@/components/ui";
 import { cn } from "@/utils";
 
 interface ProductFormProps {
@@ -25,31 +35,34 @@ export function ProductForm({ product, onClose }: ProductFormProps) {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
     defaultValues: product
       ? {
-          sku: product.sku,
+          code: product.code,
           name: product.name,
-          genericName: product.genericName ?? "",
-          manufacturer: product.manufacturer ?? "",
-          category: product.categoryName ?? "",
+          description: product.description ?? "",
+          productType: product.productType ?? "",
           dosageForm: product.dosageForm ?? "",
           strength: product.strength ?? "",
-          unitPrice: product.unitPrice ?? undefined,
-          description: product.description ?? "",
+          casNumber: product.casNumber ?? "",
+          categoryId: product.categoryId ?? "",
+          manufacturerId: product.manufacturerId ?? "",
+          baseUnitId: product.baseUnitId ?? "",
         }
       : {
-          sku: "",
+          code: "",
           name: "",
-          genericName: "",
-          manufacturer: "",
-          category: "",
+          description: "",
+          productType: "",
           dosageForm: "",
           strength: "",
-          unitPrice: undefined,
-          description: "",
+          casNumber: "",
+          categoryId: "",
+          manufacturerId: "",
+          baseUnitId: "",
         },
   });
 
@@ -57,13 +70,10 @@ export function ProductForm({ product, onClose }: ProductFormProps) {
     setSubmitError(null);
     const payload = {
       ...data,
-      genericName: data.genericName || undefined,
-      manufacturer: data.manufacturer || undefined,
-      category: data.category || undefined,
+      description: data.description || undefined,
       dosageForm: data.dosageForm || undefined,
       strength: data.strength || undefined,
-      unitPrice: data.unitPrice || undefined,
-      description: data.description || undefined,
+      casNumber: data.casNumber || undefined,
     };
 
     try {
@@ -83,23 +93,38 @@ export function ProductForm({ product, onClose }: ProductFormProps) {
     }
   }
 
+  const selectClass = cn(
+    "flex h-9 w-full rounded-lg border border-default-300 bg-transparent px-3 py-1 text-sm shadow-sm outline-none transition-colors",
+    "focus:border-primary focus:ring-1 focus:ring-primary",
+    "data-[hover=true]:border-default-400",
+    "dark:border-default-200",
+  );
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="sku" className="text-sm font-medium">
-            SKU <span className="text-danger">*</span>
+          <label htmlFor="code" className="text-sm font-medium">
+            Code
           </label>
-          <Input id="sku" placeholder="Enter SKU" {...register("sku")} />
-          {errors.sku && (
-            <p className="text-sm text-danger">{errors.sku.message}</p>
+          <Input
+            id="code"
+            placeholder="Enter product code"
+            {...register("code")}
+          />
+          {errors.code && (
+            <p className="text-sm text-danger">{errors.code.message}</p>
           )}
         </div>
         <div className="flex flex-col gap-1.5">
           <label htmlFor="name" className="text-sm font-medium">
             Name <span className="text-danger">*</span>
           </label>
-          <Input id="name" placeholder="Enter product name" {...register("name")} />
+          <Input
+            id="name"
+            placeholder="Enter product name"
+            {...register("name")}
+          />
           {errors.name && (
             <p className="text-sm text-danger">{errors.name.message}</p>
           )}
@@ -107,33 +132,23 @@ export function ProductForm({ product, onClose }: ProductFormProps) {
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <Controller
+          name="productType"
+          control={control}
+          render={({ field }) => (
+            <ProductTypeAutocomplete
+              selectedKey={field.value || null}
+              onSelectionChange={(key) => field.onChange(key)}
+              required
+              error={errors.productType?.message}
+            />
+          )}
+        />
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="genericName" className="text-sm font-medium">Generic Name</label>
-          <Input id="genericName" placeholder="Enter generic name" {...register("genericName")} />
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="manufacturer" className="text-sm font-medium">Manufacturer</label>
-          <Input id="manufacturer" placeholder="Enter manufacturer" {...register("manufacturer")} />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="category" className="text-sm font-medium">Category</label>
-          <Input id="category" placeholder="Enter category" {...register("category")} />
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="dosageForm" className="text-sm font-medium">Dosage Form</label>
-          <select
-            id="dosageForm"
-            {...register("dosageForm")}
-            className={cn(
-              "flex h-9 w-full rounded-lg border border-default-300 bg-transparent px-3 py-1 text-sm shadow-sm outline-none transition-colors",
-              "focus:border-primary focus:ring-1 focus:ring-primary",
-              "data-[hover=true]:border-default-400",
-              "dark:border-default-200",
-            )}
-          >
+          <label htmlFor="dosageForm" className="text-sm font-medium">
+            Dosage Form
+          </label>
+          <select id="dosageForm" {...register("dosageForm")} className={selectClass}>
             <option value="">Select dosage form</option>
             {DOSAGE_FORM_VALUES.map((d) => (
               <option key={d} value={d}>
@@ -146,33 +161,86 @@ export function ProductForm({ product, onClose }: ProductFormProps) {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="strength" className="text-sm font-medium">Strength</label>
-          <Input id="strength" placeholder="e.g. 500mg" {...register("strength")} />
+          <label htmlFor="strength" className="text-sm font-medium">
+            Strength
+          </label>
+          <Input
+            id="strength"
+            placeholder="e.g. 500mg"
+            {...register("strength")}
+          />
         </div>
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="unitPrice" className="text-sm font-medium">Unit Price</label>
+          <label htmlFor="casNumber" className="text-sm font-medium">
+            CAS Number
+          </label>
           <Input
-            id="unitPrice"
-            type="number"
-            step="0.01"
-            placeholder="0.00"
-            {...register("unitPrice", { valueAsNumber: true })}
+            id="casNumber"
+            placeholder="Enter CAS number"
+            {...register("casNumber")}
           />
-          {errors.unitPrice && (
-            <p className="text-sm text-danger">{errors.unitPrice.message}</p>
-          )}
         </div>
       </div>
 
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <Controller
+          name="categoryId"
+          control={control}
+          render={({ field }) => (
+            <ProductCategoryAutocomplete
+              selectedKey={field.value || null}
+              onSelectionChange={(key) => field.onChange(key)}
+              required
+              error={errors.categoryId?.message}
+            />
+          )}
+        />
+        <Controller
+          name="manufacturerId"
+          control={control}
+          render={({ field }) => (
+            <ManufacturerAutocomplete
+              selectedKey={field.value || null}
+              onSelectionChange={(key) => field.onChange(key)}
+              required
+              error={errors.manufacturerId?.message}
+            />
+          )}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <Controller
+          name="baseUnitId"
+          control={control}
+          render={({ field }) => (
+            <UnitOfMeasureAutocomplete
+              selectedKey={field.value || null}
+              onSelectionChange={(key) => field.onChange(key)}
+              required
+              error={errors.baseUnitId?.message}
+            />
+          )}
+        />
+      </div>
+
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="description" className="text-sm font-medium">Description</label>
-        <TextArea id="description" placeholder="Enter description" {...register("description")} />
+        <label htmlFor="description" className="text-sm font-medium">
+          Description
+        </label>
+        <TextArea
+          id="description"
+          placeholder="Enter description"
+          {...register("description")}
+        />
       </div>
 
       {submitError && <p className="text-sm text-danger">{submitError}</p>}
 
       <div className="flex justify-end gap-2 pt-2">
-        <Button variant="ghost" onPress={onClose}>Cancel</Button>
+        <Button variant="ghost" onPress={onClose}>
+          Cancel
+        </Button>
         <Button type="submit" variant="primary" isDisabled={isSubmitting}>
           {isSubmitting ? (
             <span className="flex items-center gap-2">

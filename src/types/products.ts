@@ -1,18 +1,40 @@
 import { z } from "zod";
 
-export const DOSAGE_FORM_VALUES = ["TABLET", "CAPSULE", "SYRUP", "INJECTION", "CREAM", "OINTMENT", "DROPS", "INHALER", "POWDER", "OTHER"] as const;
+export const DOSAGE_FORM_VALUES = [
+  "TABLET",
+  "CAPSULE",
+  "SYRUP",
+  "INJECTION",
+  "CREAM",
+  "OINTMENT",
+  "DROPS",
+  "INHALER",
+  "POWDER",
+  "OTHER",
+] as const;
 export type DosageForm = (typeof DOSAGE_FORM_VALUES)[number];
 
+export const PRODUCT_TYPE_VALUES = [
+  "BRANDED",
+  "GENERIC",
+  "OTC",
+  "SUPPLEMENT",
+  "MEDICAL_DEVICE",
+  "OTHER",
+] as const;
+export type ProductType = (typeof PRODUCT_TYPE_VALUES)[number];
+
 export const productSchema = z.object({
-  sku: z.string().min(1, "SKU is required"),
+  code: z.string().optional(),
   name: z.string().min(1, "Name is required"),
-  genericName: z.string().optional(),
-  manufacturer: z.string().optional(),
-  category: z.string().optional(),
+  description: z.string().optional(),
+  productType: z.string().min(1, "Product type is required"),
   dosageForm: z.string().optional(),
   strength: z.string().optional(),
-  unitPrice: z.number().min(0, "Price must be positive").optional(),
-  description: z.string().optional(),
+  casNumber: z.string().optional(),
+  categoryId: z.string().min(1, "Category is required"),
+  manufacturerId: z.string().min(1, "Manufacturer is required"),
+  baseUnitId: z.string().min(1, "Base unit is required"),
 });
 
 export type ProductFormValues = z.infer<typeof productSchema>;
@@ -20,15 +42,19 @@ export type ProductFormValues = z.infer<typeof productSchema>;
 export interface Product {
   id: string;
   orgId: string;
-  sku: string;
+  code?: string;
   name: string;
-  genericName?: string;
-  manufacturer?: string;
-  categoryName?: string;
+  description?: string;
+  productType?: ProductType;
   dosageForm?: DosageForm;
   strength?: string;
-  unitPrice?: number;
-  description?: string;
+  casNumber?: string;
+  categoryId?: string;
+  categoryName?: string;
+  manufacturerId?: string;
+  manufacturerName?: string;
+  baseUnitId?: string;
+  baseUnitName?: string;
   active: boolean;
   createdAt: string;
   updatedAt: string;

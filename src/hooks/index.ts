@@ -8,3 +8,7 @@ export { useDispenseOrders, DispenseOrdersProvider } from "./use-dispense-orders
 export { useRooms } from "./use-rooms";
 export { useRoomSearch } from "./use-room-search";
 export { useProducts } from "./use-products";
+export { useProductTypeSearch } from "./use-product-type-search";
+export { useUnitOfMeasureSearch } from "./use-unit-of-measure-search";
+export { useProductCategorySearch } from "./use-product-category-search";
+export { useManufacturerSearch } from "./use-manufacturer-search";
