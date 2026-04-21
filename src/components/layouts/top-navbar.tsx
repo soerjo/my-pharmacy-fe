@@ -3,14 +3,14 @@
 import { Avatar, Button, Dropdown, Spinner } from "@heroui/react";
 import { ArrowRightFromSquare, Bars, Bell, Person } from "@gravity-ui/icons";
 
-import { useAuth } from "@/providers/auth-provider";
 import { useUserProfile } from "@/hooks/use-user-profile";
-import { useAppStore } from "@/stores";
+import { useAppStore, useAuthStore } from "@/stores";
 import { ROUTES } from "@/constants";
 import { cn } from "@/utils";
 
 export function TopNavbar() {
-  const { logout, isLoading } = useAuth();
+  const logout = useAuthStore((s) => s.logout);
+  const isLoading = useAuthStore((s) => s.isLoading);
   const { user, isLoading: isUserLoading } = useUserProfile();
   const { toggleSidebar } = useAppStore();
 

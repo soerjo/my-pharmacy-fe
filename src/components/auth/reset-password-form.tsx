@@ -7,12 +7,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useSearchParams } from "next/navigation";
 import { Card, CardHeader, CardContent, Button, Spinner } from "@heroui/react";
 import { resetPasswordSchema, type ResetPasswordFormValues } from "@/types";
-import { useResetPassword } from "@/providers/reset-password-provider";
+import { useResetPasswordStore } from "@/stores";
 import { AppLink, PasswordInput } from "@/components/ui";
 import { ROUTES } from "@/constants";
 
 export function ResetPasswordForm() {
-  const { resetPassword, isLoading } = useResetPassword();
+  const { resetPassword, isLoading } = useResetPasswordStore();
   const [isSuccess, setIsSuccess] = useState(false);
   const [isApiError, setIsApiError] = useState(false);
   const searchParams = useSearchParams();

@@ -1,22 +1,26 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { Spinner } from "@heroui/react";
-import { useAuth } from "@/providers/auth-provider";
-import { TokenManager } from "@/lib/token-manager";
-import { ROUTES } from "@/constants";
+import { useEffect, useSyncExternalStore } from 'react';
+import { useRouter } from 'next/navigation';
+import { Spinner } from '@heroui/react';
+import { useAuthStore } from '@/stores/auth-store';
+import { TokenManager } from '@/lib/token-manager';
+import { ROUTES } from '@/constants';
 
-export { useAuth };
+const emptySubscribe = () => () => {};
 
 function useIsMounted() {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-  return mounted;
+  return useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false,
+  );
 }
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, isLoading } = useAuth();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const isLoading = useAuthStore((s) => s.isLoading);
+  const isInitialized = useAuthStore((s) => s.isInitialized);
   const router = useRouter();
   const mounted = useIsMounted();
 
@@ -29,10 +33,10 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    if (!isLoading && !isAuthenticated) {
+    if (isInitialized && !isLoading && !isAuthenticated) {
       router.replace(ROUTES.login);
     }
-  }, [mounted, isAuthenticated, isLoading, router]);
+  }, [mounted, isAuthenticated, isLoading, isInitialized, router]);
 
   if (!mounted || isLoading || !isAuthenticated) {
     return (
@@ -46,15 +50,17 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
 }
 
 export function GuestRoute({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, isLoading } = useAuth();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const isLoading = useAuthStore((s) => s.isLoading);
+  const isInitialized = useAuthStore((s) => s.isInitialized);
   const router = useRouter();
   const mounted = useIsMounted();
 
   useEffect(() => {
-    if (!isLoading && isAuthenticated) {
+    if (isInitialized && !isLoading && isAuthenticated) {
       router.push(ROUTES.home);
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [isAuthenticated, isLoading, isInitialized, router]);
 
   if (!mounted || isLoading || isAuthenticated) {
     return (

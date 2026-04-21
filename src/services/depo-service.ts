@@ -9,9 +9,35 @@ import type {
   Room,
   RoomFormValues,
   RoomCategory,
+  DispenseOrder,
+  DispenseOrderFormValues,
 } from "@/types";
 
 export const depoService = {
+  getDispenseOrders: (params?: { search?: string; status?: string; page?: number; limit?: number }) => {
+    const searchParams = new URLSearchParams();
+    if (params?.search) searchParams.set("search", params.search);
+    if (params?.status) searchParams.set("status", params.status);
+    if (params?.page !== undefined) searchParams.set("page", String(params.page));
+    if (params?.limit !== undefined) searchParams.set("limit", String(params.limit));
+
+    return clients.depo.get<ApiResponse<PaginatedResponse<DispenseOrder>>>(
+      searchParams.toString() ? `/api/dispense-orders?${searchParams.toString()}` : "/api/dispense-orders",
+    );
+  },
+
+  getDispenseOrder: (id: string) =>
+    clients.depo.get<ApiResponse<DispenseOrder>>(`/api/dispense-orders/${id}`),
+
+  createDispenseOrder: (data: DispenseOrderFormValues) =>
+    clients.depo.post<ApiResponse<DispenseOrder>>("/api/dispense-orders", data),
+
+  updateDispenseOrder: (id: string, data: DispenseOrderFormValues) =>
+    clients.depo.put<ApiResponse<DispenseOrder>>(`/api/dispense-orders/${id}`, data),
+
+  deleteDispenseOrder: (id: string) =>
+    clients.depo.delete<ApiResponse<void>>(`/api/dispense-orders/${id}`),
+
   getPatients: (params?: { isActive?: boolean; search?: string; page?: number; limit?: number }) => {
     const searchParams = new URLSearchParams();
     if (params?.isActive !== undefined) searchParams.set("isActive", String(params.isActive));

@@ -7,13 +7,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { Card, CardHeader, CardContent, Input, Button, Spinner } from "@heroui/react";
 import { registerSchema, type RegisterFormValues } from "@/types";
-import { useRegister } from "@/providers/register-provider";
+import { useRegisterStore } from "@/stores";
 import { AppLink, PasswordInput } from "@/components/ui";
 import { ROUTES } from "@/constants";
 import { ApiError } from "@/lib";
 
 export function RegisterForm() {
-  const { register: registerUser, isLoading } = useRegister();
+  const { register: registerUser, isLoading } = useRegisterStore();
   const router = useRouter();
   const [success, setSuccess] = useState(false);
   const [apiErrMsg, setApiErrMsg] = useState<string>("");

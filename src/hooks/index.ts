@@ -1,10 +1,10 @@
-export { useAuth, ProtectedRoute, GuestRoute } from "./use-auth";
+export { ProtectedRoute, GuestRoute } from "./use-auth";
 export { useUserProfile } from "./use-user-profile";
 export { useDebounce } from "./use-debounce";
 export { usePatientSearch } from "./use-patient-search";
 export { usePatients } from "./use-patients";
 export { useAdmissions } from "./use-admissions";
-export { useDispenseOrders, DispenseOrdersProvider } from "./use-dispense-orders";
+export { useDispenseOrders } from "./use-dispense-orders";
 export { useRooms } from "./use-rooms";
 export { useRoomSearch } from "./use-room-search";
 export { useProducts } from "./use-products";

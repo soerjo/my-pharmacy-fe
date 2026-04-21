@@ -6,12 +6,12 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Card, CardHeader, CardContent, Input, Button, Spinner } from "@heroui/react";
 import { forgotPasswordSchema, type ForgotPasswordFormValues } from "@/types";
-import { useForgotPassword } from "@/providers/forgot-password-provider";
+import { useForgotPasswordStore } from "@/stores";
 import { AppLink } from "@/components/ui";
 import { ROUTES } from "@/constants";
 
 export function ForgotPasswordForm() {
-  const { forgotPassword, isLoading } = useForgotPassword();
+  const { forgotPassword, isLoading } = useForgotPasswordStore();
   const [isSuccess, setIsSuccess] = useState(false);
 
   const {

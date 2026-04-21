@@ -1,10 +1,11 @@
 "use client";
 
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input, Button, Spinner, TextArea } from "@heroui/react";
 import { dispenseOrderSchema, type DispenseOrderFormValues, type DispenseOrder } from "@/types";
 import { useDispenseOrders } from "@/hooks/use-dispense-orders";
+import { PatientAutocomplete, AdmissionAutocomplete, ProductAutocomplete } from "@/components/ui";
 
 interface DispenseOrderFormProps {
   order?: DispenseOrder;
@@ -19,29 +20,37 @@ export function DispenseOrderForm({ order, onClose }: DispenseOrderFormProps) {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm<DispenseOrderFormValues>({
     resolver: zodResolver(dispenseOrderSchema),
     defaultValues: order
       ? {
           patientId: order.patientId,
-          prescriptionNumber: order.prescriptionNumber,
-          medications: order.medications,
-          status: order.status,
+          admissionId: order.admissionId,
           notes: order.notes ?? "",
+          items: order.items?.map((item) => ({
+            drugId: item.drugId,
+            quantity: item.quantity,
+            instructions: item.instructions ?? "",
+          })) ?? [{ drugId: "", quantity: 1, instructions: "" }],
         }
       : {
           patientId: "",
-          prescriptionNumber: "",
-          medications: "",
-          status: "pending",
+          admissionId: "",
           notes: "",
+          items: [{ drugId: "", quantity: 1, instructions: "" }],
         },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "items",
   });
 
   async function onSubmit(data: DispenseOrderFormValues) {
     if (isEditing && order) {
-      await updateOrder(order.id, data);
+      await updateOrder(order.id ?? order.orderNumber, data);
     } else {
       await createOrder(data);
     }
@@ -50,65 +59,119 @@ export function DispenseOrderForm({ order, onClose }: DispenseOrderFormProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="patientId" className="text-sm font-medium">
-          Patient ID <span className="text-danger">*</span>
-        </label>
-        <Input
-          id="patientId"
-          placeholder="Enter patient ID"
-          {...register("patientId")}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <Controller
+          name="patientId"
+          control={control}
+          render={({ field }) => (
+            <PatientAutocomplete
+              selectedKey={field.value || null}
+              onSelectionChange={(key) => field.onChange(key)}
+              label="Patient"
+              placeholder="Search patients..."
+              required
+              error={errors.patientId?.message}
+            />
+          )}
         />
-        {errors.patientId && (
-          <p className="text-sm text-danger">{errors.patientId.message}</p>
-        )}
+
+        <Controller
+          name="admissionId"
+          control={control}
+          render={({ field }) => (
+            <AdmissionAutocomplete
+              selectedKey={field.value || null}
+              onSelectionChange={(key) => field.onChange(key)}
+              label="Admission"
+              placeholder="Search admissions..."
+              required
+              error={errors.admissionId?.message}
+            />
+          )}
+        />
       </div>
 
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="prescriptionNumber" className="text-sm font-medium">
-          Prescription Number <span className="text-danger">*</span>
-        </label>
-        <Input
-          id="prescriptionNumber"
-          placeholder="Enter prescription number"
-          {...register("prescriptionNumber")}
-        />
-        {errors.prescriptionNumber && (
-          <p className="text-sm text-danger">{errors.prescriptionNumber.message}</p>
-        )}
-      </div>
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center justify-between">
+          <label className="text-sm font-medium">
+            Items <span className="text-danger">*</span>
+          </label>
+          <Button
+            size="sm"
+            variant="secondary"
+            type="button"
+            onPress={() => append({ drugId: "", quantity: 1, instructions: "" })}
+          >
+            + Add Item
+          </Button>
+        </div>
 
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="medications" className="text-sm font-medium">
-          Medications <span className="text-danger">*</span>
-        </label>
-        <TextArea
-          id="medications"
-          placeholder="Enter medications (e.g., Amoxicillin 500mg, Paracetamol 500mg)"
-          {...register("medications")}
-        />
-        {errors.medications && (
-          <p className="text-sm text-danger">{errors.medications.message}</p>
+        {errors.items && !Array.isArray(errors.items) && (
+          <p className="text-sm text-danger">{errors.items.message}</p>
         )}
-      </div>
 
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="status" className="text-sm font-medium">
-          Status <span className="text-danger">*</span>
-        </label>
-        <select
-          id="status"
-          className="rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-sm"
-          {...register("status")}
-        >
-          <option value="pending">Pending</option>
-          <option value="processing">Processing</option>
-          <option value="completed">Completed</option>
-          <option value="cancelled">Cancelled</option>
-        </select>
-        {errors.status && (
-          <p className="text-sm text-danger">{errors.status.message}</p>
-        )}
+        <div className="flex flex-col gap-3">
+          {fields.map((field, index) => (
+            <div
+              key={field.id}
+              className="grid grid-cols-1 gap-3 rounded-lg border border-zinc-200 p-3 dark:border-zinc-800 sm:grid-cols-[1fr_100px_1fr_auto]"
+            >
+              <Controller
+                name={`items.${index}.drugId`}
+                control={control}
+                render={({ field: drugField }) => (
+                  <ProductAutocomplete
+                    selectedKey={drugField.value || null}
+                    onSelectionChange={(key) => drugField.onChange(key)}
+                    label={index === 0 ? "Drug" : undefined}
+                    placeholder="Search drug..."
+                    required
+                    error={errors.items?.[index]?.drugId?.message}
+                  />
+                )}
+              />
+
+              <div className="flex flex-col gap-1.5">
+                {index === 0 && (
+                  <label className="text-sm font-medium">
+                    Qty <span className="text-danger">*</span>
+                  </label>
+                )}
+                <Input
+                  type="number"
+                  min={1}
+                  placeholder="Qty"
+                  {...register(`items.${index}.quantity`, { valueAsNumber: true })}
+                />
+                {errors.items?.[index]?.quantity && (
+                  <p className="text-sm text-danger">{errors.items[index].quantity?.message}</p>
+                )}
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                {index === 0 && (
+                  <label className="text-sm font-medium">Instructions</label>
+                )}
+                <Input
+                  placeholder="Instructions"
+                  {...register(`items.${index}.instructions`)}
+                />
+              </div>
+
+              {fields.length > 1 && (
+                <Button
+                  size="sm"
+                  variant="danger"
+                  type="button"
+                  className="self-end"
+                  onPress={() => remove(index)}
+                >
+                  Remove
+                </Button>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
 
       <div className="flex flex-col gap-1.5">

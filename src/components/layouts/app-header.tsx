@@ -3,12 +3,12 @@
 import Link from "next/link";
 import { Button, Spinner } from "@heroui/react";
 import { Bars } from "@gravity-ui/icons";
-import { useAuth } from "@/providers/auth-provider";
 import { ROUTES } from "@/constants";
-import { useAppStore } from "@/stores";
+import { useAppStore, useAuthStore } from "@/stores";
 
 export function AppHeader() {
-  const { logout, isLoading } = useAuth();
+  const logout = useAuthStore((s) => s.logout);
+  const isLoading = useAuthStore((s) => s.isLoading);
   const { toggleSidebar } = useAppStore();
 
   return (

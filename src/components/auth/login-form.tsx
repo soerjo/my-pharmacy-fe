@@ -4,13 +4,15 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Card, CardHeader, CardContent, Input, Button, Spinner } from "@heroui/react";
+import { useRouter } from "next/navigation";
 import { loginSchema, type LoginFormValues } from "@/types";
-import { useLogin } from "@/providers/login-provider";
+import { useLoginStore } from "@/stores";
 import { AppLink, PasswordInput } from "@/components/ui";
 import { ROUTES } from "@/constants";
 
 export function LoginForm() {
-  const { login, isLoading } = useLogin();
+  const { login, isLoading } = useLoginStore();
+  const router = useRouter();
 
   const {
     register,
@@ -25,7 +27,10 @@ export function LoginForm() {
   });
 
   async function onSubmit(data: LoginFormValues) {
-    await login(data);
+    try {
+      await login(data);
+      router.push(ROUTES.home);
+    } catch {}
   }
 
   return (

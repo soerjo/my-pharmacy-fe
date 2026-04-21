@@ -1,47 +1,70 @@
 "use client";
 
-import { useState } from "react";
+import { useShallow } from "zustand/react/shallow";
 import { Button, Spinner } from "@heroui/react";
 import {
   Table,
   TableHeader,
   TableColumn,
   TableBody,
-  TableRow,
-  TableCell,
+  TableContent,
+  TableFooter,
 } from "@heroui/react";
 import { useDispenseOrders } from "@/hooks/use-dispense-orders";
+import { useDispenseOrdersStore } from "@/stores/dispense-orders-store";
+import { onServerError } from "@/providers/error-provider";
 import { DispenseOrderForm } from "./dispense-order-form";
-import { cn, formatDate } from "@/utils";
-import type { DispenseOrder, DispenseOrderStatus } from "@/types";
-
-const statusStyles: Record<DispenseOrderStatus, string> = {
-  pending: "bg-yellow-100 text-yellow-800 dark:bg-yellow-950 dark:text-yellow-300",
-  processing: "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300",
-  completed: "bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300",
-  cancelled: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300",
-};
+import { DispenseOrdersToolbar } from "./dispense-orders-toolbar";
+import { DispenseOrderRow } from "./dispense-order-row";
+import { DispenseOrdersPagination } from "./dispense-orders-pagination";
+import type { DispenseOrder } from "@/types";
 
 export function DispenseOrdersTable() {
-  const { dispenseOrders, isLoading, deleteOrder } = useDispenseOrders();
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingOrder, setEditingOrder] = useState<DispenseOrder | undefined>(undefined);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const {
+    dispenseOrders,
+    isLoading,
+    isFetching,
+    error,
+    deleteOrder,
+    pagination,
+    paginationMeta,
+    setPage,
+    setPageSize,
+  } = useDispenseOrders();
 
-  function handleEdit(order: DispenseOrder) {
-    setEditingOrder(order);
-    setIsFormOpen(true);
-  }
+  const {
+    filters,
+    setFilters,
+    isFormOpen,
+    editingOrder,
+    deletingId,
+    openCreateForm,
+    openEditForm,
+    closeForm,
+    setDeletingId,
+  } = useDispenseOrdersStore(
+    useShallow((state) => ({
+      filters: state.filters,
+      setFilters: state.setFilters,
+      isFormOpen: state.isFormOpen,
+      editingOrder: state.editingOrder,
+      deletingId: state.deletingId,
+      openCreateForm: state.openCreateForm,
+      openEditForm: state.openEditForm,
+      closeForm: state.closeForm,
+      setDeletingId: state.setDeletingId,
+    })),
+  );
 
-  function handleCloseForm() {
-    setIsFormOpen(false);
-    setEditingOrder(undefined);
-  }
+  const totalPages = paginationMeta?.totalPages ?? 1;
+  const totalItems = paginationMeta?.total ?? 0;
 
   async function handleDelete(id: string) {
     setDeletingId(id);
     try {
       await deleteOrder(id);
+    } catch (err) {
+      onServerError(err);
     } finally {
       setDeletingId(null);
     }
@@ -55,86 +78,84 @@ export function DispenseOrdersTable() {
     );
   }
 
-  return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Dispense Orders</h2>
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-4 rounded-xl border border-danger/20 bg-danger/5 py-12">
+        <p className="text-sm text-danger">Failed to load dispense orders. Please try again.</p>
         <Button
-          variant="primary"
-          onPress={() => {
-            setEditingOrder(undefined);
-            setIsFormOpen(true);
-          }}
+          variant="secondary"
+          size="sm"
+          onPress={() => window.location.reload()}
         >
-          + New Order
+          Retry
         </Button>
       </div>
+    );
+  }
+  console.log({dispenseOrders})
+
+  return (
+    <div className="flex flex-col gap-4">
+      <DispenseOrdersToolbar
+        searchValue={filters.search}
+        statusValue={filters.status}
+        onSearchChange={(value) => setFilters({ search: value })}
+        onStatusChange={(value) => setFilters({ status: value })}
+        onAdd={openCreateForm}
+      />
 
       {isFormOpen && (
         <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6">
           <h3 className="text-lg font-semibold mb-4">
-            {editingOrder ? "Edit Order" : "New Dispense Order"}
+            {editingOrder ? `Edit ${editingOrder.orderNumber}` : "New Dispense Order"}
           </h3>
           <DispenseOrderForm
             order={editingOrder}
-            onClose={handleCloseForm}
+            onClose={closeForm}
           />
         </div>
       )}
 
       {dispenseOrders.length === 0 ? (
         <div className="rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 py-12 text-center text-zinc-500">
-          No dispense orders found. Click &quot;+ New Order&quot; to create one.
+          {filters.search
+            ? `No dispense orders found for "${filters.search}".`
+            : 'No dispense orders found. Click "+ New Order" to create one.'}
         </div>
       ) : (
         <Table aria-label="Dispense orders table">
-          <TableHeader>
-            <TableColumn>Prescription #</TableColumn>
-            <TableColumn>Patient</TableColumn>
-            <TableColumn>Medications</TableColumn>
-            <TableColumn>Status</TableColumn>
-            <TableColumn>Created</TableColumn>
-            <TableColumn>Actions</TableColumn>
-          </TableHeader>
-          <TableBody items={dispenseOrders}>
-            {(order: DispenseOrder) => (
-              <TableRow key={order.id}>
-                <TableCell>{order.prescriptionNumber}</TableCell>
-                <TableCell>{order.patientName}</TableCell>
-                <TableCell>{order.medications}</TableCell>
-                <TableCell>
-                  <span
-                    className={cn(
-                      "inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium capitalize",
-                      statusStyles[order.status]
-                    )}
-                  >
-                    {order.status}
-                  </span>
-                </TableCell>
-                <TableCell>{formatDate(order.createdAt)}</TableCell>
-                <TableCell>
-                  <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      onPress={() => handleEdit(order)}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="danger"
-                      onPress={() => handleDelete(order.id)}
-                      isDisabled={deletingId === order.id}
-                    >
-                      {deletingId === order.id ? <Spinner size="sm" /> : "Delete"}
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
+          <TableContent>
+            <TableHeader>
+              <TableColumn>Order #</TableColumn>
+              <TableColumn>Admission #</TableColumn>
+              <TableColumn>Type</TableColumn>
+              <TableColumn>Status</TableColumn>
+              <TableColumn>Admission Date</TableColumn>
+              <TableColumn>Created At</TableColumn>
+              <TableColumn>Actions</TableColumn>
+            </TableHeader>
+            <TableBody items={dispenseOrders} >
+              {(order: any) => (
+                <DispenseOrderRow
+                  key={order.orderNumber}
+                  order={order}
+                  isDeleting={deletingId === (order.id ?? order.orderNumber)}
+                  onEdit={openEditForm}
+                  onDelete={handleDelete}
+                />
+              )}
+            </TableBody>
+          </TableContent>
+          <TableFooter>
+            <DispenseOrdersPagination
+              page={pagination.page}
+              pageSize={pagination.pageSize}
+              totalItems={totalItems}
+              totalPages={totalPages}
+              onPageChange={setPage}
+              onPageSizeChange={setPageSize}
+            />
+          </TableFooter>
         </Table>
       )}
     </div>
