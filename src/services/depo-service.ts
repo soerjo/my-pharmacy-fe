@@ -22,21 +22,21 @@ export const depoService = {
     if (params?.limit !== undefined) searchParams.set("limit", String(params.limit));
 
     return clients.depo.get<ApiResponse<PaginatedResponse<DispenseOrder>>>(
-      searchParams.toString() ? `/api/dispense-orders?${searchParams.toString()}` : "/api/dispense-orders",
+      searchParams.toString() ? `/dispense-orders?${searchParams.toString()}` : "/dispense-orders",
     );
   },
 
   getDispenseOrder: (id: string) =>
-    clients.depo.get<ApiResponse<DispenseOrder>>(`/api/dispense-orders/${id}`),
+    clients.depo.get<ApiResponse<DispenseOrder>>(`/dispense-orders/${id}`),
 
   createDispenseOrder: (data: DispenseOrderFormValues) =>
-    clients.depo.post<ApiResponse<DispenseOrder>>("/api/dispense-orders", data),
+    clients.depo.post<ApiResponse<DispenseOrder>>("/dispense-orders", data),
 
   updateDispenseOrder: (id: string, data: DispenseOrderFormValues) =>
-    clients.depo.put<ApiResponse<DispenseOrder>>(`/api/dispense-orders/${id}`, data),
+    clients.depo.put<ApiResponse<DispenseOrder>>(`/dispense-orders/${id}`, data),
 
   deleteDispenseOrder: (id: string) =>
-    clients.depo.delete<ApiResponse<void>>(`/api/dispense-orders/${id}`),
+    clients.depo.delete<ApiResponse<void>>(`/dispense-orders/${id}`),
 
   getPatients: (params?: { isActive?: boolean; search?: string; page?: number; limit?: number }) => {
     const searchParams = new URLSearchParams();
@@ -46,21 +46,21 @@ export const depoService = {
     if (params?.limit !== undefined) searchParams.set("limit", String(params.limit));
 
     return clients.depo.get<ApiResponse<PaginatedResponse<Patient>>>(
-      searchParams.toString() ? `/api/patients?${searchParams.toString()}` : "/api/patients"
+      searchParams.toString() ? `/patients?${searchParams.toString()}` : "/patients"
     );
   },
 
   getPatient: (id: string) =>
-    clients.depo.get<ApiResponse<Patient>>(`/api/patients/${id}`),
+    clients.depo.get<ApiResponse<Patient>>(`/patients/${id}`),
 
   createPatient: (data: PatientFormValues) =>
-    clients.depo.post<ApiResponse<Patient>>("/api/patients", data),
+    clients.depo.post<ApiResponse<Patient>>("/patients", data),
 
   updatePatient: (id: string, data: PatientFormValues) =>
-    clients.depo.put<ApiResponse<Patient>>(`/api/patients/${id}`, data),
+    clients.depo.put<ApiResponse<Patient>>(`/patients/${id}`, data),
 
   deletePatient: (id: string) =>
-    clients.depo.delete<ApiResponse<void>>(`/api/patients/${id}`),
+    clients.depo.delete<ApiResponse<void>>(`/patients/${id}`),
 
   getAdmissions: (params?: { isActive?: boolean; search?: string; page?: number; limit?: number }) => {
     const searchParams = new URLSearchParams();
@@ -70,21 +70,21 @@ export const depoService = {
     if (params?.limit !== undefined) searchParams.set("limit", String(params.limit));
 
     return clients.depo.get<ApiResponse<PaginatedResponse<Admission>>>(
-      searchParams.toString() ? `/api/admissions?${searchParams.toString()}` : "/api/admissions"
+      searchParams.toString() ? `/admissions?${searchParams.toString()}` : "/admissions"
     );
   },
 
   getAdmission: (id: string) =>
-    clients.depo.get<ApiResponse<Admission>>(`/api/admissions/${id}`),
+    clients.depo.get<ApiResponse<Admission>>(`/admissions/${id}`),
 
   createAdmission: (data: CreateAdmissionFormValues) =>
-    clients.depo.post<ApiResponse<Admission>>("/api/admissions", data),
+    clients.depo.post<ApiResponse<Admission>>("/admissions", data),
 
   updateAdmission: (id: string, data: AdmissionFormValues) =>
-    clients.depo.put<ApiResponse<Admission>>(`/api/admissions/${id}`, data),
+    clients.depo.put<ApiResponse<Admission>>(`/admissions/${id}`, data),
 
   deleteAdmission: (id: string) =>
-    clients.depo.delete<ApiResponse<void>>(`/api/admissions/${id}`),
+    clients.depo.delete<ApiResponse<void>>(`/admissions/${id}`),
 
   getRoomCategories: (params?: { search?: string; page?: number; limit?: number }) => {
     const searchParams = new URLSearchParams();
@@ -93,7 +93,7 @@ export const depoService = {
     if (params?.limit !== undefined) searchParams.set("limit", String(params.limit));
 
     return clients.depo.get<ApiResponse<PaginatedResponse<RoomCategory>>>(
-      searchParams.toString() ? `/api/room-categories?${searchParams.toString()}` : "/api/room-categories"
+      searchParams.toString() ? `/room-categories?${searchParams.toString()}` : "/room-categories"
     );
   },
 
@@ -105,19 +105,19 @@ export const depoService = {
     if (params?.limit !== undefined) searchParams.set("limit", String(params.limit));
 
     return clients.depo.get<ApiResponse<PaginatedResponse<Room>>>(
-      searchParams.toString() ? `/api/rooms?${searchParams.toString()}` : "/api/rooms"
+      searchParams.toString() ? `/rooms?${searchParams.toString()}` : "/rooms"
     );
   },
 
   getRoom: (id: string) =>
-    clients.depo.get<ApiResponse<Room>>(`/api/rooms/${id}`),
+    clients.depo.get<ApiResponse<Room>>(`/rooms/${id}`),
 
   createRoom: (data: RoomFormValues) =>
-    clients.depo.post<ApiResponse<Room>>("/api/rooms", data),
+    clients.depo.post<ApiResponse<Room>>("/rooms", data),
 
   updateRoom: (id: string, data: RoomFormValues) =>
-    clients.depo.put<ApiResponse<Room>>(`/api/rooms/${id}`, data),
+    clients.depo.put<ApiResponse<Room>>(`/rooms/${id}`, data),
 
   deleteRoom: (id: string) =>
-    clients.depo.delete<ApiResponse<void>>(`/api/rooms/${id}`),
+    clients.depo.delete<ApiResponse<void>>(`/rooms/${id}`),
 };

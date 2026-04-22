@@ -18,21 +18,21 @@ export const warehouseService = {
     if (params?.limit !== undefined) searchParams.set("limit", String(params.limit));
 
     return clients.warehouse.get<ApiResponse<PaginatedResponse<Product>>>(
-      searchParams.toString() ? `/api/products?${searchParams.toString()}` : "/api/products"
+      searchParams.toString() ? `/products?${searchParams.toString()}` : "/products"
     );
   },
 
   getProduct: (id: string) =>
-    clients.warehouse.get<ApiResponse<Product>>(`/api/products/${id}`),
+    clients.warehouse.get<ApiResponse<Product>>(`/products/${id}`),
 
   createProduct: (data: ProductFormValues) =>
-    clients.warehouse.post<ApiResponse<Product>>("/api/products", data),
+    clients.warehouse.post<ApiResponse<Product>>("/products", data),
 
   updateProduct: (id: string, data: ProductFormValues) =>
-    clients.warehouse.put<ApiResponse<Product>>(`/api/products/${id}`, data),
+    clients.warehouse.put<ApiResponse<Product>>(`/products/${id}`, data),
 
   deleteProduct: (id: string) =>
-    clients.warehouse.delete<ApiResponse<void>>(`/api/products/${id}`),
+    clients.warehouse.delete<ApiResponse<void>>(`/products/${id}`),
 
   getProductTypes: (params?: { search?: string; page?: number; limit?: number }) => {
     const searchParams = new URLSearchParams();
@@ -41,7 +41,7 @@ export const warehouseService = {
     if (params?.limit !== undefined) searchParams.set("limit", String(params.limit));
 
     return clients.warehouse.get<ApiResponse<ProductTypeEntity[]>>(
-      searchParams.toString() ? `/api/products/type?${searchParams.toString()}` : "/api/products/type"
+      searchParams.toString() ? `/products/type?${searchParams.toString()}` : "/products/type"
     );
   },
 
@@ -52,7 +52,7 @@ export const warehouseService = {
     if (params?.limit !== undefined) searchParams.set("limit", String(params.limit));
 
     return clients.warehouse.get<ApiResponse<PaginatedResponse<UnitOfMeasure>>>(
-      searchParams.toString() ? `/api/unit-of-measures?${searchParams.toString()}` : "/api/unit-of-measures"
+      searchParams.toString() ? `/unit-of-measures?${searchParams.toString()}` : "/unit-of-measures"
     );
   },
 
@@ -63,7 +63,7 @@ export const warehouseService = {
     if (params?.limit !== undefined) searchParams.set("limit", String(params.limit));
 
     return clients.warehouse.get<ApiResponse<PaginatedResponse<ProductCategory>>>(
-      searchParams.toString() ? `/api/product-categories?${searchParams.toString()}` : "/api/product-categories"
+      searchParams.toString() ? `/product-categories?${searchParams.toString()}` : "/product-categories"
     );
   },
 
@@ -74,7 +74,7 @@ export const warehouseService = {
     if (params?.limit !== undefined) searchParams.set("limit", String(params.limit));
 
     return clients.warehouse.get<ApiResponse<PaginatedResponse<Manufacturer>>>(
-      searchParams.toString() ? `/api/manufacturers?${searchParams.toString()}` : "/api/manufacturers"
+      searchParams.toString() ? `/manufacturers?${searchParams.toString()}` : "/manufacturers"
     );
   },
 };
