@@ -44,7 +44,6 @@ export function RoomForm({ room, onClose }: RoomFormProps) {
   });
 
   async function onSubmit(data: RoomFormValues) {
-    console.log({data})
     setSubmitError(null);
     const payload = {
       code: data.code || undefined,
@@ -53,8 +52,6 @@ export function RoomForm({ room, onClose }: RoomFormProps) {
     };
 
     try {
-      console.log({room})
-      console.log({payload})
       if (isEditing && room) {
         await updateRoom(room.id, payload);
       } else {

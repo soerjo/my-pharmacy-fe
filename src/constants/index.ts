@@ -13,20 +13,3 @@ export const ROUTES = {
   products: "/products",
   settings: "/settings",
 } as const;
-
-export const API_ROUTES = {
-  health: "/api/health",
-  login: "/api/auth/login",
-  logout: "/api/auth/logout",
-  refreshToken: "/api/auth/refresh-token",
-  verifyToken: "/api/auth/verify-token",
-  me: "/api/users/me",
-  forgotPassword: "/api/auth/forgot-password",
-  resetPassword: "/api/auth/reset-password",
-  register: "/api/auth/register",
-  patients: "/api/patients",
-  admissions: "/api/admissions",
-  dispenseOrders: "/api/dispense-orders",
-  rooms: "/api/rooms",
-  products: "/api/products",
-} as const;

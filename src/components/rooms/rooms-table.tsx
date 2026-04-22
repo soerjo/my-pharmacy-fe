@@ -120,7 +120,7 @@ export function RoomsTable() {
         <Table aria-label="Rooms table">
           <TableContent>
             <TableHeader>
-              <TableColumn>Code</TableColumn>
+              <TableColumn isRowHeader>Code</TableColumn>
               <TableColumn>Name</TableColumn>
               <TableColumn>Category</TableColumn>
               <TableColumn>Actions</TableColumn>

@@ -21,7 +21,6 @@ interface DispenseOrderRowProps {
 }
 
 export function DispenseOrderRow({ order, isDeleting, onEdit, onDelete }: DispenseOrderRowProps) {
-  console.log({order})
   return (
     <TableRow key={order.orderNumber}>
       <TableCell>{order.orderNumber}</TableCell>

@@ -123,7 +123,7 @@ export function AdmissionsTable() {
         <Table aria-label="Admissions table">
           <TableContent>
             <TableHeader>
-              <TableColumn>Patient</TableColumn>
+              <TableColumn isRowHeader>Patient</TableColumn>
               <TableColumn>Ward</TableColumn>
               <TableColumn>Diagnosis</TableColumn>
               <TableColumn>Admission Date</TableColumn>

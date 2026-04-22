@@ -126,7 +126,7 @@ export function PatientsTable() {
         <Table aria-label="Patients table">
           <TableContent>
             <TableHeader>
-              <TableColumn>MRN</TableColumn>
+              <TableColumn isRowHeader>MRN</TableColumn>
               <TableColumn>Name</TableColumn>
               <TableColumn>Gender</TableColumn>
               <TableColumn>Date of Birth</TableColumn>

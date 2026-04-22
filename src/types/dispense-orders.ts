@@ -42,7 +42,7 @@ const dispenseOrderItemSchema = z.object({
 });
 
 export const dispenseOrderSchema = z.object({
-  patientId: z.string().min(1, "Patient is required"),
+  // patientId: z.string().min(1, "Patient is required"),
   admissionId: z.string().min(1, "Admission is required"),
   notes: z.string(),
   items: z.array(dispenseOrderItemSchema).min(1, "At least one item is required"),

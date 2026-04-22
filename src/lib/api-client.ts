@@ -1,5 +1,4 @@
 import { TokenManager } from "@/lib/token-manager";
-import { API_ROUTES } from "@/constants";
 
 type RequestOptions = {
   body?: string;
@@ -10,9 +9,13 @@ type RequestOptions = {
 
 class ApiClient {
   private baseUrl: string;
-  private isRefreshing: boolean = false;
-  private refreshSubscribers: Array<(token: string) => void> = [];
+  private static isRefreshing: boolean = false;
+  private static refreshSubscribers: Array<{
+    resolve: () => void;
+    reject: (error: Error) => void;
+  }> = [];
   private static readonly MAX_RETRY_ATTEMPTS = Number(process.env.NEXT_PUBLIC_MAX_TOKEN_RETRY_ATTEMPTS) || 3;
+  private static readonly AUTH_BASE_URL = process.env.NEXT_PUBLIC_API_AUTH_SERVICE ?? "";
 
   constructor(baseUrl = process.env.NEXT_PUBLIC_API_AUTH_SERVICE ?? "") {
     this.baseUrl = baseUrl;
@@ -20,7 +23,7 @@ class ApiClient {
 
   private getAuthHeaders(skipAuth: boolean = false): Record<string, string> {
     if (skipAuth) return {};
-    
+
     const token = TokenManager.getAccessToken();
     if (!token) return {};
 
@@ -29,47 +32,62 @@ class ApiClient {
     };
   }
 
-  private subscribeTokenRefresh(callback: (token: string) => void): void {
-    this.refreshSubscribers.push(callback);
+  private static addRefreshSubscriber(subscriber: {
+    resolve: () => void;
+    reject: (error: Error) => void;
+  }): void {
+    ApiClient.refreshSubscribers.push(subscriber);
   }
 
-  private onTokenRefreshed(token: string): void {
-    this.refreshSubscribers.forEach((callback) => callback(token));
-    this.refreshSubscribers = [];
+  private static resolveRefreshSubscribers(): void {
+    const subscribers = ApiClient.refreshSubscribers;
+    ApiClient.refreshSubscribers = [];
+    subscribers.forEach((sub) => sub.resolve());
   }
 
-  private async refreshAccessToken(): Promise<string | null> {
+  private static rejectRefreshSubscribers(error: Error): void {
+    const subscribers = ApiClient.refreshSubscribers;
+    ApiClient.refreshSubscribers = [];
+    subscribers.forEach((sub) => sub.reject(error));
+  }
+
+  private static async refreshAccessToken(): Promise<string> {
     const refreshToken = TokenManager.getRefreshToken();
     if (!refreshToken) {
-      TokenManager.clearTokens();
-      return null;
+      throw new ApiError(401, "No refresh token available");
     }
 
-    try {
-      const response = await fetch(`${this.baseUrl}${API_ROUTES.refreshToken}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ refreshToken }),
-      });
+    const response = await fetch(`${ApiClient.AUTH_BASE_URL}/auth/refresh-token`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ refreshToken }),
+    });
 
-      if (!response.ok) {
-        return null;
+    if (!response.ok) {
+      throw new ApiError(response.status, "Refresh token request failed");
+    }
+
+    const data = await response.json();
+    if (data.data?.accessToken) {
+      TokenManager.setAccessToken(data.data.accessToken);
+      if (data.data.refreshToken) {
+        TokenManager.setRefreshToken(data.data.refreshToken);
       }
+      return data.data.accessToken;
+    }
 
-      const data = await response.json();
-      if (data.data?.accessToken) {
-        TokenManager.setAccessToken(data.data.accessToken);
-        if (data.data.refreshToken) {
-          TokenManager.setRefreshToken(data.data.refreshToken);
-        }
-        return data.data.accessToken;
-      }
+    throw new ApiError(401, "Invalid refresh token response");
+  }
 
-      return null;
-    } catch {
-      return null;
+  private static handleSessionExpired(): void {
+    TokenManager.clearTokens();
+    ApiClient.isRefreshing = false;
+    const error = new ApiError(401, "Session expired");
+    ApiClient.rejectRefreshSubscribers(error);
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("auth:unauthorized"));
     }
   }
 
@@ -94,65 +112,53 @@ class ApiClient {
     }
 
     if (response.status === 401 && !skipAuth) {
-      const retryCount = options._retryCount || 0;
-      
-      if (retryCount >= ApiClient.MAX_RETRY_ATTEMPTS) {
-        TokenManager.clearTokens();
-        if (typeof window !== "undefined") {
-          window.dispatchEvent(new CustomEvent("auth:unauthorized"));
-        }
-        throw new ApiError(response.status, "Max retry attempts reached");
-      }
-
-      const refreshToken = TokenManager.getRefreshToken();
-      
-      if (!refreshToken) {
-        TokenManager.clearTokens();
-        if (typeof window !== "undefined") {
-          window.dispatchEvent(new CustomEvent("auth:unauthorized"));
-        }
-        throw new ApiError(response.status, await response.text());
-      }
-
-      if (this.isRefreshing) {
-        return new Promise((resolve, reject) => {
-          this.subscribeTokenRefresh(() => {
-            this.request<T>(endpoint, { ...options, _retryCount: retryCount + 1 })
-              .then(resolve)
-              .catch(reject);
-          });
-        });
-      }
-
-      this.isRefreshing = true;
-
-      try {
-        const newToken = await this.refreshAccessToken();
-        
-        if (newToken) {
-          this.isRefreshing = false;
-          this.onTokenRefreshed(newToken);
-          return this.request<T>(endpoint, { ...options, _retryCount: retryCount + 1 });
-        } else {
-          this.isRefreshing = false;
-          TokenManager.clearTokens();
-          if (typeof window !== "undefined") {
-            window.dispatchEvent(new CustomEvent("auth:unauthorized"));
-          }
-          throw new ApiError(response.status, "Failed to refresh token");
-        }
-      } catch (error) {
-        this.isRefreshing = false;
-        TokenManager.clearTokens();
-        if (typeof window !== "undefined") {
-          window.dispatchEvent(new CustomEvent("auth:unauthorized"));
-        }
-        throw error;
-      }
+      return this.handleTokenExpired<T>(endpoint, options);
     }
 
     const errorText = await response.text();
     throw new ApiError(response.status, errorText);
+  }
+
+  private async handleTokenExpired<T>(
+    endpoint: string,
+    options: RequestInit & RequestOptions,
+  ): Promise<T> {
+    const retryCount = options._retryCount || 0;
+
+    if (retryCount >= ApiClient.MAX_RETRY_ATTEMPTS) {
+      ApiClient.handleSessionExpired();
+      throw new ApiError(401, "Max retry attempts reached");
+    }
+
+    if (!TokenManager.getRefreshToken()) {
+      ApiClient.handleSessionExpired();
+      throw new ApiError(401, "No refresh token available");
+    }
+
+    if (ApiClient.isRefreshing) {
+      return new Promise<T>((resolve, reject) => {
+        ApiClient.addRefreshSubscriber({
+          resolve: () => {
+            this.request<T>(endpoint, { ...options, _retryCount: retryCount + 1 })
+              .then(resolve)
+              .catch(reject);
+          },
+          reject,
+        });
+      });
+    }
+
+    ApiClient.isRefreshing = true;
+
+    try {
+      await ApiClient.refreshAccessToken();
+      ApiClient.isRefreshing = false;
+      ApiClient.resolveRefreshSubscribers();
+      return this.request<T>(endpoint, { ...options, _retryCount: retryCount + 1 });
+    } catch (error) {
+      ApiClient.handleSessionExpired();
+      throw error instanceof ApiError ? error : new ApiError(401, "Token refresh failed");
+    }
   }
 
   get<T>(endpoint: string, options?: RequestOptions) {

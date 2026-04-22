@@ -26,7 +26,7 @@ export function DispenseOrderForm({ order, onClose }: DispenseOrderFormProps) {
     resolver: zodResolver(dispenseOrderSchema),
     defaultValues: order
       ? {
-          patientId: order.patientId,
+          // patientId: order.patientId,
           admissionId: order.admissionId,
           notes: order.notes ?? "",
           items: order.items?.map((item) => ({
@@ -36,7 +36,7 @@ export function DispenseOrderForm({ order, onClose }: DispenseOrderFormProps) {
           })) ?? [{ drugId: "", quantity: 1, instructions: "" }],
         }
       : {
-          patientId: "",
+          // patientId: "",
           admissionId: "",
           notes: "",
           items: [{ drugId: "", quantity: 1, instructions: "" }],
@@ -49,6 +49,7 @@ export function DispenseOrderForm({ order, onClose }: DispenseOrderFormProps) {
   });
 
   async function onSubmit(data: DispenseOrderFormValues) {
+    console.log("Form data:", data);
     if (isEditing && order) {
       await updateOrder(order.id ?? order.orderNumber, data);
     } else {
@@ -60,7 +61,7 @@ export function DispenseOrderForm({ order, onClose }: DispenseOrderFormProps) {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Controller
+        {/* <Controller
           name="patientId"
           control={control}
           render={({ field }) => (
@@ -73,7 +74,7 @@ export function DispenseOrderForm({ order, onClose }: DispenseOrderFormProps) {
               error={errors.patientId?.message}
             />
           )}
-        />
+        /> */}
 
         <Controller
           name="admissionId"

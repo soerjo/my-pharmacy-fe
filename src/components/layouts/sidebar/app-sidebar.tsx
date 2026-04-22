@@ -55,7 +55,7 @@ export function AppSidebar() {
             href="/"
             className="flex items-center gap-2 overflow-hidden whitespace-nowrap font-semibold"
           >
-            <span className="shrink-0 text-lg">P</span>
+            {/* <span className="shrink-0 text-lg">P</span> */}
             <span>{APP_NAME}</span>
           </Link>
         </div>
@@ -70,7 +70,7 @@ export function AppSidebar() {
           <Drawer.Content placement="left">
             <Drawer.Dialog className="w-72">
               <Drawer.Header className="flex items-center gap-2">
-                <span className="text-lg font-semibold">P</span>
+                {/* <span className="text-lg font-semibold">P</span> */}
                 <Drawer.Heading className="font-semibold">
                   {APP_NAME}
                 </Drawer.Heading>

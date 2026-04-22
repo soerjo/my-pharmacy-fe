@@ -17,7 +17,6 @@ import { DispenseOrderForm } from "./dispense-order-form";
 import { DispenseOrdersToolbar } from "./dispense-orders-toolbar";
 import { DispenseOrderRow } from "./dispense-order-row";
 import { DispenseOrdersPagination } from "./dispense-orders-pagination";
-import type { DispenseOrder } from "@/types";
 
 export function DispenseOrdersTable() {
   const {
@@ -92,7 +91,6 @@ export function DispenseOrdersTable() {
       </div>
     );
   }
-  console.log({dispenseOrders})
 
   return (
     <div className="flex flex-col gap-4">
@@ -126,7 +124,7 @@ export function DispenseOrdersTable() {
         <Table aria-label="Dispense orders table">
           <TableContent>
             <TableHeader>
-              <TableColumn>Order #</TableColumn>
+              <TableColumn isRowHeader>Order #</TableColumn>
               <TableColumn>Admission #</TableColumn>
               <TableColumn>Type</TableColumn>
               <TableColumn>Status</TableColumn>

@@ -37,7 +37,6 @@ export function ResetPasswordForm() {
       await resetPassword({ ...data, token });
       setIsSuccess(true);
     } catch (err) {
-      console.error("Reset password error:", err);
       setIsApiError(true);
     }
   }
