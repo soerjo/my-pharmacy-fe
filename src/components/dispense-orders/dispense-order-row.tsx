@@ -5,6 +5,8 @@ import { TableCell, TableRow } from "@heroui/react";
 import { formatDate } from "@/utils";
 import type { DispenseOrder, DispenseOrderStatus } from "@/types";
 import { cn } from "@/utils";
+import { useRouter } from "next/navigation";
+import { DispenseOrderModal } from "./dispense-order-form-modal";
 
 const statusStyles: Record<DispenseOrderStatus, string> = {
   PENDING: "bg-yellow-100 text-yellow-800 dark:bg-yellow-950 dark:text-yellow-300",
@@ -40,9 +42,10 @@ export function DispenseOrderRow({ order, isDeleting, onEdit, onDelete }: Dispen
       <TableCell>{order.createdAt ? formatDate(order.createdAt) : "-"}</TableCell>
       <TableCell>
         <div className="flex gap-2">
-          <Button size="sm" variant="secondary" onPress={() => onEdit(order)}>
+          {/* <Button size="sm" variant="secondary" onPress={() => router.push(`?id=${order.id}`)}>
             Edit
-          </Button>
+          </Button> */}
+          <DispenseOrderModal id={order.id!} />
           {/* <Button
             size="sm"
             variant="danger"

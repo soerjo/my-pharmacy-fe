@@ -41,7 +41,7 @@ export type ProductFormValues = z.infer<typeof productSchema>;
 
 export interface Product {
   id: string;
-  orgId: string;
+  organizationId: string;
   code?: string;
   name: string;
   description?: string;

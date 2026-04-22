@@ -14,6 +14,18 @@ export interface DispenseOrderItem {
   updatedBy: string | null;
 }
 
+export interface DispenseOrderDetailItem {
+  id: string;
+  drugId: string;
+  drugName: string;
+  quantity: number;
+  instructions: string;
+  baseUnitId: string;
+  baseUnitName: string;
+  baseUnitCode: string;
+  baseUnitAbbreviation: string;
+}
+
 export interface DispenseOrder {
   id?: string;
   orgId?: string;
@@ -33,6 +45,26 @@ export interface DispenseOrder {
   admissionDate: string | null;
   roomId: string | null;
   items?: DispenseOrderItem[];
+}
+
+export interface DispenseOrderDetail {
+  id: string;
+  orderNumber: string;
+  patientId: string;
+  admissionId: string;
+  dispensedAt: string | null;
+  notes: string;
+  cancelReason: string | null;
+  status: DispenseOrderStatus;
+  createdAt: string;
+  createdBy: string;
+  admission_type: string;
+  admissionNumber: string;
+  admissionDate: string;
+  admissionStatus: string;
+  admissionNotes: string;
+  admissionCreatedAt: string;
+  items: DispenseOrderDetailItem[];
 }
 
 const dispenseOrderItemSchema = z.object({

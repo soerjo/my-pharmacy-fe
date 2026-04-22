@@ -27,7 +27,9 @@ export function ProductRow({ product, isDeleting, onEdit, onDelete }: ProductRow
       <TableCell>{product.strength ?? "-"}</TableCell>
       <TableCell>
         <div className="flex gap-2">
-          <Button size="sm" variant="secondary" onPress={() => onEdit(product)}>Edit</Button>
+            <Button isDisabled={!product.organizationId} size="sm" variant="secondary" onPress={() => onEdit(product)}>
+              Edit
+            </Button>
           {/* <Button size="sm" variant="danger" onPress={() => onDelete(product.id)} isDisabled={isDeleting}>
             {isDeleting ? <Spinner size="sm" /> : "Delete"}
           </Button> */}

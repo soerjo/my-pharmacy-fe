@@ -6,6 +6,22 @@ import { depoService } from "@/services/depo-service";
 import { useDispenseOrdersStore } from "@/stores/dispense-orders-store";
 import type { DispenseOrderFormValues } from "@/types";
 
+export function useDispenseOrder(id: string) {
+  const detailQuery = useQuery({
+    queryKey: queryKeys.dispenseOrders.detail(id),
+    queryFn: () => depoService.getDispenseOrder(id),
+    select: (response) => response.data,
+    enabled: !!id,
+  });
+
+  return {
+    dispenseOrder: detailQuery.data ?? null,
+    isLoading: detailQuery.isLoading,
+    isFetching: detailQuery.isFetching,
+    error: detailQuery.error,
+  };
+}
+
 export function useDispenseOrders() {
   const filters = useDispenseOrdersStore((s) => s.filters);
   const pagination = useDispenseOrdersStore((s) => s.pagination);

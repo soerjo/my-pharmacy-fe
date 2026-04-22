@@ -4,7 +4,7 @@ export { useDebounce } from "./use-debounce";
 export { usePatientSearch } from "./use-patient-search";
 export { usePatients } from "./use-patients";
 export { useAdmissions } from "./use-admissions";
-export { useDispenseOrders } from "./use-dispense-orders";
+export { useDispenseOrders, useDispenseOrder } from "./use-dispense-orders";
 export { useRooms } from "./use-rooms";
 export { useRoomSearch } from "./use-room-search";
 export { useProducts } from "./use-products";

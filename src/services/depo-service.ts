@@ -11,6 +11,7 @@ import type {
   RoomCategory,
   DispenseOrder,
   DispenseOrderFormValues,
+  DispenseOrderDetail,
 } from "@/types";
 
 export const depoService = {
@@ -27,7 +28,7 @@ export const depoService = {
   },
 
   getDispenseOrder: (id: string) =>
-    clients.depo.get<ApiResponse<DispenseOrder>>(`/dispense-orders/${id}`),
+    clients.depo.get<ApiResponse<DispenseOrderDetail>>(`/dispense-orders/${id}`),
 
   createDispenseOrder: (data: DispenseOrderFormValues) =>
     clients.depo.post<ApiResponse<DispenseOrder>>("/dispense-orders", data),
