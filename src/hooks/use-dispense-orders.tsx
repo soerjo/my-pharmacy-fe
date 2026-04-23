@@ -2,6 +2,7 @@
 
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query-keys";
+import { onServerError } from "@/providers/error-provider";
 import { depoService } from "@/services/depo-service";
 import { useDispenseOrdersStore } from "@/stores/dispense-orders-store";
 import type { DispenseOrderFormValues } from "@/types";
@@ -39,6 +40,7 @@ export function useDispenseOrders() {
     mutationFn: (data: DispenseOrderFormValues) => depoService.createDispenseOrder(data),
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: queryKeys.dispenseOrders.all }),
+    onError: onServerError,
   });
 
   const updateMutation = useMutation({
@@ -46,6 +48,7 @@ export function useDispenseOrders() {
       depoService.updateDispenseOrder(id, data),
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: queryKeys.dispenseOrders.all }),
+    onError: onServerError,
   });
 
   const updateOrder = async (id: string, data: DispenseOrderFormValues) => {
@@ -56,12 +59,7 @@ export function useDispenseOrders() {
     mutationFn: (id: string) => depoService.deleteDispenseOrder(id),
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: queryKeys.dispenseOrders.all }),
-  });
-
-  const detailQuery = useMutation({
-    mutationFn: (id: string) => depoService.getDispenseOrder(id),
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: queryKeys.dispenseOrders.all }),
+    onError: onServerError,
   });
 
   return {
@@ -80,9 +78,23 @@ export function useDispenseOrders() {
     createOrder: createMutation.mutateAsync,
     updateOrder,
     deleteOrder: deleteMutation.mutateAsync,
-    detailOrder: detailQuery.mutateAsync,
     isCreating: createMutation.isPending,
     isUpdating: updateMutation.isPending,
     isDeleting: deleteMutation.isPending,
+  };
+}
+
+export function useDispenseOrder(id: string) {
+  const detailQuery = useQuery({
+    queryKey: queryKeys.dispenseOrders.detail(id),
+    queryFn: () => depoService.getDispenseOrder(id),
+    select: (response) => response.data,
+    enabled: !!id,
+  });
+
+  return {
+    dispenseOrder: detailQuery.data ?? null,
+    isLoading: detailQuery.isLoading,
+    error: detailQuery.error,
   };
 }

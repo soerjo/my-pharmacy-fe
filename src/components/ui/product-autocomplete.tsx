@@ -7,6 +7,7 @@ import type { Product } from "@/types";
 interface ProductAutocompleteProps {
   selectedKey: string | null;
   onSelectionChange: (key: string | null) => void;
+  initialItems?: Product[];
   label?: string;
   placeholder?: string;
   className?: string;
@@ -17,6 +18,7 @@ interface ProductAutocompleteProps {
 export function ProductAutocomplete({
   selectedKey,
   onSelectionChange,
+  initialItems,
   label = "Product / Drug",
   placeholder = "Search products...",
   className,
@@ -36,6 +38,7 @@ export function ProductAutocomplete({
           <span className="text-xs text-default-400">{product.code || product.id}</span>
         </div>
       )}
+      initialItems={initialItems}
       label={label}
       placeholder={placeholder}
       emptyText="No products found"

@@ -1,6 +1,6 @@
 "use client";
 
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useState, useMemo } from "react";
 import {
   Autocomplete,
   Spinner,
@@ -23,6 +23,7 @@ interface AsyncAutocompleteProps<T extends object> {
   renderItem: (item: T) => ReactNode;
   getId: (item: T) => string;
   getTextValue: (item: T) => string;
+  initialItems?: T[];
   label?: string;
   placeholder?: string;
   emptyText?: string;
@@ -38,6 +39,7 @@ export function AsyncAutocomplete<T extends object>({
   renderItem,
   getId,
   getTextValue,
+  initialItems,
   label = "Search",
   placeholder = "Search...",
   emptyText = "No results found",
@@ -47,6 +49,13 @@ export function AsyncAutocomplete<T extends object>({
 }: AsyncAutocompleteProps<T>) {
   const [inputValue, setInputValue] = useState("");
   const { data: items = [], isLoading } = useSearch(inputValue);
+
+  const mergedItems = useMemo(() => {
+    if (!initialItems?.length) return items;
+    const existingIds = new Set(items.map(getId));
+    const filtered = initialItems.filter((item) => !existingIds.has(getId(item)));
+    return [...filtered, ...items];
+  }, [initialItems, items, getId]);
 
   return (
     <div className="flex flex-col gap-1.5">
@@ -98,7 +107,7 @@ export function AsyncAutocomplete<T extends object>({
             </SearchField>
             <ListBox
               className="max-h-[420px] overflow-y-auto"
-              items={items}
+              items={mergedItems}
               renderEmptyState={() => <EmptyState>{emptyText}</EmptyState>}
             >
               {(item: T) => (

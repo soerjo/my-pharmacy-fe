@@ -1,75 +1,34 @@
 "use client";
 
-import { useState } from "react";
-import { useForm, useFieldArray, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import type { UseFormRegister, Control, FieldErrors } from "react-hook-form";
+import { Controller } from "react-hook-form";
 import { Input, Button, TextArea } from "@heroui/react";
-import { dispenseOrderSchema, type DispenseOrderFormValues, type DispenseOrder } from "@/types";
-import { useDispenseOrders } from "@/hooks/use-dispense-orders";
+import type { DispenseOrderFormValues } from "@/types";
 import { AdmissionAutocomplete, ProductAutocomplete } from "@/components/ui";
 
-interface DispenseOrderFormProps {
-  order?: DispenseOrder;
-  onClose: () => void;
-  formId: string;
+interface FormField {
+  id: string;
 }
 
-export function DispenseOrderForm({ order, onClose, formId }: DispenseOrderFormProps) {
-  const { createOrder, updateOrder } = useDispenseOrders();
-  const [submitError, setSubmitError] = useState<string | null>(null);
-  const isEditing = !!order;
+interface DispenseOrderFormBodyProps {
+  control: Control<DispenseOrderFormValues>;
+  register: UseFormRegister<DispenseOrderFormValues>;
+  errors: FieldErrors<DispenseOrderFormValues>;
+  fields: FormField[];
+  append: (value: { drugId: string; quantity: number; instructions: string }) => void;
+  remove: (index: number) => void;
+}
 
-  const {
-    register,
-    handleSubmit,
-    control,
-    formState: { errors },
-  } = useForm<DispenseOrderFormValues>({
-    resolver: zodResolver(dispenseOrderSchema),
-    defaultValues: order
-      ? {
-          // patientId: order.patientId,
-          admissionId: order.admissionId,
-          notes: order.notes ?? "",
-          items: order.items?.map((item) => ({
-            drugId: item.drugId,
-            quantity: item.quantity,
-            instructions: item.instructions ?? "",
-          })) ?? [{ drugId: "", quantity: 1, instructions: "" }],
-        }
-      : {
-          // patientId: "",
-          admissionId: "",
-          notes: "",
-          items: [{ drugId: "", quantity: 1, instructions: "" }],
-        },
-  });
-
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "items",
-  });
-
-  async function onSubmit(data: DispenseOrderFormValues) {
-    setSubmitError(null);
-    try {
-      if (isEditing && order) {
-        await updateOrder(order.id ?? order.orderNumber, data);
-      } else {
-        await createOrder(data);
-      }
-      onClose();
-    } catch {
-      setSubmitError(
-        isEditing
-          ? "Failed to update order. Please try again."
-          : "Failed to create order. Please try again.",
-      );
-    }
-  }
-
+export function DispenseOrderFormBody({
+  control,
+  register,
+  errors,
+  fields,
+  append,
+  remove,
+}: DispenseOrderFormBodyProps) {
   return (
-    <form id={formId} onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+    <>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Controller
           name="admissionId"
@@ -183,8 +142,6 @@ export function DispenseOrderForm({ order, onClose, formId }: DispenseOrderFormP
           <p className="text-sm text-danger">{errors.notes.message}</p>
         )}
       </div>
-
-      {submitError && <p className="text-sm text-danger">{submitError}</p>}
-    </form>
+    </>
   );
 }
