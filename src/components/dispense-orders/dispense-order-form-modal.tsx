@@ -59,7 +59,7 @@ interface DispenseOrderModalProps {
 
 export function DispenseOrderModal({id}: DispenseOrderModalProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
+  // const searchParams = useSearchParams();
   // const id = searchParams.get("id"); // string | null
   // const state = useOverlayState({isOpen: !!id});
 
@@ -70,13 +70,13 @@ export function DispenseOrderModal({id}: DispenseOrderModalProps) {
       </Button>
       <Modal.Backdrop variant="blur">
         <Modal.Container>
-          <Modal.Dialog className="md:max-w-[50vw]">
+          <Modal.Dialog className="md:max-w-[45vw]">
             <Modal.CloseTrigger />
             <Modal.Header>
               {/* <Modal.Icon className="bg-default text-foreground">
                 <Rocket className="size-5" />
               </Modal.Icon> */}
-              <Modal.Heading>Welcome to HeroUI</Modal.Heading>
+              <Modal.Heading>Detail Dispense Order</Modal.Heading>
             </Modal.Header>
             <Modal.Body>
               {/* <p>
@@ -85,11 +85,11 @@ export function DispenseOrderModal({id}: DispenseOrderModalProps) {
               </p> */}
               <DispenseOrderFormDetail id={id} />
             </Modal.Body>
-            <Modal.Footer>
+            {/* <Modal.Footer>
               <Button className="w-full" slot="close">
                 Continue
               </Button>
-            </Modal.Footer>
+            </Modal.Footer> */}
           </Modal.Dialog>
         </Modal.Container>
       </Modal.Backdrop>

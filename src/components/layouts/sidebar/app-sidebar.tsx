@@ -10,13 +10,15 @@ import {
 } from "@heroui/react";
 
 import { cn } from "@/utils";
-import { useAppStore } from "@/stores";
+import { useAppStore, useAuthStore } from "@/stores";
 import { APP_NAME } from "@/constants";
 import { NAV_SECTIONS, type NavItem } from "./nav-items";
+import { ArrowRightFromSquare } from "@gravity-ui/icons";
 
 export function AppSidebar() {
   const pathname = usePathname();
   const { setSidebarOpen } = useAppStore();
+  const logout = useAuthStore((s) => s.logout);
 
   useEffect(() => {
     setSidebarOpen(false);
@@ -74,11 +76,20 @@ export function AppSidebar() {
                 <Drawer.Heading className="font-semibold">
                   {APP_NAME}
                 </Drawer.Heading>
-                <Drawer.CloseTrigger className="ml-auto" />
+                {/* <Drawer.CloseTrigger className="ml-auto" /> */}
               </Drawer.Header>
               <Drawer.Body className="overflow-hidden p-0">
                 {navContent}
               </Drawer.Body>
+              <Drawer.Footer className="border-t border-default-200 dark:border-default-100 p-0">
+                <button
+                  onClick={() => { logout(); }}
+                  className="flex w-full items-center gap-3 px-6 py-3 text-sm font-medium transition-colors hover:bg-default-100 dark:hover:bg-default-150"
+                >
+                  <ArrowRightFromSquare className="size-5 shrink-0" />
+                  <span>Logout</span>
+                </button>
+              </Drawer.Footer>
             </Drawer.Dialog>
           </Drawer.Content>
         </Drawer.Backdrop>

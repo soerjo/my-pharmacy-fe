@@ -35,7 +35,7 @@ export function ForgotPasswordForm() {
 
   if (isSuccess) {
     return (
-      <Card className="w-full max-w-md px-4">
+      <Card className="w-full max-w-md mx-4 px-4 md:mx-0">
         <CardHeader className="flex flex-col items-center gap-2 pb-2">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -70,7 +70,7 @@ export function ForgotPasswordForm() {
   }
 
   return (
-    <Card className="w-full max-w-md px-4">
+    <Card className="w-full max-w-md mx-4 px-4 md:mx-0">
       <CardHeader className="flex flex-col items-center gap-2 pb-2">
         <svg
           xmlns="http://www.w3.org/2000/svg"

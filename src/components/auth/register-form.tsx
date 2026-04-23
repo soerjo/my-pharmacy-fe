@@ -53,7 +53,7 @@ export function RegisterForm() {
   
   if (success) {
     return (
-      <Card className="w-full max-w-md px-4">
+      <Card className="w-full max-w-md mx-4 px-4 md:mx-0">
         <CardContent className="flex flex-col items-center gap-4 py-8">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -80,7 +80,7 @@ export function RegisterForm() {
   }
 
   return (
-    <Card className="w-full max-w-md px-4">
+    <Card className="w-full max-w-md mx-4 px-4 md:mx-0">
       <CardHeader className="flex flex-col items-center gap-2 pb-2">
         <svg
           xmlns="http://www.w3.org/2000/svg"
