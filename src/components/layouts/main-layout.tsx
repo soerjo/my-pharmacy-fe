@@ -10,8 +10,10 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
       <AppSidebar />
       <div className="flex flex-1 flex-col overflow-hidden lg:ml-64">
         <TopNavbar />
-        <main className="flex flex-1 flex-col overflow-y-auto">{children}</main>
-        <AppFooter />
+        <main className="flex flex-1 flex-col overflow-y-auto">
+          {children}
+          <AppFooter />
+        </main>
       </div>
     </div>
   );

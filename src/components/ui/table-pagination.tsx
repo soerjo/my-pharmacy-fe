@@ -58,7 +58,7 @@ export function TablePagination({
 
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between items-center justify-center px-2 py-3 w-full">
-      <div className="flex items-center gap-3 w-full">
+      {/* <div className="flex items-center gap-3 w-full">
         <Pagination.Summary>
           {totalItems} result{totalItems !== 1 ? "s" : ""}
         </Pagination.Summary>
@@ -82,7 +82,7 @@ export function TablePagination({
             </ListBox>
           </SelectPopover>
         </Select>
-      </div>
+      </div> */}
       {totalPages > 1 && (
         <Pagination size="sm" className="w-fit">
           <Pagination.Content>

@@ -140,6 +140,15 @@ export function DataTable<T extends object>({
         </ModalBackdrop>
       </Modal>
 
+      <Button
+        variant="primary"
+        isIconOnly
+        onPress={onAdd}
+        className="fixed bottom-6 right-6 z-50 flex h-16 w-16 items-center justify-center rounded-full shadow-lg md:hidden"
+      >
+        <Plus />
+      </Button>
+
       {data.length === 0 ? (
         <div className="rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 py-12 text-center text-zinc-500">
           {filters.search
@@ -156,19 +165,14 @@ export function DataTable<T extends object>({
             </Table.Content>
           </TableScrollContainer>
           <TableFooter>
-            <div className="flex flex-col items-start justify-center w-full">
-              <TablePagination
-                page={page}
-                pageSize={pageSize}
-                totalItems={totalItems}
-                totalPages={totalPages}
-                onPageChange={onPageChange}
-                onPageSizeChange={onPageSizeChange}
-              />
-              <Button variant="primary"  onPress={onAdd} className="flex md:hidden self-end" isIconOnly>
-                <Plus />
-              </Button>
-            </div>
+            <TablePagination
+              page={page}
+              pageSize={pageSize}
+              totalItems={totalItems}
+              totalPages={totalPages}
+              onPageChange={onPageChange}
+              onPageSizeChange={onPageSizeChange}
+            />
           </TableFooter>
 
 
