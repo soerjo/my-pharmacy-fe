@@ -128,7 +128,7 @@ import { Table, TableScrollContainer, TableContent, TableHeader, TableBody, Tabl
 
 ## Package manager
 
-Bun is preferred (`bun.lock` present, `.npmrc` sets `package-lock=false`). npm scripts work via both npm and bun.
+npm is the package manager (`package-lock.json` present). `.npmrc` sets `package-lock=false` but the lockfile exists regardless.
 
 ## React Query + Zustand patterns
 
@@ -318,6 +318,16 @@ entityName: {
 ```
 
 Mutations always invalidate the `all` key to refetch the list.
+
+## Autocomplete pattern
+
+Entity search/select in forms uses `AsyncAutocomplete<T>` from `@/components/ui/async-autocomplete`. Each entity has a pre-built wrapper (e.g., `PatientAutocomplete`, `ProductAutocomplete`, `WardAutocomplete`) that plugs into a `use<Entity>Search` hook. To add a new one:
+1. `src/hooks/use-<entity>-search.ts` — search hook (debounced query, returns `T[]`)
+2. `src/components/ui/<entity>-autocomplete.tsx` — thin wrapper passing `useSearch`, `getId`, `getTextValue`, `renderItem` to `AsyncAutocomplete<T>`
+
+## Error handling in mutations
+
+`onServerError(error)` from `@/providers/error-provider` is the standard way to handle API errors in mutation `onError` callbacks. It parses `ApiError` (from `@/lib/api-client`), extracts the server message, and shows a `toast.danger`.
 
 ## Auth system
 

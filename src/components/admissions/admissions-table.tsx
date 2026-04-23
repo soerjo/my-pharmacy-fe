@@ -87,7 +87,7 @@ export function AdmissionsTable() {
       )}
       isFormOpen={isFormOpen}
       formTitle={editingEntity ? "Edit Admission" : "New Admission"}
-      renderForm={(onClose) => <AdmissionForm admission={editingEntity} onClose={onClose} />}
+      renderForm={(onClose, formId) => <AdmissionForm admission={editingEntity} onClose={onClose} formId={formId} />}
       onCloseForm={closeForm}
       filters={filters}
       onSearchChange={(value) => setFilters({ search: value })}

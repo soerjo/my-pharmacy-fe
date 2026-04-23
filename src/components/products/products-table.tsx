@@ -80,7 +80,7 @@ export function ProductsTable() {
       )}
       isFormOpen={isFormOpen}
       formTitle={editingEntity ? `Edit ${editingEntity.name}` : "New Product"}
-      renderForm={(onClose) => <ProductForm product={editingEntity} onClose={onClose} />}
+      renderForm={(onClose, formId) => <ProductForm product={editingEntity} onClose={onClose} formId={formId} />}
       onCloseForm={closeForm}
       filters={filters}
       onSearchChange={(value) => setFilters({ search: value })}

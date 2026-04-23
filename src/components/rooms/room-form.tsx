@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Input, Button, Spinner } from "@heroui/react";
+import { Input } from "@heroui/react";
 import { roomSchema, type RoomFormValues, type Room } from "@/types";
 import { useRooms } from "@/hooks/use-rooms";
 import { RoomCategoryAutocomplete } from "@/components/ui/room-category-autocomplete";
@@ -11,14 +11,13 @@ import { RoomCategoryAutocomplete } from "@/components/ui/room-category-autocomp
 interface RoomFormProps {
   room?: Room;
   onClose: () => void;
+  formId: string;
 }
 
-export function RoomForm({ room, onClose }: RoomFormProps) {
-  const { createRoom, updateRoom, isCreating, isUpdating } =
-    useRooms();
+export function RoomForm({ room, onClose, formId }: RoomFormProps) {
+  const { createRoom, updateRoom } = useRooms();
   const [submitError, setSubmitError] = useState<string | null>(null);
   const isEditing = !!room;
-  const isSubmitting = isCreating || isUpdating;
 
   const {
     register,
@@ -65,7 +64,7 @@ export function RoomForm({ room, onClose }: RoomFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+    <form id={formId} onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
           <label htmlFor="code" className="text-sm font-medium">
@@ -100,22 +99,6 @@ export function RoomForm({ room, onClose }: RoomFormProps) {
         />
 
       {submitError && <p className="text-sm text-danger">{submitError}</p>}
-
-      <div className="flex justify-end gap-2 pt-2">
-        <Button variant="ghost" onPress={onClose}>Cancel</Button>
-        <Button type="submit" variant="primary" isDisabled={isSubmitting}>
-          {isSubmitting ? (
-            <span className="flex items-center gap-2">
-              <Spinner size="sm" />
-              {isEditing ? "Updating..." : "Creating..."}
-            </span>
-          ) : isEditing ? (
-            "Update Room"
-          ) : (
-            "Create Room"
-          )}
-        </Button>
-      </div>
     </form>
   );
 }

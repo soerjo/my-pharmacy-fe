@@ -68,7 +68,7 @@ export function RoomsTable() {
       )}
       isFormOpen={isFormOpen}
       formTitle={editingEntity ? `Edit ${editingEntity.name}` : "New Room"}
-      renderForm={(onClose) => <RoomForm room={editingEntity} onClose={onClose} />}
+      renderForm={(onClose, formId) => <RoomForm room={editingEntity} onClose={onClose} formId={formId} />}
       onCloseForm={closeForm}
       filters={filters}
       onSearchChange={(value) => setFilters({ search: value })}

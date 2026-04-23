@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Input, Button, Spinner, TextArea } from "@heroui/react";
+import { Input, TextArea } from "@heroui/react";
 import {
   productSchema,
   type ProductFormValues,
@@ -22,14 +22,14 @@ import { cn } from "@/utils";
 interface ProductFormProps {
   product?: Product;
   onClose: () => void;
+  formId: string;
 }
 
-export function ProductForm({ product, onClose }: ProductFormProps) {
-  const { createProduct, updateProduct, isCreating, isUpdating } =
+export function ProductForm({ product, onClose, formId }: ProductFormProps) {
+  const { createProduct, updateProduct } =
     useProducts();
   const [submitError, setSubmitError] = useState<string | null>(null);
   const isEditing = !!product;
-  const isSubmitting = isCreating || isUpdating;
 
   const {
     register,
@@ -99,7 +99,7 @@ export function ProductForm({ product, onClose }: ProductFormProps) {
   );
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+    <form id={formId} onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
           <label htmlFor="code" className="text-sm font-medium">
@@ -234,24 +234,6 @@ export function ProductForm({ product, onClose }: ProductFormProps) {
       </div>
 
       {submitError && <p className="text-sm text-danger">{submitError}</p>}
-
-      <div className="flex justify-end gap-2 pt-2">
-        <Button variant="ghost" onPress={onClose}>
-          Cancel
-        </Button>
-        <Button type="submit" variant="primary" isDisabled={isSubmitting}>
-          {isSubmitting ? (
-            <span className="flex items-center gap-2">
-              <Spinner size="sm" />
-              {isEditing ? "Updating..." : "Creating..."}
-            </span>
-          ) : isEditing ? (
-            "Update Product"
-          ) : (
-            "Create Product"
-          )}
-        </Button>
-      </div>
     </form>
   );
 }

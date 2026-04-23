@@ -6,22 +6,6 @@ import { depoService } from "@/services/depo-service";
 import { useDispenseOrdersStore } from "@/stores/dispense-orders-store";
 import type { DispenseOrderFormValues } from "@/types";
 
-export function useDispenseOrder(id: string) {
-  const detailQuery = useQuery({
-    queryKey: queryKeys.dispenseOrders.detail(id),
-    queryFn: () => depoService.getDispenseOrder(id),
-    select: (response) => response.data,
-    enabled: !!id,
-  });
-
-  return {
-    dispenseOrder: detailQuery.data ?? null,
-    isLoading: detailQuery.isLoading,
-    isFetching: detailQuery.isFetching,
-    error: detailQuery.error,
-  };
-}
-
 export function useDispenseOrders() {
   const filters = useDispenseOrdersStore((s) => s.filters);
   const pagination = useDispenseOrdersStore((s) => s.pagination);
@@ -74,6 +58,12 @@ export function useDispenseOrders() {
       queryClient.invalidateQueries({ queryKey: queryKeys.dispenseOrders.all }),
   });
 
+  const detailQuery = useMutation({
+    mutationFn: (id: string) => depoService.getDispenseOrder(id),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: queryKeys.dispenseOrders.all }),
+  });
+
   return {
     dispenseOrders: ordersQuery.data?.data ?? [],
     isLoading: ordersQuery.isLoading,
@@ -90,6 +80,7 @@ export function useDispenseOrders() {
     createOrder: createMutation.mutateAsync,
     updateOrder,
     deleteOrder: deleteMutation.mutateAsync,
+    detailOrder: detailQuery.mutateAsync,
     isCreating: createMutation.isPending,
     isUpdating: updateMutation.isPending,
     isDeleting: deleteMutation.isPending,

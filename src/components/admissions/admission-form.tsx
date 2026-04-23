@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Input, Button, Spinner, TextArea } from "@heroui/react";
+import { Input, TextArea } from "@heroui/react";
 import { createAdmissionSchema, type CreateAdmissionFormValues, type Admission } from "@/types";
 import { useAdmissions } from "@/hooks/use-admissions";
 import { PatientAutocomplete, WardAutocomplete } from "@/components/ui";
@@ -19,13 +19,13 @@ function getTodayDate(): string {
 interface AdmissionFormProps {
   admission?: Admission;
   onClose: () => void;
+  formId: string;
 }
 
-export function AdmissionForm({ admission, onClose }: AdmissionFormProps) {
-  const { createAdmission, updateAdmission, isCreating, isUpdating } = useAdmissions();
+export function AdmissionForm({ admission, onClose, formId }: AdmissionFormProps) {
+  const { createAdmission, updateAdmission } = useAdmissions();
   const [submitError, setSubmitError] = useState<string | null>(null);
   const isEditing = !!admission;
-  const isSubmitting = isCreating || isUpdating;
 
   const {
     register,
@@ -70,7 +70,7 @@ export function AdmissionForm({ admission, onClose }: AdmissionFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+    <form id={formId} onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
           <Controller
@@ -149,26 +149,6 @@ export function AdmissionForm({ admission, onClose }: AdmissionFormProps) {
       </div>
 
       {submitError && <p className="text-sm text-danger">{submitError}</p>}
-
-      <div className="flex justify-end gap-2 pt-2">
-        <Button variant="ghost" onPress={onClose}>
-          Cancel
-        </Button>
-        <Button
-          type="submit"
-          variant="primary"
-          isDisabled={isSubmitting}
-        >
-          {isSubmitting ? (
-            <span className="flex items-center gap-2">
-              <Spinner size="sm" />
-              {isEditing ? "Updating..." : "Creating..."}
-            </span>
-          ) : (
-            isEditing ? "Update Admission" : "Create Admission"
-          )}
-        </Button>
-      </div>
     </form>
   );
 }

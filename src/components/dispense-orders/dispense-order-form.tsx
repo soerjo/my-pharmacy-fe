@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Input, Button, Spinner, TextArea } from "@heroui/react";
+import { Input, Button, TextArea } from "@heroui/react";
 import { dispenseOrderSchema, type DispenseOrderFormValues, type DispenseOrder } from "@/types";
 import { useDispenseOrders } from "@/hooks/use-dispense-orders";
 import { AdmissionAutocomplete, ProductAutocomplete } from "@/components/ui";
@@ -11,13 +11,13 @@ import { AdmissionAutocomplete, ProductAutocomplete } from "@/components/ui";
 interface DispenseOrderFormProps {
   order?: DispenseOrder;
   onClose: () => void;
+  formId: string;
 }
 
-export function DispenseOrderForm({ order, onClose }: DispenseOrderFormProps) {
-  const { createOrder, updateOrder, isCreating, isUpdating } = useDispenseOrders();
+export function DispenseOrderForm({ order, onClose, formId }: DispenseOrderFormProps) {
+  const { createOrder, updateOrder } = useDispenseOrders();
   const [submitError, setSubmitError] = useState<string | null>(null);
   const isEditing = !!order;
-  const isSubmitting = isCreating || isUpdating;
 
   const {
     register,
@@ -69,23 +69,8 @@ export function DispenseOrderForm({ order, onClose }: DispenseOrderFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+    <form id={formId} onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {/* <Controller
-          name="patientId"
-          control={control}
-          render={({ field }) => (
-            <PatientAutocomplete
-              selectedKey={field.value || null}
-              onSelectionChange={(key) => field.onChange(key)}
-              label="Patient"
-              placeholder="Search patients..."
-              required
-              error={errors.patientId?.message}
-            />
-          )}
-        /> */}
-
         <Controller
           name="admissionId"
           control={control}
@@ -200,26 +185,6 @@ export function DispenseOrderForm({ order, onClose }: DispenseOrderFormProps) {
       </div>
 
       {submitError && <p className="text-sm text-danger">{submitError}</p>}
-
-      <div className="flex justify-end gap-2 pt-2">
-        <Button variant="ghost" onPress={onClose}>
-          Cancel
-        </Button>
-        <Button
-          type="submit"
-          variant="primary"
-          isDisabled={isSubmitting}
-        >
-          {isSubmitting ? (
-            <span className="flex items-center gap-2">
-              <Spinner size="sm" />
-              {isEditing ? "Updating..." : "Creating..."}
-            </span>
-          ) : (
-            isEditing ? "Update Order" : "Create Order"
-          )}
-        </Button>
-      </div>
     </form>
   );
 }

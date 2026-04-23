@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Input, Button, Spinner, TextArea } from "@heroui/react";
+import { Input, TextArea } from "@heroui/react";
 import { patientSchema, type PatientFormValues, type Patient } from "@/types";
 import { GENDER_VALUES } from "@/types";
 import { usePatients } from "@/hooks/use-patients";
@@ -12,14 +12,14 @@ import { cn } from "@/utils";
 interface PatientFormProps {
   patient?: Patient;
   onClose: () => void;
+  formId: string;
 }
 
-export function PatientForm({ patient, onClose }: PatientFormProps) {
-  const { createPatient, updatePatient, isCreating, isUpdating } =
+export function PatientForm({ patient, onClose, formId }: PatientFormProps) {
+  const { createPatient, updatePatient } =
     usePatients();
   const [submitError, setSubmitError] = useState<string | null>(null);
   const isEditing = !!patient;
-  const isSubmitting = isCreating || isUpdating;
 
   const {
     register,
@@ -77,7 +77,7 @@ export function PatientForm({ patient, onClose }: PatientFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+    <form id={formId} onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
           <label htmlFor="mrn" className="text-sm font-medium">
@@ -197,28 +197,6 @@ export function PatientForm({ patient, onClose }: PatientFormProps) {
       </div>
 
       {submitError && <p className="text-sm text-danger">{submitError}</p>}
-
-      <div className="flex justify-end gap-2 pt-2">
-        <Button variant="ghost" onPress={onClose}>
-          Cancel
-        </Button>
-        <Button
-          type="submit"
-          variant="primary"
-          isDisabled={isSubmitting}
-        >
-          {isSubmitting ? (
-            <span className="flex items-center gap-2">
-              <Spinner size="sm" />
-              {isEditing ? "Updating..." : "Creating..."}
-            </span>
-          ) : isEditing ? (
-            "Update Patient"
-          ) : (
-            "Create Patient"
-          )}
-        </Button>
-      </div>
     </form>
   );
 }

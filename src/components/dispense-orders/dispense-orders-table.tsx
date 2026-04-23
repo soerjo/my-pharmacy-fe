@@ -2,6 +2,7 @@
 
 import { useShallow } from "zustand/react/shallow";
 import {
+  Button,
   Select,
   SelectTrigger,
   SelectValue,
@@ -16,7 +17,6 @@ import { DataTable } from "@/components/ui/data-table";
 import { useDispenseOrders } from "@/hooks/use-dispense-orders";
 import { useDispenseOrdersStore } from "@/stores/dispense-orders-store";
 import { DispenseOrderForm } from "./dispense-order-form";
-import { DispenseOrderModal } from "./dispense-order-form-modal";
 import { formatDate, cn } from "@/utils";
 import type { DispenseOrder, DispenseOrderStatus } from "@/types";
 
@@ -52,6 +52,7 @@ export function DispenseOrdersTable() {
     isFormOpen,
     editingEntity,
     openCreateForm,
+    openEditForm,
     closeForm,
   } = useDispenseOrdersStore(
     useShallow((state) => ({
@@ -60,6 +61,7 @@ export function DispenseOrdersTable() {
       isFormOpen: state.isFormOpen,
       editingEntity: state.editingEntity,
       openCreateForm: state.openCreateForm,
+      openEditForm: state.openEditForm,
       closeForm: state.closeForm,
     })),
   );
@@ -100,13 +102,15 @@ export function DispenseOrdersTable() {
           <TableCell>{order.admissionDate ? formatDate(order.admissionDate) : "-"}</TableCell>
           <TableCell>{order.createdAt ? formatDate(order.createdAt) : "-"}</TableCell>
           <TableCell>
-            <DispenseOrderModal id={order.id!} />
+            <Button size="sm" variant="secondary" onPress={() => openEditForm(order)}>
+              Edit
+            </Button>
           </TableCell>
         </TableRow>
       )}
       isFormOpen={isFormOpen}
       formTitle={editingEntity ? `Edit ${editingEntity.orderNumber}` : "New Dispense Order"}
-      renderForm={(onClose) => <DispenseOrderForm order={editingEntity} onClose={onClose} />}
+      renderForm={(onClose, formId) => <DispenseOrderForm order={editingEntity} onClose={onClose} formId={formId} />}
       onCloseForm={closeForm}
       filters={filters}
       onSearchChange={(value) => setFilters({ search: value })}

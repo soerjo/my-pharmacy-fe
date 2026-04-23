@@ -1,7 +1,7 @@
 "use client";
 
 import { type ReactNode } from "react";
-import { Button, Spinner, useOverlayState } from "@heroui/react";
+import { Button, ModalFooter, Spinner, useOverlayState } from "@heroui/react";
 import {
   Table,
   TableHeader,
@@ -14,7 +14,6 @@ import {
   Modal,
   ModalBackdrop,
   ModalBody,
-  ModalCloseTrigger,
   ModalContainer,
   ModalDialog,
   ModalHeader,
@@ -23,6 +22,8 @@ import {
 import { TablePagination } from "./table-pagination";
 import { TableToolbar } from "./table-toolbar";
 import { Plus } from "@gravity-ui/icons";
+
+const FORM_ID = "data-table-form";
 
 interface DataTableProps<T extends object> {
   entityNamePlural: string;
@@ -37,7 +38,7 @@ interface DataTableProps<T extends object> {
 
   isFormOpen: boolean;
   formTitle: string;
-  renderForm: (onClose: () => void) => ReactNode;
+  renderForm: (onClose: () => void, formId: string) => ReactNode;
   onCloseForm: () => void;
 
   filters: { search: string };
@@ -120,13 +121,20 @@ export function DataTable<T extends object>({
 
       <Modal state={modalState}>
         <ModalBackdrop variant="blur">
-          <ModalContainer>
-            <ModalDialog className="md:max-w-[45vw]">
-              <ModalCloseTrigger />
+          <ModalContainer size="lg" className="p-2 sm:p-10">
+            <ModalDialog className="h-dvh w-full max-w-full rounded-none sm:h-auto sm:w-3/4 sm:max-w-3/4 sm:rounded-3xl">
               <ModalHeader>
                 <ModalHeading>{formTitle}</ModalHeading>
               </ModalHeader>
-              <ModalBody>{renderForm(onCloseForm)}</ModalBody>
+              <ModalBody className="p-2">{renderForm(onCloseForm, FORM_ID)}</ModalBody>
+              <ModalFooter>
+                <Button variant="secondary" onPress={onCloseForm}>
+                  Cancel
+                </Button>
+                <Button type="submit" form={FORM_ID} variant="primary">
+                  Save
+                </Button>
+              </ModalFooter>
             </ModalDialog>
           </ModalContainer>
         </ModalBackdrop>
