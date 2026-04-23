@@ -14,6 +14,7 @@ import { useAppStore, useAuthStore } from "@/stores";
 import { APP_NAME } from "@/constants";
 import { NAV_SECTIONS, type NavItem } from "./nav-items";
 import { ArrowRightFromSquare } from "@gravity-ui/icons";
+import Image from "next/image";
 
 export function AppSidebar() {
   const pathname = usePathname();
@@ -55,9 +56,9 @@ export function AppSidebar() {
         <div className="flex h-14 shrink-0 items-center border-b border-default-200 px-4 dark:border-default-100">
           <Link
             href="/"
-            className="flex items-center gap-2 overflow-hidden whitespace-nowrap font-semibold"
+            className="flex  flex-row items-center gap-2 overflow-hidden whitespace-nowrap font-semibold"
           >
-            {/* <span className="shrink-0 text-lg">P</span> */}
+            <Image src="/pwa-192x192.png" alt="Logo" width={36} height={36} priority />
             <span>{APP_NAME}</span>
           </Link>
         </div>
@@ -73,7 +74,9 @@ export function AppSidebar() {
             <Drawer.Dialog className="w-72">
               <Drawer.Header className="flex items-center gap-2">
                 {/* <span className="text-lg font-semibold">P</span> */}
-                <Drawer.Heading className="font-semibold">
+                <Drawer.Heading className="font-semibold flex  flex-row  items-center gap-2">
+                  {/* i hope i can use my icon here */}
+                  <Image src="/pwa-192x192.png" alt="Logo" width={36} height={36} priority />
                   {APP_NAME}
                 </Drawer.Heading>
                 {/* <Drawer.CloseTrigger className="ml-auto" /> */}

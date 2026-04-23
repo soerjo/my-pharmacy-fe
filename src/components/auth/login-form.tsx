@@ -1,6 +1,7 @@
 "use client";
 
 
+import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Card, CardHeader, CardContent, Input, Button, Spinner } from "@heroui/react";
@@ -39,22 +40,7 @@ export function LoginForm() {
   return (
     <Card className="w-full max-w-md mx-4 px-4 md:mx-0">
       <CardHeader className="flex flex-col items-center gap-2 pb-2">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="48"
-          height="48"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="text-default-400"
-        >
-          <circle cx="12" cy="12" r="10" />
-          <path d="M2 12h20" />
-          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-        </svg>
+        <Image src="/pwa-192x192.png" alt="Logo" width={48} height={48} priority />
         <h1 className="text-2xl font-bold">Sign In</h1>
         <p className="text-sm text-default-400">
           Enter your credentials to continue
