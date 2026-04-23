@@ -3,9 +3,10 @@
 import { useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { dispenseOrderSchema, type DispenseOrderFormValues } from "@/types";
+import { toast } from "@heroui/react";
 import { useDispenseOrders } from "@/hooks/use-dispense-orders";
 import { DispenseOrderFormBody } from "./dispense-order-form-body";
+import { dispenseCreateOrderSchema, DispenseOrderCreateFormValues } from "@/types/dispense-orders";
 
 interface DispenseOrderCreateFormProps {
   onClose: () => void;
@@ -21,8 +22,8 @@ export function DispenseOrderCreateForm({ onClose, formId }: DispenseOrderCreate
     handleSubmit,
     control,
     formState: { errors },
-  } = useForm<DispenseOrderFormValues>({
-    resolver: zodResolver(dispenseOrderSchema),
+  } = useForm<DispenseOrderCreateFormValues>({
+    resolver: zodResolver(dispenseCreateOrderSchema),
     defaultValues: {
       admissionId: "",
       notes: "",
@@ -35,7 +36,7 @@ export function DispenseOrderCreateForm({ onClose, formId }: DispenseOrderCreate
     name: "items",
   });
 
-  async function onSubmit(data: DispenseOrderFormValues) {
+  async function onSubmit(data: DispenseOrderCreateFormValues) {
     setSubmitError(null);
     try {
       await createOrder(data);

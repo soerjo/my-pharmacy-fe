@@ -12,6 +12,7 @@ interface AdmissionAutocompleteProps {
   className?: string;
   error?: string;
   required?: boolean;
+  isDisabled?: boolean;
 }
 
 export function AdmissionAutocomplete({
@@ -22,6 +23,7 @@ export function AdmissionAutocomplete({
   className,
   error,
   required,
+  isDisabled,
 }: AdmissionAutocompleteProps) {
   return (
     <AsyncAutocomplete<Admission>
@@ -42,6 +44,7 @@ export function AdmissionAutocomplete({
       className={className}
       error={error}
       required={required}
+      isDisabled={isDisabled}
     />
   );
 }

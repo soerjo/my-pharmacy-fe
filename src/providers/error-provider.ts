@@ -24,7 +24,5 @@ function extractServerMessage(error: ApiError): string {
 export function onServerError(error: unknown) {
   if (!(error instanceof ApiError)) return;
   const message = extractServerMessage(error);
-  toast.danger("Error", {
-    description: message,
-  });
+  toast.danger("Error", { description: message });
 }

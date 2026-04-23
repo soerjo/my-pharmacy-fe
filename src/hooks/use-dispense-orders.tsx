@@ -2,10 +2,11 @@
 
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query-keys";
-import { onServerError } from "@/providers/error-provider";
 import { depoService } from "@/services/depo-service";
 import { useDispenseOrdersStore } from "@/stores/dispense-orders-store";
 import type { DispenseOrderFormValues } from "@/types";
+import { DispenseOrderCreateFormValues } from "@/types/dispense-orders";
+import { toast } from "@heroui/react";
 
 export function useDispenseOrders() {
   const filters = useDispenseOrdersStore((s) => s.filters);
@@ -37,18 +38,20 @@ export function useDispenseOrders() {
     : null;
 
   const createMutation = useMutation({
-    mutationFn: (data: DispenseOrderFormValues) => depoService.createDispenseOrder(data),
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: queryKeys.dispenseOrders.all }),
-    onError: onServerError,
+    mutationFn: (data: DispenseOrderCreateFormValues) => depoService.createDispenseOrder(data),
+    onSuccess: () => {
+      toast.success("Success", { description: "Order created successfully" });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dispenseOrders.all });
+    }
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: DispenseOrderFormValues }) =>
       depoService.updateDispenseOrder(id, data),
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: queryKeys.dispenseOrders.all }),
-    onError: onServerError,
+    onSuccess: () => {
+      toast.success("Success", { description: "Order updated successfully" });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dispenseOrders.all });
+    }
   });
 
   const updateOrder = async (id: string, data: DispenseOrderFormValues) => {
@@ -57,9 +60,35 @@ export function useDispenseOrders() {
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => depoService.deleteDispenseOrder(id),
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: queryKeys.dispenseOrders.all }),
-    onError: onServerError,
+    onSuccess: () => {
+      toast.success("Success", { description: "Order deleted successfully" });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dispenseOrders.all });
+    }
+  });
+
+  const prepareMutation = useMutation({
+    mutationFn: (id: string) => depoService.prepareDispenseOrder(id),
+    onSuccess: () => {
+      toast.success("Success", { description: "Order is now being prepared" });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dispenseOrders.all });
+    }
+  });
+
+  const dispenseMutation = useMutation({
+    mutationFn: (id: string) => depoService.dispenseDispenseOrder(id),
+    onSuccess: () => {
+      toast.success("Success", { description: "Order has been dispensed" });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dispenseOrders.all });
+    }
+  });
+
+  const cancelMutation = useMutation({
+    mutationFn: ({ id, cancelReason }: { id: string; cancelReason?: string }) =>
+      depoService.cancelDispenseOrder(id, { cancelReason }),
+    onSuccess: () => {
+      toast.success("Success", { description: "Order has been cancelled" });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dispenseOrders.all });
+    }
   });
 
   return {
@@ -78,9 +107,15 @@ export function useDispenseOrders() {
     createOrder: createMutation.mutateAsync,
     updateOrder,
     deleteOrder: deleteMutation.mutateAsync,
+    prepareOrder: prepareMutation.mutateAsync,
+    dispenseOrder: dispenseMutation.mutateAsync,
+    cancelOrder: cancelMutation.mutateAsync,
     isCreating: createMutation.isPending,
     isUpdating: updateMutation.isPending,
     isDeleting: deleteMutation.isPending,
+    isPreparing: prepareMutation.isPending,
+    isDispensing: dispenseMutation.isPending,
+    isCancelling: cancelMutation.isPending,
   };
 }
 

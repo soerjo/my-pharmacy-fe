@@ -21,14 +21,17 @@ import {
   TableCell,
   TableColumn,
   TableRow,
+  TooltipRoot,
+  TooltipContent,
+  toast,
   useOverlayState,
 } from "@heroui/react";
+import { Copy } from "@gravity-ui/icons";
 import { DataTable } from "@/components/ui/data-table";
 import { useDispenseOrders } from "@/hooks/use-dispense-orders";
 import { useDispenseOrdersStore } from "@/stores/dispense-orders-store";
 import { DispenseOrderCreateForm } from "./dispense-order-create-form";
 import { DispenseOrderUpdateForm } from "./dispense-order-update-form";
-import { DispenseOrderFormDetail } from "./dispense-order-form-detail";
 import { formatDate, cn } from "@/utils";
 import type { DispenseOrder, DispenseOrderStatus } from "@/types";
 
@@ -48,6 +51,33 @@ const statusStyles: Record<DispenseOrderStatus, string> = {
 };
 
 const UPDATE_FORM_ID = "dispense-order-update-form";
+
+function CopyableText({ text }: { text?: string | null }) {
+  if (!text) return <p>-</p>;
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(text);
+    toast.success("Copied!", { description: text });
+  };
+
+  return (
+    <TooltipRoot>
+      <div className="flex items-center gap-1.5">
+        <p>{text}</p>
+        <TooltipContent showArrow>
+          <span className="text-xs">Copy</span>
+        </TooltipContent>
+        <button
+          type="button"
+          onClick={handleCopy}
+          className="text-default-400 hover:text-default-600 transition-colors hover:cursor-pointer"
+        >
+          <Copy className="size-3.5" />
+        </button>
+      </div>
+    </TooltipRoot>
+  );
+}
 
 export function DispenseOrdersTable() {
   const {
@@ -76,33 +106,22 @@ export function DispenseOrdersTable() {
     })),
   );
 
-  const [detailId, setDetailId] = useState<string | null>(null);
   const [updateId, setUpdateId] = useState<string | null>(null);
-
-  const detailModalState = useOverlayState({
-    isOpen: !!detailId,
-    onOpenChange: (open) => {
-      if (!open) setDetailId(null);
-    },
-  });
+  const [updateOrderStatus, setUpdateOrderStatus] = useState<DispenseOrderStatus | null>(null);
 
   const updateModalState = useOverlayState({
     isOpen: !!updateId,
     onOpenChange: (open) => {
-      if (!open) setUpdateId(null);
+      if (!open) {
+        setUpdateId(null);
+        setUpdateOrderStatus(null);
+      }
     },
   });
 
-  function openDetail(id: string) {
-    setDetailId(id);
-  }
-
-  function openUpdate(id: string) {
+  function openUpdate(id: string, status: DispenseOrderStatus) {
     setUpdateId(id);
-  }
-
-  function closeDetail() {
-    setDetailId(null);
+    setUpdateOrderStatus(status);
   }
 
   function closeUpdate() {
@@ -121,18 +140,30 @@ export function DispenseOrdersTable() {
           <>
             <TableColumn isRowHeader>Order #</TableColumn>
             <TableColumn>Admission #</TableColumn>
-            <TableColumn>Type</TableColumn>
+            {/* <TableColumn>Patient Name</TableColumn> */}
             <TableColumn>Status</TableColumn>
-            <TableColumn>Admission Date</TableColumn>
-            <TableColumn>Created At</TableColumn>
+            {/* <TableColumn>Created At</TableColumn> */}
+            <TableColumn>Created By</TableColumn>
             <TableColumn>Actions</TableColumn>
           </>
         }
         renderRow={(order: DispenseOrder) => (
           <TableRow key={order.orderNumber}>
-            <TableCell>{order.orderNumber}</TableCell>
-            <TableCell>{order.admissionNumber ?? "-"}</TableCell>
-            <TableCell>{order.type ?? "-"}</TableCell>
+            <TableCell>
+              <div>
+                <p>{order.orderNumber}</p>              
+                <p className="text-xs text-default-400"> {order.createdAt ? formatDate(order.createdAt) : "-"} | {order.patientName ?? "-"}</p>
+              </div>
+              </TableCell>
+            <TableCell>
+              <div>
+                <CopyableText text={order.admissionNumber} />
+                <p className="text-xs text-default-400">
+                  {order.type ?? "-"} | {order.admissionDate ? formatDate(order.admissionDate) : "-"}
+                </p>
+              </div>
+            </TableCell>
+            {/* <TableCell>{order.patientName ?? "-"}</TableCell> */}
             <TableCell>
               <span
                 className={cn(
@@ -143,15 +174,13 @@ export function DispenseOrdersTable() {
                 {order.status}
               </span>
             </TableCell>
-            <TableCell>{order.admissionDate ? formatDate(order.admissionDate) : "-"}</TableCell>
-            <TableCell>{order.createdAt ? formatDate(order.createdAt) : "-"}</TableCell>
+            {/* <TableCell>{order.admissionDate ? formatDate(order.admissionDate) : "-"}</TableCell> */}
+            {/* <TableCell>{order.createdAt ? formatDate(order.createdAt) : "-"}</TableCell> */}
+            <TableCell>{order.createdByName ? order.createdByName : "-"}</TableCell>
             <TableCell>
               <div className="flex gap-1">
-                <Button size="sm" variant="secondary" onPress={() => openDetail(order.id ?? order.orderNumber)}>
-                  Detail
-                </Button>
-                <Button size="sm" variant="secondary" onPress={() => openUpdate(order.id ?? order.orderNumber)}>
-                  Edit
+                <Button size="sm" variant="secondary" onPress={() => openUpdate(order.id!, order.status)}>
+                  Details
                 </Button>
               </div>
             </TableCell>
@@ -195,28 +224,7 @@ export function DispenseOrdersTable() {
         onPageSizeChange={setPageSize}
       />
 
-      {/* Detail Modal */}
-      <Modal state={detailModalState}>
-        <ModalBackdrop variant="blur">
-          <ModalContainer size="lg" className="p-2 sm:p-10">
-            <ModalDialog className="h-dvh w-full max-w-full sm:h-auto sm:w-3/4 sm:max-w-3/4 sm:rounded-3xl">
-              <ModalHeader>
-                <ModalHeading>Order Detail</ModalHeading>
-              </ModalHeader>
-              <ModalBody className="p-2">
-                {detailId && <DispenseOrderFormDetail id={detailId} />}
-              </ModalBody>
-              <ModalFooter>
-                <Button variant="secondary" onPress={closeDetail}>
-                  Close
-                </Button>
-              </ModalFooter>
-            </ModalDialog>
-          </ModalContainer>
-        </ModalBackdrop>
-      </Modal>
-
-      {/* Update Modal */}
+      {/* Update Modal => could be used for view details */}
       <Modal state={updateModalState}>
         <ModalBackdrop variant="blur">
           <ModalContainer size="lg" className="p-2 sm:p-10">
@@ -229,11 +237,13 @@ export function DispenseOrdersTable() {
               </ModalBody>
               <ModalFooter>
                 <Button variant="secondary" onPress={closeUpdate}>
-                  Cancel
+                  {updateOrderStatus === "DISPENSED" || updateOrderStatus === "CANCELLED" ? "Close" : "Cancel"}
                 </Button>
-                <Button type="submit" form={UPDATE_FORM_ID} variant="primary">
-                  Save
-                </Button>
+                {updateOrderStatus !== "DISPENSED" && updateOrderStatus !== "CANCELLED" && (
+                  <Button type="submit" form={UPDATE_FORM_ID} variant="primary">
+                    Save
+                  </Button>
+                )}
               </ModalFooter>
             </ModalDialog>
           </ModalContainer>

@@ -31,6 +31,7 @@ export interface DispenseOrder {
   orgId?: string;
   orderNumber: string;
   patientId: string;
+  patientName: string;
   admissionId: string;
   dispensedAt: string | null;
   notes: string;
@@ -38,6 +39,7 @@ export interface DispenseOrder {
   status: DispenseOrderStatus;
   createdAt: string;
   createdBy: string;
+  createdByName: string;
   updatedAt?: string;
   updatedBy?: string | null;
   type: string | null;
@@ -52,6 +54,7 @@ export interface DispenseOrderDetail {
   orderNumber: string;
   patientId: string;
   admissionId: string;
+  patientName: string;
   dispensedAt: string | null;
   notes: string;
   cancelReason: string | null;
@@ -76,8 +79,19 @@ const dispenseOrderItemSchema = z.object({
 export const dispenseOrderSchema = z.object({
   // patientId: z.string().min(1, "Patient is required"),
   admissionId: z.string().min(1, "Admission is required"),
+  status: z.enum(["PENDING", "PREPARING", "DISPENSED", "CANCELLED"]),
+  notes: z.string(),
+  items: z.array(dispenseOrderItemSchema).min(1, "At least one item is required"),
+});
+
+
+export const dispenseCreateOrderSchema = z.object({
+  // patientId: z.string().min(1, "Patient is required"),
+  admissionId: z.string().min(1, "Admission is required"),
+  // status: z.enum(["PENDING", "PREPARING", "DISPENSED", "CANCELLED"]),
   notes: z.string(),
   items: z.array(dispenseOrderItemSchema).min(1, "At least one item is required"),
 });
 
 export type DispenseOrderFormValues = z.infer<typeof dispenseOrderSchema>;
+export type DispenseOrderCreateFormValues = z.infer<typeof dispenseCreateOrderSchema>;

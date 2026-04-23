@@ -55,6 +55,8 @@ export interface Product {
   manufacturerName?: string;
   baseUnitId?: string;
   baseUnitName?: string;
+  baseUnitCode?: string;
+  baseUnitAbbreviation?: string;
   active: boolean;
   createdAt: string;
   updatedAt: string;

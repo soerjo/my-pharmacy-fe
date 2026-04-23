@@ -24,7 +24,7 @@ export function QueryProvider({ children }: { children: ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Toast.Provider placement="bottom end"/>
+      <Toast.Provider placement="top end"/>
       {children}
     </QueryClientProvider>
   );

@@ -30,6 +30,8 @@ interface AsyncAutocompleteProps<T extends object> {
   className?: string;
   error?: string;
   required?: boolean;
+  isDisabled?: boolean;
+  onItemSelect?: (item: T | null) => void;
 }
 
 export function AsyncAutocomplete<T extends object>({
@@ -46,6 +48,8 @@ export function AsyncAutocomplete<T extends object>({
   className,
   error,
   required,
+  isDisabled,
+  onItemSelect,
 }: AsyncAutocompleteProps<T>) {
   const [inputValue, setInputValue] = useState("");
   const { data: items = [], isLoading } = useSearch(inputValue);
@@ -62,15 +66,20 @@ export function AsyncAutocomplete<T extends object>({
       <Autocomplete
         allowsEmptyCollection
         className={className}
+        // isDisabled={isDisabled}
+        // isDisabled
         selectionMode="single"
         value={selectedKey}
-        onChange={(key) => onSelectionChange(key as string | null)}
+        onChange={(key) => {
+          onSelectionChange(key as string | null);
+          onItemSelect?.(key ? (mergedItems.find((item) => getId(item) === key) ?? null) : null);
+        }}
       >
         <Label>
           {label}
           {required && <span className="text-danger"> *</span>}
         </Label>
-        <Autocomplete.Trigger>
+        <Autocomplete.Trigger isDisabled={isDisabled}>
           <Autocomplete.Value />
           <Autocomplete.ClearButton />
           <Autocomplete.Indicator />

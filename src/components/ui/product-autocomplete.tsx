@@ -13,6 +13,8 @@ interface ProductAutocompleteProps {
   className?: string;
   error?: string;
   required?: boolean;
+  isDisabled?: boolean;
+  onProductSelect?: (product: Product | null) => void;
 }
 
 export function ProductAutocomplete({
@@ -24,6 +26,8 @@ export function ProductAutocomplete({
   className,
   error,
   required,
+  isDisabled,
+  onProductSelect,
 }: ProductAutocompleteProps) {
   return (
     <AsyncAutocomplete<Product>
@@ -45,6 +49,8 @@ export function ProductAutocomplete({
       className={className}
       error={error}
       required={required}
+      isDisabled={isDisabled}
+      onItemSelect={onProductSelect}
     />
   );
 }

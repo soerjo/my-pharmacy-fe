@@ -13,6 +13,7 @@ import type {
   DispenseOrderFormValues,
   DispenseOrderDetail,
 } from "@/types";
+import { DispenseOrderCreateFormValues } from "@/types/dispense-orders";
 
 export const depoService = {
   getDispenseOrders: (params?: { search?: string; status?: string; page?: number; limit?: number }) => {
@@ -30,7 +31,7 @@ export const depoService = {
   getDispenseOrder: (id: string) =>
     clients.depo.get<ApiResponse<DispenseOrderDetail>>(`/dispense-orders/${id}`),
 
-  createDispenseOrder: (data: DispenseOrderFormValues) =>
+  createDispenseOrder: (data: DispenseOrderCreateFormValues) =>
     clients.depo.post<ApiResponse<DispenseOrder>>("/dispense-orders", data),
 
   updateDispenseOrder: (id: string, data: DispenseOrderFormValues) =>
@@ -38,6 +39,15 @@ export const depoService = {
 
   deleteDispenseOrder: (id: string) =>
     clients.depo.delete<ApiResponse<void>>(`/dispense-orders/${id}`),
+
+  prepareDispenseOrder: (id: string) =>
+    clients.depo.post<ApiResponse<DispenseOrder>>(`/dispense-orders/${id}/prepare`),
+
+  dispenseDispenseOrder: (id: string) =>
+    clients.depo.post<ApiResponse<DispenseOrder>>(`/dispense-orders/${id}/dispense`),
+
+  cancelDispenseOrder: (id: string, data?: { cancelReason?: string }) =>
+    clients.depo.post<ApiResponse<DispenseOrder>>(`/dispense-orders/${id}/cancel`, data),
 
   getPatients: (params?: { isActive?: boolean; search?: string; page?: number; limit?: number }) => {
     const searchParams = new URLSearchParams();

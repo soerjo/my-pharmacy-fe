@@ -3,20 +3,22 @@
 import type { UseFormRegister, Control, FieldErrors } from "react-hook-form";
 import { Controller } from "react-hook-form";
 import { Input, Button, TextArea } from "@heroui/react";
-import type { DispenseOrderFormValues } from "@/types";
+// import type { DispenseOrderFormValues } from "@/types";
 import { AdmissionAutocomplete, ProductAutocomplete } from "@/components/ui";
+import { DispenseOrderCreateFormValues } from "@/types/dispense-orders";
 
 interface FormField {
   id: string;
 }
 
 interface DispenseOrderFormBodyProps {
-  control: Control<DispenseOrderFormValues>;
-  register: UseFormRegister<DispenseOrderFormValues>;
-  errors: FieldErrors<DispenseOrderFormValues>;
+  control: Control<DispenseOrderCreateFormValues>;
+  register: UseFormRegister<DispenseOrderCreateFormValues>;
+  errors: FieldErrors<DispenseOrderCreateFormValues>;
   fields: FormField[];
   append: (value: { drugId: string; quantity: number; instructions: string }) => void;
   remove: (index: number) => void;
+  isDisabled?: boolean;
 }
 
 export function DispenseOrderFormBody({
@@ -26,6 +28,7 @@ export function DispenseOrderFormBody({
   fields,
   append,
   remove,
+  isDisabled = false,
 }: DispenseOrderFormBodyProps) {
   return (
     <>
@@ -40,6 +43,7 @@ export function DispenseOrderFormBody({
               label="Admission"
               placeholder="Search admissions..."
               required
+              isDisabled={isDisabled}
               error={errors.admissionId?.message}
             />
           )}
@@ -56,6 +60,7 @@ export function DispenseOrderFormBody({
             variant="secondary"
             type="button"
             onPress={() => append({ drugId: "", quantity: 1, instructions: "" })}
+            isDisabled={isDisabled}
           >
             + Add Item
           </Button>
@@ -81,6 +86,7 @@ export function DispenseOrderFormBody({
                     label={index === 0 ? "Drug" : undefined}
                     placeholder="Search drug..."
                     required
+                    isDisabled={isDisabled}
                     error={errors.items?.[index]?.drugId?.message}
                   />
                 )}
@@ -96,6 +102,7 @@ export function DispenseOrderFormBody({
                   type="number"
                   min={1}
                   placeholder="Qty"
+                  disabled={isDisabled}
                   {...register(`items.${index}.quantity`, { valueAsNumber: true })}
                 />
                 {errors.items?.[index]?.quantity && (
@@ -109,6 +116,7 @@ export function DispenseOrderFormBody({
                 )}
                 <Input
                   placeholder="Instructions"
+                  disabled={isDisabled}
                   {...register(`items.${index}.instructions`)}
                 />
               </div>
@@ -120,6 +128,7 @@ export function DispenseOrderFormBody({
                   type="button"
                   className="self-end"
                   onPress={() => remove(index)}
+                  isDisabled={isDisabled}
                 >
                   Remove
                 </Button>
@@ -136,6 +145,7 @@ export function DispenseOrderFormBody({
         <TextArea
           id="notes"
           placeholder="Additional notes (optional)"
+          disabled={isDisabled}
           {...register("notes")}
         />
         {errors.notes && (

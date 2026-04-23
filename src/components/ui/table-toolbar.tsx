@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { Label, SearchField} from "@heroui/react";
 import { Button, Input } from "@heroui/react";
 import { Magnifier, Plus } from "@gravity-ui/icons";
 
@@ -37,8 +38,8 @@ export function TableToolbar({
       <h2 className="text-xl font-semibold">{title}</h2>
       <div className="flex md:flex-row flex-col items-center justify-end gap-3">
         <div className="relative w-full sm:w-64">
-          <Magnifier className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-default-400" />
-          <Input
+          {/* <Magnifier className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-default-400" /> */}
+          {/* <Input
           fullWidth
             placeholder={searchPlaceholder}
             value={localSearch}
@@ -52,7 +53,25 @@ export function TableToolbar({
             }}
             className="pl-8"
             aria-label={searchPlaceholder}
-          />
+          /> */}
+
+          <SearchField name="search" value={localSearch} onChange={(e) => {
+              const value = e;
+              setLocalSearch(value);
+              if (debounceRef.current) clearTimeout(debounceRef.current);
+              debounceRef.current = setTimeout(() => {
+                onSearchChange(value);
+              }, 300);
+            }}>
+            {/* <Label>Search</Label> */}
+            <SearchField.Group>
+              <SearchField.SearchIcon />
+              <SearchField.Input className="w-[280px]" placeholder="Search..." />
+              <SearchField.ClearButton />
+            </SearchField.Group>
+            {/* <Description>Current value: {value || "(empty)"}</Description> */}
+          </SearchField>
+
         </div>
         <div className="flex items-center justify-end gap-2 w-full">
         {extra}
