@@ -10,13 +10,12 @@ import { registerSchema, type RegisterFormValues } from "@/types";
 import { useRegisterStore } from "@/stores";
 import { AppLink, PasswordInput } from "@/components/ui";
 import { ROUTES } from "@/constants";
-import { ApiError } from "@/lib";
+import { onServerError } from "@/providers/error-provider";
 
 export function RegisterForm() {
   const { register: registerUser, isLoading } = useRegisterStore();
   const router = useRouter();
   const [success, setSuccess] = useState(false);
-  const [apiErrMsg, setApiErrMsg] = useState<string>("");
 
   const {
     register,
@@ -33,21 +32,13 @@ export function RegisterForm() {
     },
   });
 
-  async function onSubmit(data: RegisterFormValues, event?: React.BaseSyntheticEvent) {
-    event?.preventDefault();
-    
+  async function onSubmit(data: RegisterFormValues) {
     try {
       await registerUser(data);
       setSuccess(true);
       router.push(ROUTES.login);
-    } catch(error: unknown) {
-      if(error instanceof ApiError) {
-        if(error.status == 400) {
-          const errorMessage = error.message;
-          const errorResponse: ApiError = JSON.parse(errorMessage);
-          setApiErrMsg(errorResponse.message);
-        }
-      }
+    } catch (err) {
+      onServerError(err);
     }
   }
   
@@ -107,15 +98,6 @@ export function RegisterForm() {
 
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-          {/* {error && (
-            <div
-              role="alert"
-              className="rounded-lg bg-danger-50 border border-danger-200 px-4 py-3 text-sm text-danger-700 dark:bg-danger-950 dark:border-danger-800 dark:text-danger-300"
-            >
-              {error.message || "Registration failed. Please try again."}
-            </div>
-          )} */}
-
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
               <label htmlFor="firstName" className="text-sm font-medium">
@@ -184,8 +166,6 @@ export function RegisterForm() {
               required
             />
           </div>
-
-          {apiErrMsg && <p className="text-sm text-red-400">{apiErrMsg}</p>}
 
           <Button
             type="submit"

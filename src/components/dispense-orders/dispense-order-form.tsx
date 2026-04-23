@@ -1,11 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input, Button, Spinner, TextArea } from "@heroui/react";
 import { dispenseOrderSchema, type DispenseOrderFormValues, type DispenseOrder } from "@/types";
 import { useDispenseOrders } from "@/hooks/use-dispense-orders";
-import { PatientAutocomplete, AdmissionAutocomplete, ProductAutocomplete } from "@/components/ui";
+import { AdmissionAutocomplete, ProductAutocomplete } from "@/components/ui";
 
 interface DispenseOrderFormProps {
   order?: DispenseOrder;
@@ -14,6 +15,7 @@ interface DispenseOrderFormProps {
 
 export function DispenseOrderForm({ order, onClose }: DispenseOrderFormProps) {
   const { createOrder, updateOrder, isCreating, isUpdating } = useDispenseOrders();
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const isEditing = !!order;
   const isSubmitting = isCreating || isUpdating;
 
@@ -49,13 +51,21 @@ export function DispenseOrderForm({ order, onClose }: DispenseOrderFormProps) {
   });
 
   async function onSubmit(data: DispenseOrderFormValues) {
-    console.log("Form data:", data);
-    if (isEditing && order) {
-      await updateOrder(order.id ?? order.orderNumber, data);
-    } else {
-      await createOrder(data);
+    setSubmitError(null);
+    try {
+      if (isEditing && order) {
+        await updateOrder(order.id ?? order.orderNumber, data);
+      } else {
+        await createOrder(data);
+      }
+      onClose();
+    } catch {
+      setSubmitError(
+        isEditing
+          ? "Failed to update order. Please try again."
+          : "Failed to create order. Please try again.",
+      );
     }
-    onClose();
   }
 
   return (
@@ -188,6 +198,8 @@ export function DispenseOrderForm({ order, onClose }: DispenseOrderFormProps) {
           <p className="text-sm text-danger">{errors.notes.message}</p>
         )}
       </div>
+
+      {submitError && <p className="text-sm text-danger">{submitError}</p>}
 
       <div className="flex justify-end gap-2 pt-2">
         <Button variant="ghost" onPress={onClose}>

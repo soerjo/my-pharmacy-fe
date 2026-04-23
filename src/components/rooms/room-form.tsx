@@ -6,7 +6,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Input, Button, Spinner } from "@heroui/react";
 import { roomSchema, type RoomFormValues, type Room } from "@/types";
 import { useRooms } from "@/hooks/use-rooms";
-import { onServerError } from "@/providers/error-provider";
 import { RoomCategoryAutocomplete } from "@/components/ui/room-category-autocomplete";
 
 interface RoomFormProps {
@@ -25,8 +24,6 @@ export function RoomForm({ room, onClose }: RoomFormProps) {
     register,
     handleSubmit,
     formState: { errors },
-    setValue,
-    watch,
     control,
   } = useForm<RoomFormValues>({
     resolver: zodResolver(roomSchema),
@@ -58,8 +55,7 @@ export function RoomForm({ room, onClose }: RoomFormProps) {
         await createRoom(payload);
       }
       onClose();
-    } catch (err) {
-      onServerError(err);
+    } catch {
       setSubmitError(
         isEditing
           ? "Failed to update room. Please try again."

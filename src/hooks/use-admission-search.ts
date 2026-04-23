@@ -16,6 +16,7 @@ export function useAdmissionSearch(search: string, limit = 20) {
       depoService.getAdmissions({
         search: debouncedSearch || undefined,
         limit,
+        isActive: true,
       }),
     select: (response) => response.data.data,
   });

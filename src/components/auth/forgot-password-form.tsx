@@ -9,6 +9,7 @@ import { forgotPasswordSchema, type ForgotPasswordFormValues } from "@/types";
 import { useForgotPasswordStore } from "@/stores";
 import { AppLink } from "@/components/ui";
 import { ROUTES } from "@/constants";
+import { onServerError } from "@/providers/error-provider";
 
 export function ForgotPasswordForm() {
   const { forgotPassword, isLoading } = useForgotPasswordStore();
@@ -29,7 +30,8 @@ export function ForgotPasswordForm() {
     try {
       await forgotPassword(data);
       setIsSuccess(true);
-    } catch {
+    } catch (err) {
+      onServerError(err);
     }
   }
 

@@ -18,7 +18,7 @@ const PAGE_SIZE_OPTIONS = [
   { id: "100", label: "100 / page" },
 ];
 
-interface PatientsPaginationProps {
+interface TablePaginationProps {
   page: number;
   pageSize: number;
   totalItems: number;
@@ -27,35 +27,29 @@ interface PatientsPaginationProps {
   onPageSizeChange: (size: number) => void;
 }
 
-export function PatientsPagination({
+export function TablePagination({
   page,
   pageSize,
   totalItems,
   totalPages,
   onPageChange,
   onPageSizeChange,
-}: PatientsPaginationProps) {
+}: TablePaginationProps) {
   const pages = useMemo(() => {
-    if (totalPages <= 7) {
+    if (totalPages <= 4) {
       return Array.from({ length: totalPages }, (_, i) => i + 1);
     }
 
     const delta: (number | "ellipsis")[] = [1];
 
-    if (page > 3) {
-      delta.push("ellipsis");
-    }
+    if (page > 3) delta.push("ellipsis");
 
     const start = Math.max(2, page - 1);
     const end = Math.min(totalPages - 1, page + 1);
 
-    for (let i = start; i <= end; i++) {
-      delta.push(i);
-    }
+    for (let i = start; i <= end; i++) delta.push(i);
 
-    if (page < totalPages - 2) {
-      delta.push("ellipsis");
-    }
+    if (page < totalPages - 2) delta.push("ellipsis");
 
     delta.push(totalPages);
 
@@ -63,8 +57,8 @@ export function PatientsPagination({
   }, [page, totalPages]);
 
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between px-2 py-3">
-      <div className="flex items-center gap-3">
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between items-center justify-center px-2 py-3 w-full">
+      <div className="flex items-center gap-3 w-full">
         <Pagination.Summary>
           {totalItems} result{totalItems !== 1 ? "s" : ""}
         </Pagination.Summary>
@@ -90,7 +84,7 @@ export function PatientsPagination({
         </Select>
       </div>
       {totalPages > 1 && (
-        <Pagination size="sm">
+        <Pagination size="sm" className="w-fit">
           <Pagination.Content>
             <Pagination.Item>
               <Pagination.Previous
@@ -100,17 +94,14 @@ export function PatientsPagination({
                 <Pagination.PreviousIcon />
               </Pagination.Previous>
             </Pagination.Item>
-            {pages.map((p) =>
+            {pages.map((p, i) =>
               p === "ellipsis" ? (
-                <Pagination.Item key={`ellipsis-${p}`}>
+                <Pagination.Item key={`ellipsis-${i}`}>
                   <Pagination.Ellipsis />
                 </Pagination.Item>
               ) : (
                 <Pagination.Item key={p}>
-                  <Pagination.Link
-                    isActive={p === page}
-                    onPress={() => onPageChange(p)}
-                  >
+                  <Pagination.Link isActive={p === page} onPress={() => onPageChange(p)}>
                     {p}
                   </Pagination.Link>
                 </Pagination.Item>

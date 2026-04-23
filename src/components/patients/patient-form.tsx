@@ -7,7 +7,6 @@ import { Input, Button, Spinner, TextArea } from "@heroui/react";
 import { patientSchema, type PatientFormValues, type Patient } from "@/types";
 import { GENDER_VALUES } from "@/types";
 import { usePatients } from "@/hooks/use-patients";
-import { onServerError } from "@/providers/error-provider";
 import { cn } from "@/utils";
 
 interface PatientFormProps {
@@ -68,8 +67,7 @@ export function PatientForm({ patient, onClose }: PatientFormProps) {
         await createPatient(payload);
       }
       onClose();
-    } catch (err) {
-      onServerError(err);
+    } catch {
       setSubmitError(
         isEditing
           ? "Failed to update patient. Please try again."

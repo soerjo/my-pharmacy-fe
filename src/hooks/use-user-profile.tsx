@@ -7,12 +7,13 @@ export function useUserProfile() {
   const query = useQuery({
     queryKey: queryKeys.auth.me,
     queryFn: () => authService.getProfile(),
+    select: (response) => response.data,
     enabled: typeof window !== "undefined",
     staleTime: 1000 * 60 * 5,
   });
 
   return {
-    user: query.data?.data ?? null,
+    user: query.data ?? null,
     isLoading: query.isLoading,
     error: query.error,
   };

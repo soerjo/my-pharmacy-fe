@@ -3,7 +3,7 @@ import { z } from "zod";
 export const roomSchema = z.object({
   code: z.string().optional(),
   name: z.string().min(1, "Name is required"),
-  categoryId: z.string(),
+  categoryId: z.string().min(1, "Category is required"),
 });
 
 export type RoomFormValues = z.infer<typeof roomSchema>;

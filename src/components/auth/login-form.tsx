@@ -9,6 +9,7 @@ import { loginSchema, type LoginFormValues } from "@/types";
 import { useLoginStore } from "@/stores";
 import { AppLink, PasswordInput } from "@/components/ui";
 import { ROUTES } from "@/constants";
+import { onServerError } from "@/providers/error-provider";
 
 export function LoginForm() {
   const { login, isLoading } = useLoginStore();
@@ -30,7 +31,9 @@ export function LoginForm() {
     try {
       await login(data);
       router.push(ROUTES.home);
-    } catch {}
+    } catch (err) {
+      onServerError(err);
+    }
   }
 
   return (
@@ -60,15 +63,6 @@ export function LoginForm() {
 
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-          {/* {error && (
-            <div
-              role="alert"
-              className="rounded-lg bg-danger-50 border border-danger-200 px-4 py-3 text-sm text-danger-700 dark:bg-danger-950 dark:border-danger-800 dark:text-danger-300"
-            >
-              {error.message || "Login failed. Please try again."}
-            </div>
-          )} */}
-
           <div className="flex flex-col gap-1.5">
             <label htmlFor="email" className="text-sm font-medium">
               Email <span className="text-danger">*</span>
@@ -117,13 +111,6 @@ export function LoginForm() {
               "Sign In"
             )}
           </Button>
-
-          {/* <p className="text-center text-sm text-default-400">
-            Don&apos;t have an account?{" "}
-            <AppLink href={ROUTES.register} className="text-primary font-medium">
-              Create one
-            </AppLink>
-          </p> */}
         </form>
       </CardContent>
     </Card>

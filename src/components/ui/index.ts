@@ -10,3 +10,6 @@ export { ProductTypeAutocomplete } from "./product-type-autocomplete";
 export { UnitOfMeasureAutocomplete } from "./unit-of-measure-autocomplete";
 export { ProductCategoryAutocomplete } from "./product-category-autocomplete";
 export { ManufacturerAutocomplete } from "./manufacturer-autocomplete";
+export { DataTable } from "./data-table";
+export { TablePagination } from "./table-pagination";
+export { TableToolbar } from "./table-toolbar";

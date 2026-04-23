@@ -11,7 +11,6 @@ import {
   DOSAGE_FORM_VALUES,
 } from "@/types";
 import { useProducts } from "@/hooks/use-products";
-import { onServerError } from "@/providers/error-provider";
 import {
   ProductTypeAutocomplete,
   UnitOfMeasureAutocomplete,
@@ -83,8 +82,7 @@ export function ProductForm({ product, onClose }: ProductFormProps) {
         await createProduct(payload);
       }
       onClose();
-    } catch (err) {
-      onServerError(err);
+    } catch {
       setSubmitError(
         isEditing
           ? "Failed to update product. Please try again."

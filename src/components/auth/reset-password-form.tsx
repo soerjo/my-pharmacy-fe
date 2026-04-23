@@ -31,12 +31,11 @@ export function ResetPasswordForm() {
     },
   });
 
-  async function onSubmit(data: ResetPasswordFormValues, event?: React.BaseSyntheticEvent) {
-    event?.preventDefault();
+  async function onSubmit(data: ResetPasswordFormValues) {
     try {
       await resetPassword({ ...data, token });
       setIsSuccess(true);
-    } catch (err) {
+    } catch {
       setIsApiError(true);
     }
   }

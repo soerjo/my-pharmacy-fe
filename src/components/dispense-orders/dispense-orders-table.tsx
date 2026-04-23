@@ -1,30 +1,45 @@
 "use client";
 
 import { useShallow } from "zustand/react/shallow";
-import { Button, Spinner } from "@heroui/react";
 import {
-  Table,
-  TableHeader,
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectPopover,
+  ListBox,
+  ListBoxItem,
+  TableCell,
   TableColumn,
-  TableBody,
-  TableContent,
-  TableFooter,
+  TableRow,
 } from "@heroui/react";
+import { DataTable } from "@/components/ui/data-table";
 import { useDispenseOrders } from "@/hooks/use-dispense-orders";
 import { useDispenseOrdersStore } from "@/stores/dispense-orders-store";
-import { onServerError } from "@/providers/error-provider";
 import { DispenseOrderForm } from "./dispense-order-form";
-import { DispenseOrdersToolbar } from "./dispense-orders-toolbar";
-import { DispenseOrderRow } from "./dispense-order-row";
-import { DispenseOrdersPagination } from "./dispense-orders-pagination";
+import { DispenseOrderModal } from "./dispense-order-form-modal";
+import { formatDate, cn } from "@/utils";
+import type { DispenseOrder, DispenseOrderStatus } from "@/types";
+
+const STATUS_OPTIONS: { id: string; label: string }[] = [
+  { id: "", label: "All statuses" },
+  { id: "PENDING", label: "Pending" },
+  { id: "PREPARING", label: "Preparing" },
+  { id: "DISPENSED", label: "Dispensed" },
+  { id: "CANCELLED", label: "Cancelled" },
+];
+
+const statusStyles: Record<DispenseOrderStatus, string> = {
+  PENDING: "bg-yellow-100 text-yellow-800 dark:bg-yellow-950 dark:text-yellow-300",
+  PREPARING: "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300",
+  DISPENSED: "bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300",
+  CANCELLED: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300",
+};
 
 export function DispenseOrdersTable() {
   const {
     dispenseOrders,
     isLoading,
-    isFetching,
     error,
-    deleteOrder,
     pagination,
     paginationMeta,
     setPage,
@@ -35,127 +50,96 @@ export function DispenseOrdersTable() {
     filters,
     setFilters,
     isFormOpen,
-    editingOrder,
-    deletingId,
+    editingEntity,
     openCreateForm,
-    openEditForm,
     closeForm,
-    setDeletingId,
   } = useDispenseOrdersStore(
     useShallow((state) => ({
       filters: state.filters,
       setFilters: state.setFilters,
       isFormOpen: state.isFormOpen,
-      editingOrder: state.editingOrder,
-      deletingId: state.deletingId,
+      editingEntity: state.editingEntity,
       openCreateForm: state.openCreateForm,
-      openEditForm: state.openEditForm,
       closeForm: state.closeForm,
-      setDeletingId: state.setDeletingId,
     })),
   );
 
-  const totalPages = paginationMeta?.totalPages ?? 1;
-  const totalItems = paginationMeta?.total ?? 0;
-
-  async function handleDelete(id: string) {
-    setDeletingId(id);
-    try {
-      await deleteOrder(id);
-    } catch (err) {
-      onServerError(err);
-    } finally {
-      setDeletingId(null);
-    }
-  }
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center py-12">
-        <Spinner size="lg" />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center gap-4 rounded-xl border border-danger/20 bg-danger/5 py-12">
-        <p className="text-sm text-danger">Failed to load dispense orders. Please try again.</p>
-        <Button
-          variant="secondary"
-          size="sm"
-          onPress={() => window.location.reload()}
-        >
-          Retry
-        </Button>
-      </div>
-    );
-  }
-
   return (
-    <div className="flex flex-col gap-4">
-      <DispenseOrdersToolbar
-        searchValue={filters.search}
-        statusValue={filters.status}
-        onSearchChange={(value) => setFilters({ search: value })}
-        onStatusChange={(value) => setFilters({ status: value })}
-        onAdd={openCreateForm}
-      />
-
-      {isFormOpen && (
-        <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6">
-          <h3 className="text-lg font-semibold mb-4">
-            {editingOrder ? `Edit ${editingOrder.orderNumber}` : "New Dispense Order"}
-          </h3>
-          <DispenseOrderForm
-            order={editingOrder}
-            onClose={closeForm}
-          />
-        </div>
-      )}
-
-      {dispenseOrders.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 py-12 text-center text-zinc-500">
-          {filters.search
-            ? `No dispense orders found for "${filters.search}".`
-            : 'No dispense orders found. Click "+ New Order" to create one.'}
-        </div>
-      ) : (
-        <Table aria-label="Dispense orders table">
-          <TableContent>
-            <TableHeader>
-              <TableColumn isRowHeader>Order #</TableColumn>
-              <TableColumn>Admission #</TableColumn>
-              <TableColumn>Type</TableColumn>
-              <TableColumn>Status</TableColumn>
-              <TableColumn>Admission Date</TableColumn>
-              <TableColumn>Created At</TableColumn>
-              <TableColumn>Actions</TableColumn>
-            </TableHeader>
-            <TableBody items={dispenseOrders} >
-              {(order: any) => (
-                <DispenseOrderRow
-                  key={order.orderNumber}
-                  order={order}
-                  isDeleting={deletingId === (order.id ?? order.orderNumber)}
-                  onEdit={openEditForm}
-                  onDelete={handleDelete}
-                />
+    <DataTable<DispenseOrder>
+      entityNamePlural="Dispense Orders"
+      ariaLabel="Dispense orders table"
+      data={dispenseOrders}
+      isLoading={isLoading}
+      error={error}
+      columns={
+        <>
+          <TableColumn isRowHeader>Order #</TableColumn>
+          <TableColumn>Admission #</TableColumn>
+          <TableColumn>Type</TableColumn>
+          <TableColumn>Status</TableColumn>
+          <TableColumn>Admission Date</TableColumn>
+          <TableColumn>Created At</TableColumn>
+          <TableColumn>Actions</TableColumn>
+        </>
+      }
+      renderRow={(order: DispenseOrder) => (
+        <TableRow key={order.orderNumber}>
+          <TableCell>{order.orderNumber}</TableCell>
+          <TableCell>{order.admissionNumber ?? "-"}</TableCell>
+          <TableCell>{order.type ?? "-"}</TableCell>
+          <TableCell>
+            <span
+              className={cn(
+                "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium",
+                statusStyles[order.status],
               )}
-            </TableBody>
-          </TableContent>
-          <TableFooter>
-            <DispenseOrdersPagination
-              page={pagination.page}
-              pageSize={pagination.pageSize}
-              totalItems={totalItems}
-              totalPages={totalPages}
-              onPageChange={setPage}
-              onPageSizeChange={setPageSize}
-            />
-          </TableFooter>
-        </Table>
+            >
+              {order.status}
+            </span>
+          </TableCell>
+          <TableCell>{order.admissionDate ? formatDate(order.admissionDate) : "-"}</TableCell>
+          <TableCell>{order.createdAt ? formatDate(order.createdAt) : "-"}</TableCell>
+          <TableCell>
+            <DispenseOrderModal id={order.id!} />
+          </TableCell>
+        </TableRow>
       )}
-    </div>
+      isFormOpen={isFormOpen}
+      formTitle={editingEntity ? `Edit ${editingEntity.orderNumber}` : "New Dispense Order"}
+      renderForm={(onClose) => <DispenseOrderForm order={editingEntity} onClose={onClose} />}
+      onCloseForm={closeForm}
+      filters={filters}
+      onSearchChange={(value) => setFilters({ search: value })}
+      onAdd={openCreateForm}
+      addLabel="+ New Order"
+      toolbarExtra={
+        <Select
+          selectedKey={filters.status || undefined}
+          onSelectionChange={(key) => {
+            setFilters({ status: key ? String(key) : "" });
+          }}
+          fullWidth
+        >
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectPopover>
+            <ListBox items={STATUS_OPTIONS}>
+              {(item) => (
+                <ListBoxItem key={item.id} textValue={item.label}>
+                  {item.label}
+                </ListBoxItem>
+              )}
+            </ListBox>
+          </SelectPopover>
+        </Select>
+      }
+      page={pagination.page}
+      pageSize={pagination.pageSize}
+      totalItems={paginationMeta?.total ?? 0}
+      totalPages={paginationMeta?.totalPages ?? 1}
+      onPageChange={setPage}
+      onPageSizeChange={setPageSize}
+    />
   );
 }
