@@ -6,11 +6,11 @@ import { TopNavbar } from "./top-navbar";
 
 export function MainLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen">
+    <div className="flex h-screen overflow-hidden">
       <AppSidebar />
-      <div className="flex min-h-screen flex-1 flex-col lg:ml-64">
+      <div className="flex flex-1 flex-col overflow-hidden lg:ml-64">
         <TopNavbar />
-        <main className="flex flex-1 flex-col">{children}</main>
+        <main className="flex flex-1 flex-col overflow-y-auto">{children}</main>
         <AppFooter />
       </div>
     </div>

@@ -19,7 +19,7 @@ export function TopNavbar() {
     : null;
 
   return (
-    <header className="flex h-14 shrink-0 items-center justify-end border-b border-default-200 px-4 dark:border-default-100">
+    <header className="sticky top-0 z-50 flex h-14 shrink-0 items-center justify-end border-b border-default-200 bg-white/80 px-4 backdrop-blur-md dark:border-default-100 dark:bg-zinc-900/80">
       <Button
         isIconOnly
         variant="ghost"
