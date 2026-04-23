@@ -25,6 +25,7 @@ import {
   TooltipContent,
   toast,
   useOverlayState,
+  Table,
 } from "@heroui/react";
 import { Copy } from "@gravity-ui/icons";
 import { DataTable } from "@/components/ui/data-table";
@@ -138,33 +139,33 @@ export function DispenseOrdersTable() {
         error={error}
         columns={
           <>
-            <TableColumn isRowHeader>Order #</TableColumn>
-            <TableColumn>Admission #</TableColumn>
-            {/* <TableColumn>Patient Name</TableColumn> */}
-            <TableColumn>Status</TableColumn>
-            {/* <TableColumn>Created At</TableColumn> */}
-            <TableColumn>Created By</TableColumn>
-            <TableColumn>Actions</TableColumn>
+            <Table.Column isRowHeader defaultWidth="1fr" minWidth={200} >Order # <Table.ColumnResizer /></Table.Column>
+            <Table.Column defaultWidth="1fr" minWidth={200} >Admission # <Table.ColumnResizer /></Table.Column>
+            {/* <Table.Column>Patient Name</Table.Column> */}
+            <Table.Column defaultWidth="1fr" minWidth={120}>Status <Table.ColumnResizer /></Table.Column>
+            {/* <Table.Column>Created At</Table.Column> */}
+            {/* <Table.Column defaultWidth="1fr" minWidth={80} >Created By <Table.ColumnResizer /></Table.Column> */}
+            <Table.Column defaultWidth="1fr" minWidth={100}>Actions <Table.ColumnResizer /></Table.Column>
           </>
         }
         renderRow={(order: DispenseOrder) => (
-          <TableRow key={order.orderNumber}>
-            <TableCell>
+          <Table.Row key={order.orderNumber}>
+            <Table.Cell>
               <div>
                 <p>{order.orderNumber}</p>              
                 <p className="text-xs text-default-400"> {order.createdAt ? formatDate(order.createdAt) : "-"} | {order.patientName ?? "-"}</p>
               </div>
-              </TableCell>
-            <TableCell>
+              </Table.Cell>
+            <Table.Cell>
               <div>
                 <CopyableText text={order.admissionNumber} />
                 <p className="text-xs text-default-400">
                   {order.type ?? "-"} | {order.admissionDate ? formatDate(order.admissionDate) : "-"}
                 </p>
               </div>
-            </TableCell>
-            {/* <TableCell>{order.patientName ?? "-"}</TableCell> */}
-            <TableCell>
+            </Table.Cell>
+            {/* <Table.Cell>{order.patientName ?? "-"}</Table.Cell> */}
+            <Table.Cell>
               <span
                 className={cn(
                   "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium",
@@ -173,18 +174,18 @@ export function DispenseOrdersTable() {
               >
                 {order.status}
               </span>
-            </TableCell>
-            {/* <TableCell>{order.admissionDate ? formatDate(order.admissionDate) : "-"}</TableCell> */}
-            {/* <TableCell>{order.createdAt ? formatDate(order.createdAt) : "-"}</TableCell> */}
-            <TableCell>{order.createdByName ? order.createdByName : "-"}</TableCell>
-            <TableCell>
+            </Table.Cell>
+            {/* <Table.Cell>{order.admissionDate ? formatDate(order.admissionDate) : "-"}</Table.Cell> */}
+            {/* <Table.Cell>{order.createdAt ? formatDate(order.createdAt) : "-"}</Table.Cell> */}
+            {/* <Table.Cell>{order.createdByName ? order.createdByName : "-"}</Table.Cell> */}
+            <Table.Cell>
               <div className="flex gap-1">
                 <Button size="sm" variant="secondary" onPress={() => openUpdate(order.id!, order.status)}>
                   Details
                 </Button>
               </div>
-            </TableCell>
-          </TableRow>
+            </Table.Cell>
+          </Table.Row>
         )}
         isFormOpen={isFormOpen}
         formTitle="New Dispense Order"
@@ -204,6 +205,7 @@ export function DispenseOrdersTable() {
           >
             <SelectTrigger>
               <SelectValue />
+              <Select.Indicator />
             </SelectTrigger>
             <SelectPopover>
               <ListBox items={STATUS_OPTIONS}>

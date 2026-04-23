@@ -147,12 +147,13 @@ export function DataTable<T extends object>({
             : `No ${entityNamePlural.toLowerCase()} found. Click "${addLabel}" to create one.`}
         </div>
       ) : (
-        <Table aria-label={ariaLabel}>
+        <Table>
+        <Table.ResizableContainer aria-label={ariaLabel}>
           <TableScrollContainer>
-            <TableContent>
-              <TableHeader>{columns}</TableHeader>
-              <TableBody items={data}>{(item: T) => renderRow(item)}</TableBody>
-            </TableContent>
+            <Table.Content>
+              <Table.Header>{columns}</Table.Header>
+              <Table.Body items={data}>{(item: T) => renderRow(item)}</Table.Body>
+            </Table.Content>
           </TableScrollContainer>
           <TableFooter>
             <div className="flex flex-col items-start justify-center w-full">
@@ -171,6 +172,7 @@ export function DataTable<T extends object>({
           </TableFooter>
 
 
+        </Table.ResizableContainer>
         </Table>
       )}
     </div>
