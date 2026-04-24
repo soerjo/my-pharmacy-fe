@@ -225,7 +225,7 @@ export function DispenseOrdersTable() {
       <Modal state={updateModalState}>
         <ModalBackdrop variant="blur">
           <ModalContainer size="lg">
-            <ModalDialog className="h-dvh w-full max-w-full sm:h-auto sm:w-3/4 sm:max-w-3/4 sm:rounded-3xl">
+              <ModalDialog className="h-dvh w-full max-w-full md:h-auto md:w-3/4 md:max-w-2/4 md:rounded-3xl">
               <ModalHeader>
                 <ModalHeading>Edit Order</ModalHeading>
               </ModalHeader>

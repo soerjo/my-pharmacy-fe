@@ -122,7 +122,7 @@ export function DataTable<T extends object>({
       <Modal state={modalState}>
         <ModalBackdrop variant="blur">
           <ModalContainer size="lg" className="p-2 sm:p-10">
-            <ModalDialog className="h-dvh w-full max-w-full rounded-none sm:h-auto sm:w-3/4 sm:max-w-3/4 sm:rounded-3xl">
+              <ModalDialog className="h-dvh w-full max-w-full md:h-auto md:w-3/4 md:max-w-2/4 md:rounded-3xl">
               <ModalHeader>
                 <ModalHeading>{formTitle}</ModalHeading>
               </ModalHeader>

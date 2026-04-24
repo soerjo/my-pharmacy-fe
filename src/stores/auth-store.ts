@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { authService } from '@/services/auth-service';
 import { TokenManager } from '@/lib/token-manager';
+import { queryClient } from '@/providers/query-provider';
 
 interface AuthState {
   isAuthenticated: boolean;
@@ -52,6 +53,7 @@ export const useAuthStore = create<AuthState>()(
 
       logout: () => {
         TokenManager.clearTokens();
+        queryClient.clear();
         set(
           { isAuthenticated: false, isLoading: false, error: null },
           false,

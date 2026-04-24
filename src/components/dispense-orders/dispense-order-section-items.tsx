@@ -57,7 +57,7 @@ export function DispenseOrderSectionItems({
               {!isReadOnly && (
                 <Button
                   size="sm"
-                  variant="secondary"
+                  variant="primary"
                   type="button"
                   className="ml-auto"
                   onPress={() => append({ drugId: "", quantity: 1, instructions: "" })}

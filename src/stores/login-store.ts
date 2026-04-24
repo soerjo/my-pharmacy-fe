@@ -3,6 +3,8 @@ import { devtools } from 'zustand/middleware';
 import { authService } from '@/services/auth-service';
 import { TokenManager } from '@/lib/token-manager';
 import { useAuthStore } from './auth-store';
+import { queryClient } from '@/providers/query-provider';
+import { queryKeys } from '@/lib/query-keys';
 import type { LoginFormValues } from '@/types';
 
 interface LoginState {
@@ -26,6 +28,7 @@ export const useLoginStore = create<LoginState>()(
           if (response.data?.accessToken) {
             TokenManager.setAccessToken(response.data.accessToken);
             TokenManager.setRefreshToken(response.data.refreshToken);
+            await queryClient.invalidateQueries({ queryKey: queryKeys.auth.me });
             useAuthStore.getState().setAuthenticated(true);
           }
           set({ isLoading: false }, false, 'login/success');
