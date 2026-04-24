@@ -30,7 +30,11 @@ import { dispenseOrderSchema, type DispenseOrderFormValues, type DispenseOrderSt
 import { useDispenseOrders, useDispenseOrder } from "@/hooks/use-dispense-orders";
 import { ProductAutocomplete } from "@/components/ui";
 import { formatDate, cn } from "@/utils";
-import { TrashBin } from "@gravity-ui/icons";
+import { Pill, Receipt, TrashBin } from "@gravity-ui/icons";
+
+import { ChevronDown, Book } from "@gravity-ui/icons";
+import { Bookmark } from '@gravity-ui/icons';
+import { Accordion } from "@heroui/react";
 
 const statusStyles: Record<DispenseOrderStatus, string> = {
   PENDING: "bg-yellow-100 text-yellow-800 dark:bg-yellow-950 dark:text-yellow-300",
@@ -272,186 +276,255 @@ export function DispenseOrderUpdateForm({ id, onClose, formId }: DispenseOrderUp
   }
 
   return (
-    <form id={formId} onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5 p-1">
-      <div className="grid grid-cols-2 gap-4">
-        <InfoField label="Order Number" >
-          <span className="text-black">{orderDetail.orderNumber}</span>
-          <span className="text-sm">{orderDetail.createdAt ? formatDate(orderDetail.createdAt) : "-"}</span>
-        </InfoField>
-        <InfoField label="Status">
-          <Controller
-            name="status"
-            control={control}
-            render={({ field }) => (
-              <div className="flex items-center gap-2">
-                <Select
-                  selectedKey={field.value}
-                  onSelectionChange={(key) => handleStatusChange(String(key))}
-                  isDisabled={isStatusChanging || validNextStatuses.length === 0}
-                  className="w-fit shadow-none"
-                  
-                  // variant="secondary"
-                >
-                  <Select.Trigger className="w-auto py-0" >
-                    <Select.Value className="p-0 flex justify-center items-center" />
-                    <Select.Indicator />
-                  </Select.Trigger>
-                  <SelectPopover className="w-auto">
-                    <ListBox items={filteredStatusOptions}>
-                      {(item) => (
-                        <ListBoxItem key={item.id} textValue={item.label}>
-                          <span
-                            className={cn(
-                              "inline-flex items-center rounded-full px-2 py-1 text-xs font-medium",
-                              statusStyles[item.id as DispenseOrderStatus],
-                            )}
-                          >
-                            {item.label}
-                          </span>
-                        </ListBoxItem>
-                      )}
-                    </ListBox>
-                  </SelectPopover>
-                </Select>
-                {isStatusChanging && <Spinner size="sm" />}
-              </div>
-            )}
-          />
-        </InfoField>
-        <InfoField label="Admission Number">
-          <span className="text-black">{orderDetail.admissionNumber}</span>
-          <span className="text-sm">{orderDetail.admissionCreatedAt ? formatDate(orderDetail.admissionCreatedAt) : "-"}</span>
-        </InfoField>
-        <InfoField label="Admission Type" value={orderDetail.admission_type || "-"} />
-        <InfoField label="Patient Name" value={orderDetail.patientName} />
-        <InfoField label="Admission Status" value={orderDetail.admissionStatus || "-"} /> 
-      </div>
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="update-notes" className="text-sm font-medium">
-          Notes
-        </label>
-        <TextArea
-          id="update-notes"
-          placeholder="Additional notes (optional)"
-          readOnly={isReadOnly}
-          // {isReadOnly && ...register("notes")}
-          {...register("notes")}
-        />
-        {errors.notes && <p className="text-sm text-danger">{errors.notes.message}</p>}
-      </div>
+    <form id={formId} onSubmit={handleSubmit(onSubmit)}>
 
-      <div className="flex flex-col gap-2">
-        <div className="flex items-center justify-between">
-          <label className="text-sm font-medium text-black">
-            Items <span className="text-danger">*</span>
-          </label>
-          <Button
-            size="sm"
-            variant="secondary"
-            type="button"
-            onPress={() => append({ drugId: "", quantity: 1, instructions: "" })}
-            isDisabled={isReadOnly}
-          >
-            + Add Item
-          </Button>
-        </div>
+      <Accordion allowsMultipleExpanded defaultExpandedKeys={["dispense-details", "order-items"]} className="w-full" variant="default">
 
-        {errors.items && !Array.isArray(errors.items) && (
-          <p className="text-sm text-danger">{errors.items.message}</p>
-        )}
-
-        <ScrollShadow hideScrollBar className="max-h-[40vh] md:max-h-[35vh]">
-          <div className="flex flex-col gap-3">
-            {fields.map((field, index) => {
-              const currentDrugId = watchedItems?.[index]?.drugId;
-              const selectedProduct = currentDrugId ? productMap.get(currentDrugId) : undefined;
-
-              return (
-                <div
-                  key={field.id}
-                  className="flex flex-col gap-3 rounded-lg border border-zinc-200 p-3 dark:border-zinc-800 sm:grid-cols-[1fr_130px_1fr_auto]"
-                >
+        <Accordion.Item id="dispense-details">
+          <Accordion.Heading>
+            <Accordion.Trigger>
+              <span className="mr-3 size-4 shrink-0 text-muted"><Bookmark /></span>{"Dispense Details"}
+              <Accordion.Indicator>
+                <ChevronDown />
+              </Accordion.Indicator>
+            </Accordion.Trigger>
+          </Accordion.Heading>
+          <Accordion.Panel>
+            <Accordion.Body>
+              <div className="grid grid-cols-2 gap-4">
+                <InfoField label="Order Number" >
+                  <span className="text-black">{orderDetail.orderNumber}</span>
+                  <span className="text-xs">{orderDetail.createdAt ? formatDate(orderDetail.createdAt) : "-"}</span>
+                </InfoField>
+                <InfoField label="Status">
                   <Controller
-                    name={`items.${index}.drugId`}
+                    name="status"
                     control={control}
-                    render={({ field: drugField }) => (
-                      <ProductAutocomplete
-                        label={`Item ${index + 1}`}
-                        selectedKey={drugField.value || null}
-                        onSelectionChange={(key) => drugField.onChange(key)}
-                        onProductSelect={handleProductSelect}
-                        placeholder="Search drug..."
-                        required
-                        // isDisabled={isReadOnly}
-                        readOnly={isReadOnly}
-                        error={errors.items?.[index]?.drugId?.message}
-                        initialItems={index < initialProducts.length ? [initialProducts[index]] : undefined}
-                      />
+                    render={({ field }) => (
+                      <div className="flex items-center gap-2">
+                        <Select
+                          selectedKey={field.value}
+                          onSelectionChange={(key) => handleStatusChange(String(key))}
+                          isDisabled={isStatusChanging || validNextStatuses.length === 0}
+                          className="w-fit shadow-none"
+
+                        // variant="secondary"
+                        >
+                          <Select.Trigger className="w-auto py-0" >
+                            <Select.Value className="p-0 flex justify-center items-center" />
+                            <Select.Indicator />
+                          </Select.Trigger>
+                          <SelectPopover className="w-auto">
+                            <ListBox items={filteredStatusOptions}>
+                              {(item) => (
+                                <ListBoxItem key={item.id} textValue={item.label}>
+                                  <span
+                                    className={cn(
+                                      "inline-flex items-center rounded-full px-2 py-1 text-xs font-medium",
+                                      statusStyles[item.id as DispenseOrderStatus],
+                                    )}
+                                  >
+                                    {item.label}
+                                  </span>
+                                </ListBoxItem>
+                              )}
+                            </ListBox>
+                          </SelectPopover>
+                        </Select>
+                        {isStatusChanging && <Spinner size="sm" />}
+                      </div>
                     )}
                   />
+                </InfoField>
+              </div>
+            </Accordion.Body>
+          </Accordion.Panel>
+        </Accordion.Item>
 
-                  <div className="flex flex-col gap-1.5">
-                    <Controller
-                      name={`items.${index}.quantity`}
-                      control={control}
-                      render={({ field }) => (
-                        <InputGroup>
-                          <InputGroup.Input
-                            type="number"
-                            min={1}
-                            placeholder="Qty"
-                            defaultValue={field.value}
-                            onChange={(e) => {
-                              const val = e.target.value;
-                              field.onChange(val === "" ? undefined : Number(val));
-                            }}
-                            className={cn(errors.items?.[index]?.quantity && "border-danger", "max-w-full")}
-                            onBlur={field.onBlur}
-                            ref={field.ref}
-                            // disabled={isReadOnly}
-                            readOnly={isReadOnly}
-                          />
-                          {selectedProduct?.baseUnitAbbreviation && (
-                            <InputGroup.Suffix>
-                              <span className="whitespace-nowrap">
-                                {selectedProduct.baseUnitAbbreviation}
-                              </span>
-                            </InputGroup.Suffix>
-                          )}
-                        </InputGroup>
-                      )}
-                    />
-                    {errors.items?.[index]?.quantity && (
-                      <p className="text-sm text-danger">{errors.items[index].quantity?.message}</p>
-                    )}
-                  </div>
+        <Accordion.Item id="dispense-items">
+          <Accordion.Heading>
+            <Accordion.Trigger>
+              <span className="mr-3 size-4 shrink-0 text-muted"><Receipt /></span>{"Admission Details"}
+              <Accordion.Indicator>
+                <ChevronDown />
+              </Accordion.Indicator>
+            </Accordion.Trigger>
+          </Accordion.Heading>
+          <Accordion.Panel>
+            <Accordion.Body>
+              <div className="grid grid-cols-2 gap-4">
+                <InfoField label="Admission Number">
+                  <span className="text-black">{orderDetail.admissionNumber}</span>
+                  <span className="text-xs">{orderDetail.admissionCreatedAt ? formatDate(orderDetail.admissionCreatedAt) : "-"}</span>
+                </InfoField>
+                <InfoField label="Admission Type" value={orderDetail.admission_type || "-"} />
+                <InfoField label="Patient Name" value={orderDetail.patientName} />
+                <InfoField label="Admission Status" value={orderDetail.admissionStatus || "-"} />
+              </div>
+            </Accordion.Body>
+          </Accordion.Panel>
+        </Accordion.Item>
 
-                  <div className="flex flex-col gap-1.5">
-                    <Input
-                      placeholder="Instructions"
-                      // disabled={isReadOnly}
-                      readOnly={isReadOnly}
-                      {...register(`items.${index}.instructions`)}
-                    />
-                  </div>
+        <Accordion.Item id="order-notes">
+          <Accordion.Heading>
+            <Accordion.Trigger>
+              <span className="mr-3 size-4 shrink-0 text-muted"><Book /></span>{"Order Notes"}
+              <Accordion.Indicator>
+                <ChevronDown />
+              </Accordion.Indicator>
+            </Accordion.Trigger>
+          </Accordion.Heading>
+          <Accordion.Panel>
+            <Accordion.Body>
+              <div className="flex flex-col gap-1.5">
+                <TextArea
+                  id="update-notes"
+                  className="text-sm mt-1"
+                  placeholder="Additional notes (optional)"
+                  rows={6}
 
-                  <Button
-                    size="sm"
-                    variant="danger"
-                    type="button"
-                    className="self-end"
-                    onPress={() => setPendingRemoveIndex(index)}
-                    isDisabled={isReadOnly}
-                    isIconOnly
-                  >
-                    <TrashBin/>
-                  </Button>
+                  readOnly={isReadOnly}
+                  // {isReadOnly && ...register("notes")}
+                  {...register("notes")}
+                />
+                {errors.notes && <p className="text-sm text-danger">{errors.notes.message}</p>}
+              </div>
+            </Accordion.Body>
+          </Accordion.Panel>
+        </Accordion.Item>
+
+        <Accordion.Item id="order-items" isExpanded> 
+          <Accordion.Heading>
+            <Accordion.Trigger>
+              <span className="mr-3 size-4 shrink-0 text-muted"><Pill /></span>{"Order Items"}
+              <Accordion.Indicator>
+                <ChevronDown />
+              </Accordion.Indicator>
+            </Accordion.Trigger>
+          </Accordion.Heading>
+          <Accordion.Panel>
+            <Accordion.Body>
+              <div className="flex flex-col gap-2 pt-0.5">
+                <div className="flex items-center justify-between">
+                  {/* <label className="text-sm font-medium text-black">
+                    Items <span className="text-danger">*</span>
+                  </label> */}
+                  {!isReadOnly && (
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      type="button"
+                      className="ml-auto"
+                      onPress={() => append({ drugId: "", quantity: 1, instructions: "" })}
+                    // isDisabled={isReadOnly}
+                    >
+                      + Add Item
+                    </Button>
+                  )}
                 </div>
-              );
-            })}
-          </div>
-        </ScrollShadow>
-      </div>
+
+                {errors.items && !Array.isArray(errors.items) && (
+                  <p className="text-sm text-danger">{errors.items.message}</p>
+                )}
+
+                <ScrollShadow hideScrollBar className="max-h-[40vh]">
+                  <div className="flex flex-col gap-3">
+                    {fields.map((field, index) => {
+                      const currentDrugId = watchedItems?.[index]?.drugId;
+                      const selectedProduct = currentDrugId ? productMap.get(currentDrugId) : undefined;
+
+                      return (
+                        <div
+                          key={field.id}
+                          className="flex flex-col gap-3 rounded-lg border border-zinc-200 p-3 dark:border-zinc-800 sm:grid-cols-[1fr_130px_1fr_auto]"
+                        >
+                          <Controller
+                            name={`items.${index}.drugId`}
+                            control={control}
+                            render={({ field: drugField }) => (
+                              <ProductAutocomplete
+                                label={`Item ${index + 1}`}
+                                selectedKey={drugField.value || null}
+                                onSelectionChange={(key) => drugField.onChange(key)}
+                                onProductSelect={handleProductSelect}
+                                placeholder="Search drug..."
+                                required
+                                // isDisabled={isReadOnly}
+                                readOnly={isReadOnly}
+                                error={errors.items?.[index]?.drugId?.message}
+                                initialItems={index < initialProducts.length ? [initialProducts[index]] : undefined}
+                              />
+                            )}
+                          />
+
+                          <div className="flex flex-col gap-1.5">
+                            <Controller
+                              name={`items.${index}.quantity`}
+                              control={control}
+                              render={({ field }) => (
+                                <InputGroup>
+                                  <InputGroup.Input
+                                    type="number"
+                                    min={1}
+                                    placeholder="Qty"
+                                    defaultValue={field.value}
+                                    onChange={(e) => {
+                                      const val = e.target.value;
+                                      field.onChange(val === "" ? undefined : Number(val));
+                                    }}
+                                    className={cn(errors.items?.[index]?.quantity && "border-danger", "max-w-full")}
+                                    onBlur={field.onBlur}
+                                    ref={field.ref}
+                                    // disabled={isReadOnly}
+                                    readOnly={isReadOnly}
+                                  />
+                                  {selectedProduct?.baseUnitAbbreviation && (
+                                    <InputGroup.Suffix>
+                                      <span className="whitespace-nowrap">
+                                        {selectedProduct.baseUnitAbbreviation}
+                                      </span>
+                                    </InputGroup.Suffix>
+                                  )}
+                                </InputGroup>
+                              )}
+                            />
+                            {errors.items?.[index]?.quantity && (
+                              <p className="text-sm text-danger">{errors.items[index].quantity?.message}</p>
+                            )}
+                          </div>
+
+                          <div className="flex flex-col gap-1.5">
+                            <Input
+                              placeholder="Instructions"
+                              // disabled={isReadOnly}
+                              readOnly={isReadOnly}
+                              {...register(`items.${index}.instructions`)}
+                            />
+                          </div>
+
+                          <Button
+                            size="sm"
+                            variant="danger"
+                            type="button"
+                            className="self-end"
+                            onPress={() => setPendingRemoveIndex(index)}
+                            isDisabled={isReadOnly}
+                            isIconOnly
+                          >
+                            <TrashBin />
+                          </Button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </ScrollShadow>
+              </div>
+            </Accordion.Body>
+          </Accordion.Panel>
+        </Accordion.Item>
+
+      </Accordion>
+
 
       {submitError && <p className="text-sm text-danger">{submitError}</p>}
 

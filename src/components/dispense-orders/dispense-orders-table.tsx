@@ -141,10 +141,8 @@ export function DispenseOrdersTable() {
           <>
             <Table.Column isRowHeader defaultWidth="1fr" minWidth={200} >Order # <Table.ColumnResizer /></Table.Column>
             <Table.Column defaultWidth="1fr" minWidth={200} >Admission # <Table.ColumnResizer /></Table.Column>
-            {/* <Table.Column>Patient Name</Table.Column> */}
+            <Table.Column>Patient Name</Table.Column>
             <Table.Column defaultWidth="1fr" minWidth={120}>Status <Table.ColumnResizer /></Table.Column>
-            {/* <Table.Column>Created At</Table.Column> */}
-            {/* <Table.Column defaultWidth="1fr" minWidth={80} >Created By <Table.ColumnResizer /></Table.Column> */}
             <Table.Column defaultWidth="1fr" minWidth={100}>Actions <Table.ColumnResizer /></Table.Column>
           </>
         }
@@ -153,7 +151,7 @@ export function DispenseOrdersTable() {
             <Table.Cell>
               <div>
                 <p>{order.orderNumber}</p>              
-                <p className="text-xs text-default-400"> {order.createdAt ? formatDate(order.createdAt) : "-"} | {order.patientName ?? "-"}</p>
+                <p className="text-xs text-default-400"> {order.createdAt ? formatDate(order.createdAt) : "-"}</p>
               </div>
               </Table.Cell>
             <Table.Cell>
@@ -164,7 +162,7 @@ export function DispenseOrdersTable() {
                 </p>
               </div>
             </Table.Cell>
-            {/* <Table.Cell>{order.patientName ?? "-"}</Table.Cell> */}
+            <Table.Cell>{order.patientName ?? "-"}</Table.Cell> 
             <Table.Cell>
               <span
                 className={cn(
@@ -175,9 +173,6 @@ export function DispenseOrdersTable() {
                 {order.status}
               </span>
             </Table.Cell>
-            {/* <Table.Cell>{order.admissionDate ? formatDate(order.admissionDate) : "-"}</Table.Cell> */}
-            {/* <Table.Cell>{order.createdAt ? formatDate(order.createdAt) : "-"}</Table.Cell> */}
-            {/* <Table.Cell>{order.createdByName ? order.createdByName : "-"}</Table.Cell> */}
             <Table.Cell>
               <div className="flex gap-1">
                 <Button size="sm" variant="secondary" onPress={() => openUpdate(order.id!, order.status)}>
@@ -229,7 +224,7 @@ export function DispenseOrdersTable() {
       {/* Update Modal => could be used for view details */}
       <Modal state={updateModalState}>
         <ModalBackdrop variant="blur">
-          <ModalContainer size="lg" className="p-2 sm:p-10">
+          <ModalContainer size="lg">
             <ModalDialog className="h-dvh w-full max-w-full sm:h-auto sm:w-3/4 sm:max-w-3/4 sm:rounded-3xl">
               <ModalHeader>
                 <ModalHeading>Edit Order</ModalHeading>
