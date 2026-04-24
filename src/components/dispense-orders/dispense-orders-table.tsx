@@ -234,7 +234,7 @@ export function DispenseOrdersTable() {
               <ModalHeader>
                 <ModalHeading>Edit Order</ModalHeading>
               </ModalHeader>
-              <ModalBody className="p-2">
+              <ModalBody>
                 {updateId && <DispenseOrderUpdateForm id={updateId} onClose={closeUpdate} formId={UPDATE_FORM_ID} />}
               </ModalBody>
               <ModalFooter>

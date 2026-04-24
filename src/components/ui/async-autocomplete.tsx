@@ -31,6 +31,7 @@ interface AsyncAutocompleteProps<T extends object> {
   error?: string;
   required?: boolean;
   isDisabled?: boolean;
+  readOnly?: boolean;
   onItemSelect?: (item: T | null) => void;
 }
 
@@ -49,6 +50,7 @@ export function AsyncAutocomplete<T extends object>({
   error,
   required,
   isDisabled,
+  readOnly,
   onItemSelect,
 }: AsyncAutocompleteProps<T>) {
   const [inputValue, setInputValue] = useState("");
@@ -66,11 +68,11 @@ export function AsyncAutocomplete<T extends object>({
       <Autocomplete
         allowsEmptyCollection
         className={className}
-        // isDisabled={isDisabled}
-        // isDisabled
+        isDisabled={isDisabled}
         selectionMode="single"
         value={selectedKey}
         onChange={(key) => {
+          if (readOnly) return;
           onSelectionChange(key as string | null);
           onItemSelect?.(key ? (mergedItems.find((item) => getId(item) === key) ?? null) : null);
         }}
@@ -79,12 +81,12 @@ export function AsyncAutocomplete<T extends object>({
           {label}
           {required && <span className="text-danger"> *</span>}
         </Label>
-        <Autocomplete.Trigger isDisabled={isDisabled}>
+        <Autocomplete.Trigger className={cn(readOnly && "pointer-events-none")}>
           <Autocomplete.Value />
-          <Autocomplete.ClearButton />
-          <Autocomplete.Indicator />
+          {!readOnly && <Autocomplete.ClearButton />}
+          {!readOnly && <Autocomplete.Indicator />}
         </Autocomplete.Trigger>
-        <Autocomplete.Popover>
+        <Autocomplete.Popover className={cn(readOnly && "hidden")}>
           <Autocomplete.Filter
             inputValue={inputValue}
             onInputChange={setInputValue}

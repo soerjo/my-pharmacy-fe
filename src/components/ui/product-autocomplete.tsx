@@ -14,6 +14,7 @@ interface ProductAutocompleteProps {
   error?: string;
   required?: boolean;
   isDisabled?: boolean;
+  readOnly?: boolean;
   onProductSelect?: (product: Product | null) => void;
 }
 
@@ -27,6 +28,7 @@ export function ProductAutocomplete({
   error,
   required,
   isDisabled,
+  readOnly,
   onProductSelect,
 }: ProductAutocompleteProps) {
   return (
@@ -50,6 +52,7 @@ export function ProductAutocomplete({
       error={error}
       required={required}
       isDisabled={isDisabled}
+      readOnly={readOnly}
       onItemSelect={onProductSelect}
     />
   );

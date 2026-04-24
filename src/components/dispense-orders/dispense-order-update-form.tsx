@@ -272,10 +272,12 @@ export function DispenseOrderUpdateForm({ id, onClose, formId }: DispenseOrderUp
   }
 
   return (
-    <form id={formId} onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
+    <form id={formId} onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5 p-1">
       <div className="grid grid-cols-2 gap-4">
-        <InfoField label="Order Number" value={orderDetail.orderNumber} />
-
+        <InfoField label="Order Number" >
+          <span className="text-black">{orderDetail.orderNumber}</span>
+          <span className="text-sm">{orderDetail.createdAt ? formatDate(orderDetail.createdAt) : "-"}</span>
+        </InfoField>
         <InfoField label="Status">
           <Controller
             name="status"
@@ -316,19 +318,31 @@ export function DispenseOrderUpdateForm({ id, onClose, formId }: DispenseOrderUp
             )}
           />
         </InfoField>
-        <InfoField label="Patient Name" value={orderDetail.patientName || "-"} />
-        <InfoField label="Admission Number" value={orderDetail.admissionNumber || "-"} />
+        <InfoField label="Admission Number">
+          <span className="text-black">{orderDetail.admissionNumber}</span>
+          <span className="text-sm">{orderDetail.admissionCreatedAt ? formatDate(orderDetail.admissionCreatedAt) : "-"}</span>
+        </InfoField>
         <InfoField label="Admission Type" value={orderDetail.admission_type || "-"} />
+        <InfoField label="Patient Name" value={orderDetail.patientName} />
         <InfoField label="Admission Status" value={orderDetail.admissionStatus || "-"} /> 
-        <InfoField
-          label="Admission Date"
-          value={orderDetail.admissionDate ? formatDate(orderDetail.admissionDate) : "-"}
+      </div>
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="update-notes" className="text-sm font-medium">
+          Notes
+        </label>
+        <TextArea
+          id="update-notes"
+          placeholder="Additional notes (optional)"
+          readOnly={isReadOnly}
+          // {isReadOnly && ...register("notes")}
+          {...register("notes")}
         />
+        {errors.notes && <p className="text-sm text-danger">{errors.notes.message}</p>}
       </div>
 
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
-          <label className="text-sm font-medium">
+          <label className="text-sm font-medium text-black">
             Items <span className="text-danger">*</span>
           </label>
           <Button
@@ -346,7 +360,7 @@ export function DispenseOrderUpdateForm({ id, onClose, formId }: DispenseOrderUp
           <p className="text-sm text-danger">{errors.items.message}</p>
         )}
 
-        <ScrollShadow hideScrollBar className="max-h-[50vh]">
+        <ScrollShadow hideScrollBar className="max-h-[40vh] md:max-h-[35vh]">
           <div className="flex flex-col gap-3">
             {fields.map((field, index) => {
               const currentDrugId = watchedItems?.[index]?.drugId;
@@ -368,7 +382,8 @@ export function DispenseOrderUpdateForm({ id, onClose, formId }: DispenseOrderUp
                         onProductSelect={handleProductSelect}
                         placeholder="Search drug..."
                         required
-                        isDisabled={isReadOnly}
+                        // isDisabled={isReadOnly}
+                        readOnly={isReadOnly}
                         error={errors.items?.[index]?.drugId?.message}
                         initialItems={index < initialProducts.length ? [initialProducts[index]] : undefined}
                       />
@@ -376,9 +391,6 @@ export function DispenseOrderUpdateForm({ id, onClose, formId }: DispenseOrderUp
                   />
 
                   <div className="flex flex-col gap-1.5">
-                      {/* <label className="text-sm font-medium">
-                        Qty <span className="text-danger">*</span>
-                      </label> */}
                     <Controller
                       name={`items.${index}.quantity`}
                       control={control}
@@ -396,7 +408,8 @@ export function DispenseOrderUpdateForm({ id, onClose, formId }: DispenseOrderUp
                             className={cn(errors.items?.[index]?.quantity && "border-danger", "max-w-full")}
                             onBlur={field.onBlur}
                             ref={field.ref}
-                            disabled={isReadOnly}
+                            // disabled={isReadOnly}
+                            readOnly={isReadOnly}
                           />
                           {selectedProduct?.baseUnitAbbreviation && (
                             <InputGroup.Suffix>
@@ -416,7 +429,8 @@ export function DispenseOrderUpdateForm({ id, onClose, formId }: DispenseOrderUp
                   <div className="flex flex-col gap-1.5">
                     <Input
                       placeholder="Instructions"
-                      disabled={isReadOnly}
+                      // disabled={isReadOnly}
+                      readOnly={isReadOnly}
                       {...register(`items.${index}.instructions`)}
                     />
                   </div>
@@ -437,19 +451,6 @@ export function DispenseOrderUpdateForm({ id, onClose, formId }: DispenseOrderUp
             })}
           </div>
         </ScrollShadow>
-      </div>
-
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="update-notes" className="text-sm font-medium">
-          Notes
-        </label>
-        <TextArea
-          id="update-notes"
-          placeholder="Additional notes (optional)"
-          disabled={isReadOnly}
-          {...register("notes")}
-        />
-        {errors.notes && <p className="text-sm text-danger">{errors.notes.message}</p>}
       </div>
 
       {submitError && <p className="text-sm text-danger">{submitError}</p>}
@@ -585,7 +586,13 @@ function InfoField({
   return (
     <div className="flex flex-col gap-0.5">
       <span className="text-xs text-zinc-500">{label}</span>
-      {children ?? <span className="text-sm">{value}</span>}
+
+      {children ? (
+        <div className="flex flex-col gap-0 text-sm">
+          {children}
+        </div>
+      ) :
+        <span className="text-sm text-black">{value}</span>}
     </div>
   );
 }
