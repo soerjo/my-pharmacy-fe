@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useShallow } from "zustand/react/shallow";
 import {
   Button,
@@ -34,32 +34,28 @@ import { useDispenseOrdersStore } from "@/stores/dispense-orders-store";
 import { DispenseOrderCreateForm } from "./dispense-order-create-form";
 import { DispenseOrderUpdateForm } from "./dispense-order-update-form";
 import { formatDate, cn } from "@/utils";
-import type { DispenseOrder, DispenseOrderStatus } from "@/types";
+import {
+  type DispenseOrder,
+  type DispenseOrderStatus,
+  DISPENSE_ORDER_STATUS_OPTIONS,
+  DISPENSE_ORDER_STATUS_STYLES,
+} from "@/types";
 
-const STATUS_OPTIONS: { id: string; label: string }[] = [
+const STATUS_FILTER_OPTIONS = [
   { id: "", label: "All statuses" },
-  { id: "PENDING", label: "Pending" },
-  { id: "PREPARING", label: "Preparing" },
-  { id: "DISPENSED", label: "Dispensed" },
-  { id: "CANCELLED", label: "Cancelled" },
+  ...DISPENSE_ORDER_STATUS_OPTIONS,
 ];
-
-const statusStyles: Record<DispenseOrderStatus, string> = {
-  PENDING: "bg-yellow-100 text-yellow-800 dark:bg-yellow-950 dark:text-yellow-300",
-  PREPARING: "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300",
-  DISPENSED: "bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300",
-  CANCELLED: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300",
-};
 
 const UPDATE_FORM_ID = "dispense-order-update-form";
 
 function CopyableText({ text }: { text?: string | null }) {
-  if (!text) return <p>-</p>;
-
-  const handleCopy = async () => {
+  const handleCopy = useCallback(async () => {
+    if (!text) return;
     await navigator.clipboard.writeText(text);
     toast.success("Copied!", { description: text });
-  };
+  }, [text]);
+
+  if (!text) return <p>-</p>;
 
   return (
     <TooltipRoot>
@@ -91,21 +87,16 @@ export function DispenseOrdersTable() {
     setPageSize,
   } = useDispenseOrders();
 
-  const {
-    filters,
-    setFilters,
-    isFormOpen,
-    openCreateForm,
-    closeForm,
-  } = useDispenseOrdersStore(
-    useShallow((state) => ({
-      filters: state.filters,
-      setFilters: state.setFilters,
-      isFormOpen: state.isFormOpen,
-      openCreateForm: state.openCreateForm,
-      closeForm: state.closeForm,
-    })),
-  );
+  const { filters, setFilters, isFormOpen, openCreateForm, closeForm } =
+    useDispenseOrdersStore(
+      useShallow((state) => ({
+        filters: state.filters,
+        setFilters: state.setFilters,
+        isFormOpen: state.isFormOpen,
+        openCreateForm: state.openCreateForm,
+        closeForm: state.closeForm,
+      })),
+    );
 
   const [updateId, setUpdateId] = useState<string | null>(null);
   const [updateOrderStatus, setUpdateOrderStatus] = useState<DispenseOrderStatus | null>(null);
@@ -139,48 +130,58 @@ export function DispenseOrdersTable() {
         error={error}
         columns={
           <>
-            <Table.Column isRowHeader defaultWidth="1fr" minWidth={200} >Order # <Table.ColumnResizer /></Table.Column>
-            <Table.Column defaultWidth="1fr" minWidth={200} >Admission # <Table.ColumnResizer /></Table.Column>
-            <Table.Column>Patient Name</Table.Column>
-            <Table.Column defaultWidth="1fr" minWidth={120}>Status <Table.ColumnResizer /></Table.Column>
-            <Table.Column defaultWidth="1fr" minWidth={100}>Actions <Table.ColumnResizer /></Table.Column>
+            <TableColumn isRowHeader defaultWidth="1fr" minWidth={200}>
+              Order # <Table.ColumnResizer />
+            </TableColumn>
+            <TableColumn defaultWidth="1fr" minWidth={200}>
+              Admission # <Table.ColumnResizer />
+            </TableColumn>
+            <TableColumn>Patient Name</TableColumn>
+            <TableColumn defaultWidth="1fr" minWidth={120}>
+              Status <Table.ColumnResizer />
+            </TableColumn>
+            <TableColumn defaultWidth="1fr" minWidth={100}>
+              Actions <Table.ColumnResizer />
+            </TableColumn>
           </>
         }
         renderRow={(order: DispenseOrder) => (
-          <Table.Row key={order.orderNumber}>
-            <Table.Cell>
+          <TableRow key={order.orderNumber}>
+            <TableCell>
               <div>
-                <p>{order.orderNumber}</p>              
-                <p className="text-xs text-default-400"> {order.createdAt ? formatDate(order.createdAt) : "-"}</p>
+                <p>{order.orderNumber}</p>
+                <p className="text-xs text-default-400">
+                  {order.createdAt ? formatDate(order.createdAt) : "-"}
+                </p>
               </div>
-              </Table.Cell>
-            <Table.Cell>
+            </TableCell>
+            <TableCell>
               <div>
                 <CopyableText text={order.admissionNumber} />
                 <p className="text-xs text-default-400">
                   {order.type ?? "-"} | {order.admissionDate ? formatDate(order.admissionDate) : "-"}
                 </p>
               </div>
-            </Table.Cell>
-            <Table.Cell>{order.patientName ?? "-"}</Table.Cell> 
-            <Table.Cell>
+            </TableCell>
+            <TableCell>{order.patientName ?? "-"}</TableCell>
+            <TableCell>
               <span
                 className={cn(
                   "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium",
-                  statusStyles[order.status],
+                  DISPENSE_ORDER_STATUS_STYLES[order.status],
                 )}
               >
                 {order.status}
               </span>
-            </Table.Cell>
-            <Table.Cell>
+            </TableCell>
+            <TableCell>
               <div className="flex gap-1">
                 <Button size="sm" variant="secondary" onPress={() => openUpdate(order.id!, order.status)}>
                   Details
                 </Button>
               </div>
-            </Table.Cell>
-          </Table.Row>
+            </TableCell>
+          </TableRow>
         )}
         isFormOpen={isFormOpen}
         formTitle="New Dispense Order"
@@ -203,7 +204,7 @@ export function DispenseOrdersTable() {
               <Select.Indicator />
             </SelectTrigger>
             <SelectPopover>
-              <ListBox items={STATUS_OPTIONS}>
+              <ListBox items={STATUS_FILTER_OPTIONS}>
                 {(item) => (
                   <ListBoxItem key={item.id} textValue={item.label}>
                     {item.label}
@@ -221,7 +222,6 @@ export function DispenseOrdersTable() {
         onPageSizeChange={setPageSize}
       />
 
-      {/* Update Modal => could be used for view details */}
       <Modal state={updateModalState}>
         <ModalBackdrop variant="blur">
           <ModalContainer size="lg">
@@ -230,11 +230,15 @@ export function DispenseOrdersTable() {
                 <ModalHeading>Edit Order</ModalHeading>
               </ModalHeader>
               <ModalBody>
-                {updateId && <DispenseOrderUpdateForm id={updateId} onClose={closeUpdate} formId={UPDATE_FORM_ID} />}
+                {updateId && (
+                  <DispenseOrderUpdateForm id={updateId} onClose={closeUpdate} formId={UPDATE_FORM_ID} />
+                )}
               </ModalBody>
               <ModalFooter>
                 <Button variant="secondary" onPress={closeUpdate}>
-                  {updateOrderStatus === "DISPENSED" || updateOrderStatus === "CANCELLED" ? "Close" : "Cancel"}
+                  {updateOrderStatus === "DISPENSED" || updateOrderStatus === "CANCELLED"
+                    ? "Close"
+                    : "Cancel"}
                 </Button>
                 {updateOrderStatus !== "DISPENSED" && updateOrderStatus !== "CANCELLED" && (
                   <Button type="submit" form={UPDATE_FORM_ID} variant="primary">

@@ -22,7 +22,7 @@ export function ProductAutocomplete({
   selectedKey,
   onSelectionChange,
   initialItems,
-  label = "Product / Drug",
+  label,
   placeholder = "Search products...",
   className,
   error,

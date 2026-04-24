@@ -35,7 +35,7 @@ export function AdmissionAutocomplete({
       renderItem={(admission) => (
         <div className="flex flex-col">
           <span className="text-sm font-medium">{admission.patientName}</span>
-          <span className="text-xs text-default-400">{admission.diagnosis || admission.status}</span>
+          <span className="text-xs text-default-400">{admission.admissionNumber}</span>
         </div>
       )}
       label={label}

@@ -3,22 +3,22 @@
 import type { UseFormRegister, Control, FieldErrors } from "react-hook-form";
 import { Controller } from "react-hook-form";
 import { Input, Button, TextArea } from "@heroui/react";
-// import type { DispenseOrderFormValues } from "@/types";
-import { AdmissionAutocomplete, ProductAutocomplete } from "@/components/ui";
-import { DispenseOrderCreateFormValues } from "@/types/dispense-orders";
-
-interface FormField {
-  id: string;
-}
+import { AdmissionAutocomplete } from "@/components/ui";
+import { OrderItemRow } from "./dispense-order-item-row";
+import type { DispenseOrderCreateFormValues } from "@/types/dispense-orders";
+import type { Product } from "@/types";
 
 interface DispenseOrderFormBodyProps {
   control: Control<DispenseOrderCreateFormValues>;
   register: UseFormRegister<DispenseOrderCreateFormValues>;
   errors: FieldErrors<DispenseOrderCreateFormValues>;
-  fields: FormField[];
+  fields: { id: string }[];
   append: (value: { drugId: string; quantity: number; instructions: string }) => void;
   remove: (index: number) => void;
   isDisabled?: boolean;
+  watchedItems: DispenseOrderCreateFormValues["items"] | undefined;
+  productMap: Map<string, Product>;
+  onProductSelect: (product: Product | null) => void;
 }
 
 export function DispenseOrderFormBody({
@@ -29,6 +29,9 @@ export function DispenseOrderFormBody({
   append,
   remove,
   isDisabled = false,
+  watchedItems,
+  productMap,
+  onProductSelect,
 }: DispenseOrderFormBodyProps) {
   return (
     <>
@@ -48,6 +51,20 @@ export function DispenseOrderFormBody({
             />
           )}
         />
+
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="admissionDate" className="text-sm font-medium">
+            Admission Date <span className="text-danger">*</span>
+          </label>
+          <Input
+            id="admissionDate"
+            type="date"
+            className="h-full"
+            disabled={isDisabled}
+            {...register("admissionDate")}
+          />
+          {errors.admissionDate && <p className="text-sm text-danger">{errors.admissionDate.message}</p>}
+        </div>
       </div>
 
       <div className="flex flex-col gap-2">
@@ -72,68 +89,19 @@ export function DispenseOrderFormBody({
 
         <div className="flex flex-col gap-3">
           {fields.map((field, index) => (
-            <div
+            <OrderItemRow<DispenseOrderCreateFormValues>
               key={field.id}
-              className="grid grid-cols-1 gap-3 rounded-lg border border-zinc-200 p-3 dark:border-zinc-800 sm:grid-cols-[1fr_100px_1fr_auto]"
-            >
-              <Controller
-                name={`items.${index}.drugId`}
-                control={control}
-                render={({ field: drugField }) => (
-                  <ProductAutocomplete
-                    selectedKey={drugField.value || null}
-                    onSelectionChange={(key) => drugField.onChange(key)}
-                    label={index === 0 ? "Drug" : undefined}
-                    placeholder="Search drug..."
-                    required
-                    isDisabled={isDisabled}
-                    error={errors.items?.[index]?.drugId?.message}
-                  />
-                )}
-              />
-
-              <div className="flex flex-col gap-1.5">
-                {index === 0 && (
-                  <label className="text-sm font-medium">
-                    Qty <span className="text-danger">*</span>
-                  </label>
-                )}
-                <Input
-                  type="number"
-                  min={1}
-                  placeholder="Qty"
-                  disabled={isDisabled}
-                  {...register(`items.${index}.quantity`, { valueAsNumber: true })}
-                />
-                {errors.items?.[index]?.quantity && (
-                  <p className="text-sm text-danger">{errors.items[index].quantity?.message}</p>
-                )}
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                {index === 0 && (
-                  <label className="text-sm font-medium">Instructions</label>
-                )}
-                <Input
-                  placeholder="Instructions"
-                  disabled={isDisabled}
-                  {...register(`items.${index}.instructions`)}
-                />
-              </div>
-
-              {fields.length > 1 && (
-                <Button
-                  size="sm"
-                  variant="danger"
-                  type="button"
-                  className="self-end"
-                  onPress={() => remove(index)}
-                  isDisabled={isDisabled}
-                >
-                  Remove
-                </Button>
-              )}
-            </div>
+              index={index}
+              control={control}
+              register={register}
+              errors={errors}
+              onRemove={remove}
+              canRemove={fields.length > 1}
+              isDisabled={isDisabled}
+              watchedItem={watchedItems?.[index]}
+              productMap={productMap}
+              onProductSelect={onProductSelect}
+            />
           ))}
         </div>
       </div>
@@ -148,9 +116,7 @@ export function DispenseOrderFormBody({
           disabled={isDisabled}
           {...register("notes")}
         />
-        {errors.notes && (
-          <p className="text-sm text-danger">{errors.notes.message}</p>
-        )}
+        {errors.notes && <p className="text-sm text-danger">{errors.notes.message}</p>}
       </div>
     </>
   );

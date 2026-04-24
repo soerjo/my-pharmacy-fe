@@ -2,6 +2,20 @@ import { z } from "zod";
 
 export type DispenseOrderStatus = "PENDING" | "PREPARING" | "DISPENSED" | "CANCELLED";
 
+export const DISPENSE_ORDER_STATUS_OPTIONS: { id: DispenseOrderStatus; label: string }[] = [
+  { id: "PENDING", label: "Pending" },
+  { id: "PREPARING", label: "Preparing" },
+  { id: "DISPENSED", label: "Dispensed" },
+  { id: "CANCELLED", label: "Cancelled" },
+];
+
+export const DISPENSE_ORDER_STATUS_STYLES: Record<DispenseOrderStatus, string> = {
+  PENDING: "bg-yellow-100 text-yellow-800 dark:bg-yellow-950 dark:text-yellow-300",
+  PREPARING: "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300",
+  DISPENSED: "bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300",
+  CANCELLED: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300",
+};
+
 export interface DispenseOrderItem {
   id: string;
   dispenseOrderId: string;
@@ -52,6 +66,7 @@ export interface DispenseOrder {
 export interface DispenseOrderDetail {
   id: string;
   orderNumber: string;
+  orderDate: string;
   patientId: string;
   admissionId: string;
   patientName: string;
@@ -88,6 +103,7 @@ export const dispenseOrderSchema = z.object({
 export const dispenseCreateOrderSchema = z.object({
   // patientId: z.string().min(1, "Patient is required"),
   admissionId: z.string().min(1, "Admission is required"),
+  admissionDate: z.string().min(1, "Admission date is required"),
   // status: z.enum(["PENDING", "PREPARING", "DISPENSED", "CANCELLED"]),
   notes: z.string(),
   items: z.array(dispenseOrderItemSchema).min(1, "At least one item is required"),

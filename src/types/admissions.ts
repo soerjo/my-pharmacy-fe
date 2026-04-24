@@ -27,6 +27,7 @@ export interface Admission {
   id: string;
   patientId: string;
   patientName: string;
+  admissionNumber: string;
   admissionDate: string;
   dischargeDate?: string;
   wardId: string;

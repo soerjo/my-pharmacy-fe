@@ -8,6 +8,7 @@ export { GENDER_VALUES } from "./patients";
 export { admissionSchema, createAdmissionSchema } from "./admissions";
 export type { Admission, AdmissionFormValues, AdmissionStatus, CreateAdmissionFormValues } from "./admissions";
 export { dispenseOrderSchema } from "./dispense-orders";
+export { DISPENSE_ORDER_STATUS_OPTIONS, DISPENSE_ORDER_STATUS_STYLES } from "./dispense-orders";
 export type { DispenseOrder, DispenseOrderFormValues, DispenseOrderStatus, DispenseOrderItem, DispenseOrderDetail, DispenseOrderDetailItem } from "./dispense-orders";
 export { roomSchema } from "./rooms";
 export type { Room, RoomFormValues } from "./rooms";

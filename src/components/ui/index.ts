@@ -13,3 +13,4 @@ export { ManufacturerAutocomplete } from "./manufacturer-autocomplete";
 export { DataTable } from "./data-table";
 export { TablePagination } from "./table-pagination";
 export { TableToolbar } from "./table-toolbar";
+export { InfoField } from "./info-field";
