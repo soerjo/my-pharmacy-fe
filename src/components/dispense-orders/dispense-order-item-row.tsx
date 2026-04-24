@@ -87,9 +87,10 @@ export function OrderItemRow<T extends FieldValues>({
                 onBlur={field.onBlur}
                 ref={field.ref}
                 readOnly={isDisabled}
+
               />
               {selectedProduct?.baseUnitAbbreviation && (
-                <InputGroup.Suffix>
+                <InputGroup.Suffix className="bg-transparent border-0 mr-5">
                   <span className="whitespace-nowrap">
                     {selectedProduct.baseUnitAbbreviation}
                   </span>
