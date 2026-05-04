@@ -12,10 +12,8 @@ import {
   ListBoxItem,
   Modal,
   ModalBackdrop,
-  ModalBody,
   ModalContainer,
   ModalDialog,
-  ModalFooter,
   ModalHeader,
   ModalHeading,
   TableCell,
@@ -225,27 +223,11 @@ export function DispenseOrdersTable() {
       <Modal state={updateModalState}>
         <ModalBackdrop variant="blur">
           <ModalContainer size="lg">
-              <ModalDialog className="h-dvh w-full max-w-full md:h-auto md:w-3/4 md:max-w-2/4 md:rounded-3xl">
-              <ModalHeader>
+              <ModalDialog className="h-dvh w-full max-w-full md:h-auto md:w-3/4 md:max-w-2/4 md:rounded-3xl p-0 md:p-2">
+              <ModalHeader className="px-4 pt-4">
                 <ModalHeading>Edit Order</ModalHeading>
               </ModalHeader>
-              <ModalBody>
-                {updateId && (
-                  <DispenseOrderUpdateForm id={updateId} onClose={closeUpdate} formId={UPDATE_FORM_ID} />
-                )}
-              </ModalBody>
-              <ModalFooter>
-                <Button variant="secondary" onPress={closeUpdate}>
-                  {updateOrderStatus === "DISPENSED" || updateOrderStatus === "CANCELLED"
-                    ? "Close"
-                    : "Cancel"}
-                </Button>
-                {updateOrderStatus !== "DISPENSED" && updateOrderStatus !== "CANCELLED" && (
-                  <Button type="submit" form={UPDATE_FORM_ID} variant="primary">
-                    Save
-                  </Button>
-                )}
-              </ModalFooter>
+                  <DispenseOrderUpdateForm id={updateId!} onClose={closeUpdate} formId={UPDATE_FORM_ID} />
             </ModalDialog>
           </ModalContainer>
         </ModalBackdrop>

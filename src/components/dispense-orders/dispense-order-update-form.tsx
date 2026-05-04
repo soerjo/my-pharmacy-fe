@@ -3,7 +3,15 @@
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { TextArea, Spinner, Accordion, useOverlayState } from "@heroui/react";
+import { 
+  TextArea, 
+  Spinner, 
+  Accordion, 
+  useOverlayState,
+  ModalBody,
+  ModalFooter,
+  Button,
+ } from "@heroui/react";
 import { ChevronDown, Receipt, Book } from "@gravity-ui/icons";
 import {
   dispenseOrderSchema,
@@ -19,6 +27,7 @@ import { DispenseOrderSectionDetails } from "./dispense-order-section-details";
 import { DispenseOrderSectionItems } from "./dispense-order-section-items";
 import { StatusConfirmModal } from "./dispense-order-status-confirm-modal";
 import { DeleteItemConfirmModal } from "./dispense-order-delete-item-modal";
+import { ChangesConfirmModal } from "./dispense-order-changes-confirm-modal";
 
 interface DispenseOrderUpdateFormProps {
   id: string;
@@ -49,7 +58,7 @@ export function DispenseOrderUpdateForm({ id, onClose, formId }: DispenseOrderUp
     control,
     reset,
     watch,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm<DispenseOrderFormValues>({
     resolver: zodResolver(dispenseOrderSchema),
     defaultValues: {
@@ -126,6 +135,16 @@ export function DispenseOrderUpdateForm({ id, onClose, formId }: DispenseOrderUp
       if (!open) setPendingRemoveIndex(null);
     },
   });
+
+  const changesOverlayState = useOverlayState({ defaultOpen: false });
+
+  const handleClose = useCallback(() => {
+    if (isDirty) {
+      changesOverlayState.open();
+    } else {
+      onClose();
+    }
+  }, [isDirty, changesOverlayState, onClose]);
 
   const handleProductSelect = useCallback((product: Product | null) => {
     if (product) {
@@ -216,11 +235,12 @@ export function DispenseOrderUpdateForm({ id, onClose, formId }: DispenseOrderUp
   }
 
   return (
+    <>
+  <ModalBody >
     <form id={formId} onSubmit={handleSubmit(onSubmit)}>
       <Accordion
         allowsMultipleExpanded
         defaultExpandedKeys={["dispense-details", "order-items"]}
-        className="w-full"
         variant="default"
       >
         <DispenseOrderSectionDetails
@@ -324,6 +344,18 @@ export function DispenseOrderUpdateForm({ id, onClose, formId }: DispenseOrderUp
         isConfirming={isStatusChanging && pendingStatus !== null}
       />
 
+      <ChangesConfirmModal
+        state={changesOverlayState}
+        title="Unsaved Changes"
+        message="You have unsaved changes. Are you sure you want to close? All changes will be lost."
+        isCancelled={false}
+        cancelReason=""
+        onCancelReasonChange={() => {}}
+        onConfirm={onClose}
+        onDismiss={() => changesOverlayState.close()}
+        isConfirming={false}
+      />
+
       <DeleteItemConfirmModal
         state={deleteModalState}
         itemName={
@@ -336,5 +368,11 @@ export function DispenseOrderUpdateForm({ id, onClose, formId }: DispenseOrderUp
         onDismiss={() => setPendingRemoveIndex(null)}
       />
     </form>
+    </ModalBody>
+      <ModalFooter className="px-4 pb-4">
+        <Button variant="secondary" onPress={handleClose}>{isDirty ? "Cancel" : "Close"}</Button>
+        {isDirty && <Button type="submit" form={formId}>Save</Button>}
+      </ModalFooter>
+    </>
   );
 }

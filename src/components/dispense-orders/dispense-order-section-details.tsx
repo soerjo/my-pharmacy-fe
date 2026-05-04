@@ -87,7 +87,7 @@ export function DispenseOrderSectionDetails({
                                   DISPENSE_ORDER_STATUS_STYLES[item.id],
                                 )}
                               >
-                                {item.label}
+                                {item.label} || contoh
                               </span>
                             </ListBoxItem>
                           )}

@@ -29,6 +29,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - `.eslintrc.json`, `.eslintignore` — legacy format; ESLint 9 uses `eslint.config.mjs`
 - `next.config.js` — removed; `.ts` version is the active one
 - `.env.example` — stale; lists `NEXT_PUBLIC_API_URL` which no longer exists. Real env vars are the three service URLs below.
+- `example.env.local` — stale; references `NEXT_PUBLIC_BACKEND_URL` which no longer exists.
 - `AUTH_SYSTEM.md` — stale; references old import paths (`@/features/auth/*`) and single-backend architecture. Trust the code, not this doc.
 
 ## Architecture
@@ -96,35 +97,31 @@ Required:
 
 ## HeroUI v3 Table components
 
-HeroUI v3's `Table` is built on `react-aria-components`. The component structure differs from NextUI and older HeroUI versions. The correct nesting order for scrollable tables is:
+HeroUI v3's `Table` is built on `react-aria-components`. The component structure differs from NextUI and older HeroUI versions. The correct nesting order:
 
 ```tsx
-import { Table, TableScrollContainer, TableContent, TableHeader, TableBody, TableFooter, TableRow, TableColumn, TableCell } from "@heroui/react";
-
 <Table>
-  <TableScrollContainer>    {/* overflow-x-auto — enables horizontal scroll on mobile */}
-    <TableContent>           {/* <table> element */}
-      <TableHeader>
-        <TableColumn isRowHeader>Name</TableColumn>
-        <TableColumn>Actions</TableColumn>
-      </TableHeader>
-      <TableBody items={data}>
-        {(item) => <TableRow key={item.id}><TableCell>{item.name}</TableCell></TableRow>}
-      </TableBody>
-    </TableContent>
-  </TableScrollContainer>
-  <TableFooter>
-    {/* pagination */}
-  </TableFooter>
+  <Table.ResizableContainer aria-label="...">
+    <TableScrollContainer>    {/* overflow-x-auto — enables horizontal scroll on mobile */}
+      <TableContent>           {/* <table> element */}
+        <TableHeader>...</TableHeader>
+        <TableBody items={data}>
+          {(item) => <TableRow key={item.id}><TableCell>{item.name}</TableCell></TableRow>}
+        </TableBody>
+      </TableContent>
+    </TableScrollContainer>
+    <TableFooter>{/* pagination */}</TableFooter>
+  </Table.ResizableContainer>
 </Table>
 ```
 
 **Important:**
-- `TableScrollContainer` is required for horizontal scrolling on mobile. The table root uses `overflow-clip`, so wrapping the table with an external `overflow-x-auto` div will NOT work. `TableScrollContainer` must be placed between `<Table>` and `<TableContent>`.
-- Do NOT add external `overflow-x-auto` wrappers around the table. Use `TableScrollContainer` instead.
-- The shared `DataTable<T>` component in `src/components/ui/data-table.tsx` already includes `TableScrollContainer`, so all entity tables get horizontal scroll automatically.
-- `TableFooter` stays outside `TableScrollContainer` so it remains full-width (does not scroll with the table).
-- Compound component pattern: `Table.ScrollContainer`, `Table.Content`, `Table.Header`, etc. also work as alternatives to named imports.
+- `Table.ResizableContainer` wraps everything inside `<Table>` — it is required for proper layout. Omitting it breaks scrolling and column behavior.
+- `TableScrollContainer` handles horizontal overflow. The table root uses `overflow-clip`, so external `overflow-x-auto` divs will NOT work. `TableScrollContainer` must sit between `ResizableContainer` and `TableContent`.
+- Do NOT add external `overflow-x-auto` wrappers around the table.
+- `TableFooter` stays inside `ResizableContainer` but outside `TableScrollContainer` so it remains full-width.
+- The shared `DataTable<T>` component in `src/components/ui/data-table.tsx` handles this nesting automatically.
+- Compound component pattern (`Table.ResizableContainer`, `Table.Content`, `Table.Header`, etc.) also works as alternatives to named imports.
 
 ## Package manager
 
@@ -210,7 +207,7 @@ export function WidgetsTable() {
       )}
       isFormOpen={isFormOpen}
       formTitle={editingEntity ? `Edit ${editingEntity.name}` : "New Widget"}
-      renderForm={(onClose) => <WidgetForm widget={editingEntity} onClose={onClose} />}
+      renderForm={(onClose, formId) => <WidgetForm widget={editingEntity} onClose={onClose} formId={formId} />}
       onCloseForm={closeForm}
       filters={filters}
       onSearchChange={(value) => setFilters({ search: value })}
@@ -226,6 +223,8 @@ export function WidgetsTable() {
   );
 }
 ```
+
+**Form `formId` prop is critical:** `renderForm` receives `(onClose, formId)`. The form component must accept `formId` and set `id={formId}` on its `<form>` element — the modal's Save button uses `form={formId}` to submit. Without this, the Save button does nothing.
 
 **Extra toolbar filters** (e.g., status dropdown): pass via `toolbarExtra` prop:
 ```tsx
