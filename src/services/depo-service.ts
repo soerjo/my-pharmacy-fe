@@ -16,10 +16,12 @@ import type {
 import { DispenseOrderCreateFormValues } from "@/types/dispense-orders";
 
 export const depoService = {
-  getDispenseOrders: (params?: { search?: string; status?: string; page?: number; limit?: number }) => {
+  getDispenseOrders: (params?: { search?: string; status?: string; startDate?: string; endDate?: string; page?: number; limit?: number }) => {
     const searchParams = new URLSearchParams();
     if (params?.search) searchParams.set("search", params.search);
     if (params?.status) searchParams.set("status", params.status);
+    if (params?.startDate) searchParams.set("startDate", params.startDate);
+    if (params?.endDate) searchParams.set("endDate", params.endDate);
     if (params?.page !== undefined) searchParams.set("page", String(params.page));
     if (params?.limit !== undefined) searchParams.set("limit", String(params.limit));
 

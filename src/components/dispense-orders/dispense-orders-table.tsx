@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useMemo } from "react";
 import { useShallow } from "zustand/react/shallow";
 import {
   Button,
@@ -24,6 +24,8 @@ import {
   toast,
   useOverlayState,
   Table,
+  Input,
+  Label,
 } from "@heroui/react";
 import { Copy } from "@gravity-ui/icons";
 import { DataTable } from "@/components/ui/data-table";
@@ -36,14 +38,12 @@ import { formatDate, cn } from "@/utils";
 import {
   type DispenseOrder,
   type DispenseOrderStatus,
-  DISPENSE_ORDER_STATUS_OPTIONS,
   DISPENSE_ORDER_STATUS_STYLES,
 } from "@/types";
+import { RangeDatePicker } from "../ui/range-date-picker";
+import { OrderSelectItem } from "../ui/order-select-item";
+import { today, getLocalTimeZone, type CalendarDate } from "@internationalized/date";
 
-const STATUS_FILTER_OPTIONS = [
-  { id: "", label: "All statuses" },
-  ...DISPENSE_ORDER_STATUS_OPTIONS,
-];
 
 const UPDATE_FORM_ID = "dispense-order-update-form";
 
@@ -134,6 +134,22 @@ export function DispenseOrdersTable() {
     setUpdateId(null);
   }
 
+  const defaultDateRange = useMemo(() => {
+    const now = today(getLocalTimeZone());
+    return { start: now, end: now };
+  }, []);
+
+  const handleDateRangeChange = useCallback(
+    (range: { start: CalendarDate; end: CalendarDate } | null) => {
+      if (!range) return;
+      setFilters({
+        startDate: range.start.toString(),
+        endDate: range.end.toString(),
+      });
+    },
+    [setFilters],
+  );
+
   return (
     <>
       <DataTable<DispenseOrder>
@@ -208,27 +224,10 @@ export function DispenseOrdersTable() {
         onAdd={openCreateForm}
         addLabel="+ New Order"
         toolbarExtra={
-          <Select
-            selectedKey={filters.status || undefined}
-            onSelectionChange={(key) => {
-              setFilters({ status: key ? String(key) : "" });
-            }}
-            fullWidth
-          >
-            <SelectTrigger>
-              <SelectValue />
-              <Select.Indicator />
-            </SelectTrigger>
-            <SelectPopover>
-              <ListBox items={STATUS_FILTER_OPTIONS}>
-                {(item) => (
-                  <ListBoxItem key={item.id} textValue={item.label}>
-                    {item.label}
-                  </ListBoxItem>
-                )}
-              </ListBox>
-            </SelectPopover>
-          </Select>
+          <div className="flex flex-row gap-4 w-full">
+            <OrderSelectItem filters={filters} setFilters={setFilters}/>
+            <RangeDatePicker defaultValue={defaultDateRange} onChange={handleDateRangeChange} />
+          </div>
         }
         page={pagination.page}
         pageSize={pagination.pageSize}
