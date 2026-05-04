@@ -14,7 +14,7 @@ export function RangeDatePicker({ defaultValue, onChange }: RangeDatePickerProps
 
   return (
     <DateRangePicker
-      className="w-72"
+      className="w-full"
       startName="startDate"
       endName="endDate"
       defaultValue={value}

@@ -78,10 +78,14 @@ export function AdmissionsTable() {
               {admission.status}
             </Chip>
           </TableCell>
-          <TableCell>
+          <TableCell className="flex flex-row gap-2">
             <Button size="sm" variant="secondary" onPress={() => openEditForm(admission)}>
               Edit
             </Button>
+            <Button size="sm" variant="secondary" onPress={() => openEditForm(admission)}>
+              Add Order
+            </Button>
+
           </TableCell>
         </TableRow>
       )}

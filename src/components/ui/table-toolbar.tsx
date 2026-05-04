@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Label, SearchField} from "@heroui/react";
 import { Button, Input } from "@heroui/react";
-import { Magnifier, Plus } from "@gravity-ui/icons";
+import { Ellipsis, Magnifier, Plus } from "@gravity-ui/icons";
 
 interface TableToolbarProps {
   title: string;
@@ -26,6 +26,8 @@ export function TableToolbar({
 }: TableToolbarProps) {
   const [localSearch, setLocalSearch] = useState(searchValue);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [isShowFilter, setIsShowFilter] = useState<boolean>(false);
+
 
   useEffect(() => {
     return () => {
@@ -36,26 +38,11 @@ export function TableToolbar({
   return (
     <div className="flex flex-col gap-3">
       <h2 className="text-xl font-semibold">{title}</h2>
-      <div className="flex md:flex-row flex-col items-center justify-end gap-3">
+      <div className="flex flex-row items-center gap-3">
         <div className="relative w-full">
-          {/* <Magnifier className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-default-400" /> */}
-          {/* <Input
-          fullWidth
-            placeholder={searchPlaceholder}
-            value={localSearch}
-            onChange={(e) => {
-              const value = e.target.value;
-              setLocalSearch(value);
-              if (debounceRef.current) clearTimeout(debounceRef.current);
-              debounceRef.current = setTimeout(() => {
-                onSearchChange(value);
-              }, 300);
-            }}
-            className="pl-8"
-            aria-label={searchPlaceholder}
-          /> */}
-
-          <SearchField name="search" value={localSearch} onChange={(e) => {
+          <SearchField 
+          className="w-full"
+          name="search" value={localSearch} onChange={(e) => {
               const value = e;
               setLocalSearch(value);
               if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -63,27 +50,32 @@ export function TableToolbar({
                 onSearchChange(value);
               }, 300);
             }}>
-            {/* <Label>Search</Label> */}
             <SearchField.Group>
               <SearchField.SearchIcon />
               <SearchField.Input placeholder="Search..." />
               <SearchField.ClearButton />
             </SearchField.Group>
-            {/* <Description>Current value: {value || "(empty)"}</Description> */}
           </SearchField>
 
         </div>
-        {/* <Button variant="primary"  onPress={onAdd} className="flex md:hidden self-end" isIconOnly>
-          <Plus />
-          </Button> */}
+
+        <Button isIconOnly variant="tertiary" 
+        className="md:hidden aspect-square"
+        onClick={() => setIsShowFilter(!isShowFilter)}
+        >
+          <Ellipsis/>
+        </Button>
 
         <Button variant="primary" onPress={onAdd} className="hidden md:flex">
           {addLabel}
         </Button>
       </div>
-          <div className="flex items-center justify-end gap-2 w-full">
+        <div className="flex items-center justify-end gap-2 w-full md:hidden">
+          {isShowFilter && extra}
+        </div>
+        <div className="md:flex items-center justify-end gap-2 w-full hidden">
           {extra}
-          </div>
+        </div>
     </div>
   );
 }
