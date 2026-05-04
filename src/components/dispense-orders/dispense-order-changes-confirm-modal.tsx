@@ -61,6 +61,7 @@ export function ChangesConfirmModal({
                 No, go back
               </Button>
               <Button
+                slot={'close'}
                 variant={isCancelled ? "danger" : "primary"}
                 onPress={onConfirm}
                 isDisabled={isConfirming}

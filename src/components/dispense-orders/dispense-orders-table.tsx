@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { useShallow } from "zustand/react/shallow";
 import {
   Button,
@@ -31,6 +31,7 @@ import { useDispenseOrders } from "@/hooks/use-dispense-orders";
 import { useDispenseOrdersStore } from "@/stores/dispense-orders-store";
 import { DispenseOrderCreateForm } from "./dispense-order-create-form";
 import { DispenseOrderUpdateForm } from "./dispense-order-update-form";
+import { ChangesConfirmModal } from "./dispense-order-changes-confirm-modal";
 import { formatDate, cn } from "@/utils";
 import {
   type DispenseOrder,
@@ -98,6 +99,21 @@ export function DispenseOrdersTable() {
 
   const [updateId, setUpdateId] = useState<string | null>(null);
   const [updateOrderStatus, setUpdateOrderStatus] = useState<DispenseOrderStatus | null>(null);
+
+  const isCreateDirtyRef = useRef(false);
+  const createChangesOverlayState = useOverlayState({ defaultOpen: false });
+
+  const handleCreateCloseRequest = useCallback(() => {
+    if (isCreateDirtyRef.current) {
+      createChangesOverlayState.open();
+    } else {
+      closeForm();
+    }
+  }, [closeForm, createChangesOverlayState]);
+
+  const handleCreateDirtyChange = useCallback((dirty: boolean) => {
+    isCreateDirtyRef.current = dirty;
+  }, []);
 
   const updateModalState = useOverlayState({
     isOpen: !!updateId,
@@ -183,8 +199,10 @@ export function DispenseOrdersTable() {
         )}
         isFormOpen={isFormOpen}
         formTitle="New Dispense Order"
-        renderForm={(onClose, formId) => <DispenseOrderCreateForm onClose={onClose} formId={formId} />}
-        onCloseForm={closeForm}
+        renderForm={(onClose, formId) => (
+          <DispenseOrderCreateForm onClose={onClose} formId={formId} onDirtyChange={handleCreateDirtyChange} />
+        )}
+        onCloseForm={handleCreateCloseRequest}
         filters={filters}
         onSearchChange={(value) => setFilters({ search: value })}
         onAdd={openCreateForm}
@@ -218,6 +236,18 @@ export function DispenseOrdersTable() {
         totalPages={paginationMeta?.totalPages ?? 1}
         onPageChange={setPage}
         onPageSizeChange={setPageSize}
+      />
+
+      <ChangesConfirmModal
+        state={createChangesOverlayState}
+        title="Unsaved Changes"
+        message="You have unsaved changes. Are you sure you want to close? All changes will be lost."
+        isCancelled={false}
+        cancelReason=""
+        onCancelReasonChange={() => {}}
+        onConfirm={closeForm}
+        onDismiss={() => createChangesOverlayState.close()}
+        isConfirming={false}
       />
 
       <Modal state={updateModalState}>

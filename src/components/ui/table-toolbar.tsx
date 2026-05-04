@@ -34,10 +34,10 @@ export function TableToolbar({
   }, []);
 
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-3">
       <h2 className="text-xl font-semibold">{title}</h2>
       <div className="flex md:flex-row flex-col items-center justify-end gap-3">
-        <div className="relative w-full sm:w-64">
+        <div className="relative w-full">
           {/* <Magnifier className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-default-400" /> */}
           {/* <Input
           fullWidth
@@ -66,24 +66,24 @@ export function TableToolbar({
             {/* <Label>Search</Label> */}
             <SearchField.Group>
               <SearchField.SearchIcon />
-              <SearchField.Input className="w-[280px]" placeholder="Search..." />
+              <SearchField.Input placeholder="Search..." />
               <SearchField.ClearButton />
             </SearchField.Group>
             {/* <Description>Current value: {value || "(empty)"}</Description> */}
           </SearchField>
 
         </div>
-        <div className="flex items-center justify-end gap-2 w-full">
-        {extra}
-        </div>
         {/* <Button variant="primary"  onPress={onAdd} className="flex md:hidden self-end" isIconOnly>
           <Plus />
-        </Button> */}
+          </Button> */}
 
         <Button variant="primary" onPress={onAdd} className="hidden md:flex">
           {addLabel}
         </Button>
       </div>
+          <div className="flex items-center justify-end gap-2 w-full">
+          {extra}
+          </div>
     </div>
   );
 }

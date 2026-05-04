@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useDispenseOrders } from "@/hooks/use-dispense-orders";
@@ -11,9 +11,10 @@ import type { Product } from "@/types";
 interface DispenseOrderCreateFormProps {
   onClose: () => void;
   formId: string;
+  onDirtyChange?: (dirty: boolean) => void;
 }
 
-export function DispenseOrderCreateForm({ onClose, formId }: DispenseOrderCreateFormProps) {
+export function DispenseOrderCreateForm({ onClose, formId, onDirtyChange }: DispenseOrderCreateFormProps) {
   const { createOrder } = useDispenseOrders();
 
   const [productMap, setProductMap] = useState<Map<string, Product>>(new Map());
@@ -23,7 +24,7 @@ export function DispenseOrderCreateForm({ onClose, formId }: DispenseOrderCreate
     handleSubmit,
     control,
     watch,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm<DispenseOrderCreateFormValues>({
     resolver: zodResolver(dispenseCreateOrderSchema),
     defaultValues: {
@@ -33,6 +34,10 @@ export function DispenseOrderCreateForm({ onClose, formId }: DispenseOrderCreate
       items: [{ drugId: "", quantity: 1, instructions: "" }],
     },
   });
+
+  useEffect(() => {
+    onDirtyChange?.(isDirty);
+  }, [isDirty, onDirtyChange]);
 
   const watchedItems = watch("items");
   const { fields, append, remove } = useFieldArray({
