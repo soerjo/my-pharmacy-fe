@@ -114,10 +114,6 @@ export function DispenseOrderFormBody({
         </ScrollShadow>
       </div>
 
-      {/* <div className="flex items-center justify-between">
-        <label className="text-sm font-medium">
-          Items <span className="text-danger">*</span>
-        </label> */}
         <Button
           size="sm"
           // variant="secondary"
@@ -128,7 +124,6 @@ export function DispenseOrderFormBody({
         >
           + Add Item
         </Button>
-      {/* </div> */}
     </>
   );
 }

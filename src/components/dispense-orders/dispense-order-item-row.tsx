@@ -113,6 +113,7 @@ export function OrderItemRow<T extends FieldValues>({
           placeholder="Instructions"
           readOnly={isDisabled}
           {...register(`items.${index}.instructions` as Path<T>)}
+          autoFocus={false}
         />
       </div>
 

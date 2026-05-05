@@ -24,10 +24,8 @@ import {
   toast,
   useOverlayState,
   Table,
-  Input,
-  Label,
 } from "@heroui/react";
-import { Copy, BarsAscendingAlignCenter, Ellipsis } from "@gravity-ui/icons";
+import { Copy } from "@gravity-ui/icons";
 import { DataTable } from "@/components/ui/data-table";
 import { useDispenseOrders } from "@/hooks/use-dispense-orders";
 import { useDispenseOrdersStore } from "@/stores/dispense-orders-store";
@@ -224,15 +222,10 @@ export function DispenseOrdersTable() {
         onAdd={openCreateForm}
         addLabel="+ New Order"
         toolbarExtra={
-          <>
-            {/* <Button isIconOnly variant="tertiary">
-              <Ellipsis/>
-            </Button> */}
-              <div className="flex md:flex-row flex-col gap-4 w-full">
-              <OrderSelectItem filters={filters} setFilters={setFilters}/>
-              <RangeDatePicker defaultValue={defaultDateRange} onChange={handleDateRangeChange} />
-            </div>
-          </>
+          <div className="flex md:flex-row flex-col gap-4 w-full">
+            <OrderSelectItem filters={filters} setFilters={setFilters}/>
+            <RangeDatePicker defaultValue={defaultDateRange} onChange={handleDateRangeChange} />
+          </div>
         }
         page={pagination.page}
         pageSize={pagination.pageSize}
