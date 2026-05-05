@@ -1,6 +1,6 @@
 "use client";
 
-import { type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { Button, ModalFooter, Spinner, useOverlayState } from "@heroui/react";
 import {
   Table,
@@ -38,7 +38,7 @@ interface DataTableProps<T extends object> {
 
   isFormOpen: boolean;
   formTitle: string;
-  renderForm: (onClose: () => void, formId: string) => ReactNode;
+  renderForm: (onClose: () => void, formId: string, onSubmittingChange?: (submitting: boolean) => void) => ReactNode;
   onCloseForm: () => void;
 
   filters: { search: string };
@@ -86,6 +86,8 @@ export function DataTable<T extends object>({
     },
   });
 
+  const [isFormSubmitting, setIsFormSubmitting] = useState(false);
+
   if (isLoading) {
     return (
       <div className="flex justify-center py-12">
@@ -126,13 +128,13 @@ export function DataTable<T extends object>({
               <ModalHeader>
                 <ModalHeading>{formTitle}</ModalHeading>
               </ModalHeader>
-              <ModalBody className="p-2">{renderForm(onCloseForm, FORM_ID)}</ModalBody>
+              <ModalBody className="p-2">{renderForm(onCloseForm, FORM_ID, setIsFormSubmitting)}</ModalBody>
               <ModalFooter>
                 <Button variant="secondary" onPress={onCloseForm}>
                   Cancel
                 </Button>
-                <Button type="submit" form={FORM_ID} variant="primary">
-                  Save
+                <Button type="submit" form={FORM_ID} variant="primary" isDisabled={isFormSubmitting}>
+                  Save{isFormSubmitting && <Spinner size="sm" color="current" />}
                 </Button>
               </ModalFooter>
             </ModalDialog>
@@ -144,7 +146,7 @@ export function DataTable<T extends object>({
         variant="primary"
         isIconOnly
         onPress={onAdd}
-        className="fixed bottom-6 right-6 z-50 flex h-16 w-16 items-center justify-center rounded-full shadow-lg md:hidden"
+        className="fixed bottom-6 right-6 z-50 flex h-16 w-16 aspect-square items-center justify-center rounded-full shadow-lg md:hidden"
       >
         <Plus />
       </Button>

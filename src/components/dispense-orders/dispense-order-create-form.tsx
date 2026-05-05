@@ -12,9 +12,10 @@ interface DispenseOrderCreateFormProps {
   onClose: () => void;
   formId: string;
   onDirtyChange?: (dirty: boolean) => void;
+  onSubmittingChange?: (submitting: boolean) => void;
 }
 
-export function DispenseOrderCreateForm({ onClose, formId, onDirtyChange }: DispenseOrderCreateFormProps) {
+export function DispenseOrderCreateForm({ onClose, formId, onDirtyChange, onSubmittingChange }: DispenseOrderCreateFormProps) {
   const { createOrder } = useDispenseOrders();
 
   const [productMap, setProductMap] = useState<Map<string, Product>>(new Map());
@@ -53,10 +54,12 @@ export function DispenseOrderCreateForm({ onClose, formId, onDirtyChange }: Disp
 
   async function onSubmit(data: DispenseOrderCreateFormValues) {
     try {
+      onSubmittingChange?.(true);
       await createOrder(data);
+      onDirtyChange?.(false);
       onClose();
     } catch {
-      // Error handled by mutation toast
+      onSubmittingChange?.(false);
     }
   }
 

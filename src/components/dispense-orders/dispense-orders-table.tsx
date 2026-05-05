@@ -213,8 +213,8 @@ export function DispenseOrdersTable() {
         )}
         isFormOpen={isFormOpen}
         formTitle="New Dispense Order"
-        renderForm={(onClose, formId) => (
-          <DispenseOrderCreateForm onClose={onClose} formId={formId} onDirtyChange={handleCreateDirtyChange} />
+        renderForm={(onClose, formId, onSubmittingChange) => (
+          <DispenseOrderCreateForm onClose={onClose} formId={formId} onDirtyChange={handleCreateDirtyChange} onSubmittingChange={onSubmittingChange} />
         )}
         onCloseForm={handleCreateCloseRequest}
         filters={filters}
