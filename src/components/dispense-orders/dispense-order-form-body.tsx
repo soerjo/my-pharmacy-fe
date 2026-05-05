@@ -2,7 +2,7 @@
 
 import type { UseFormRegister, Control, FieldErrors } from "react-hook-form";
 import { Controller } from "react-hook-form";
-import { Input, Button, TextArea } from "@heroui/react";
+import { Input, Button, TextArea, ScrollShadow } from "@heroui/react";
 import { AdmissionAutocomplete } from "@/components/ui";
 import { OrderItemRow } from "./dispense-order-item-row";
 import type { DispenseOrderCreateFormValues } from "@/types/dispense-orders";
@@ -67,26 +67,31 @@ export function DispenseOrderFormBody({
         </div>
       </div>
 
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="notes" className="text-sm font-medium">
+          Notes
+        </label>
+        <TextArea
+          id="notes"
+          placeholder="Additional notes (optional)"
+          disabled={isDisabled}
+          {...register("notes")}
+        />
+        {errors.notes && <p className="text-sm text-danger">{errors.notes.message}</p>}
+      </div>
+
       <div className="flex flex-col gap-2">
-        <div className="flex items-center justify-between">
-          <label className="text-sm font-medium">
-            Items <span className="text-danger">*</span>
-          </label>
-          <Button
-            size="sm"
-            variant="secondary"
-            type="button"
-            onPress={() => append({ drugId: "", quantity: 1, instructions: "" })}
-            isDisabled={isDisabled}
-          >
-            + Add Item
-          </Button>
-        </div>
+        <label className="text-sm font-medium">
+          Items <span className="text-danger">*</span>
+        </label>
+
 
         {errors.items && !Array.isArray(errors.items) && (
           <p className="text-sm text-danger">{errors.items.message}</p>
         )}
 
+        {/* {fields.length} */}
+        <ScrollShadow hideScrollBar className="max-h-[40vh]">
         <div className="flex flex-col gap-3">
           {fields.map((field, index) => (
             <OrderItemRow<DispenseOrderCreateFormValues>
@@ -101,23 +106,29 @@ export function DispenseOrderFormBody({
               watchedItem={watchedItems?.[index]}
               productMap={productMap}
               onProductSelect={onProductSelect}
+              // append={append}
+              // isLastIndex={(fields.length - 1) == index}
             />
           ))}
         </div>
+        </ScrollShadow>
       </div>
 
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="notes" className="text-sm font-medium">
-          Notes
-        </label>
-        <TextArea
-          id="notes"
-          placeholder="Additional notes (optional)"
-          disabled={isDisabled}
-          {...register("notes")}
-        />
-        {errors.notes && <p className="text-sm text-danger">{errors.notes.message}</p>}
-      </div>
+      {/* <div className="flex items-center justify-between">
+        <label className="text-sm font-medium">
+          Items <span className="text-danger">*</span>
+        </label> */}
+        <Button
+          size="sm"
+          // variant="secondary"
+          type="button"
+          className="self-end"
+          onPress={() => append({ drugId: "", quantity: 1, instructions: "" })}
+          isDisabled={isDisabled}
+        >
+          + Add Item
+        </Button>
+      {/* </div> */}
     </>
   );
 }

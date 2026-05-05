@@ -87,7 +87,7 @@ export interface DispenseOrderDetail {
 
 const dispenseOrderItemSchema = z.object({
   drugId: z.string().min(1, "Drug is required"),
-  quantity: z.number().min(1, "Quantity must be at least 1"),
+  quantity: z.number().min(0, "not lest than 0"),
   instructions: z.string(),
 });
 

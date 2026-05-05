@@ -53,19 +53,7 @@ export function DispenseOrderSectionItems({
       <Accordion.Panel>
         <Accordion.Body>
           <div className="flex flex-col gap-2 pt-0.5">
-            <div className="flex items-center justify-between">
-              {!isReadOnly && (
-                <Button
-                  size="sm"
-                  variant="primary"
-                  type="button"
-                  className="ml-auto"
-                  onPress={() => append({ drugId: "", quantity: 1, instructions: "" })}
-                >
-                  + Add Item
-                </Button>
-              )}
-            </div>
+
 
             {errors.items && !Array.isArray(errors.items) && (
               <p className="text-sm text-danger">{errors.items.message}</p>
@@ -86,10 +74,24 @@ export function DispenseOrderSectionItems({
                     onProductSelect={onProductSelect}
                     initialItem={index < initialItems.length ? initialItems[index] : undefined}
                     onRemove={onRemoveRequest}
+                    // append={append}
                   />
                 ))}
               </div>
             </ScrollShadow>
+            <div className="flex items-center justify-between">
+              {!isReadOnly && (
+                <Button
+                  size="sm"
+                  variant="primary"
+                  type="button"
+                  className="ml-auto"
+                  onPress={() => append({ drugId: "", quantity: 1, instructions: "" })}
+                >
+                  + Add Item
+                </Button>
+              )}
+            </div>
           </div>
         </Accordion.Body>
       </Accordion.Panel>

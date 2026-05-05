@@ -26,6 +26,8 @@ export interface OrderItemRowProps<T extends FieldValues = FieldValues> {
   onProductSelect?: (product: Product | null) => void;
   initialItem?: DispenseOrderDetailItem;
   watchedItem?: DispenseOrderItemShape;
+  // append: (value: { drugId: string; quantity: number; instructions: string }) => void;
+  isLastIndex?: boolean
 }
 
 export function OrderItemRow<T extends FieldValues>({
@@ -40,6 +42,8 @@ export function OrderItemRow<T extends FieldValues>({
   onProductSelect,
   initialItem,
   watchedItem,
+  // append,
+  // isLastIndex,
 }: OrderItemRowProps<T>) {
   const selectedProduct = watchedItem?.drugId && productMap ? productMap.get(watchedItem.drugId) : undefined;
   const itemErrors = (errors as FieldErrors<{ items: DispenseOrderItemShape[] }>).items?.[index];
@@ -76,7 +80,7 @@ export function OrderItemRow<T extends FieldValues>({
             <InputGroup>
               <InputGroup.Input
                 type="number"
-                min={1}
+                min={0}
                 placeholder="Qty"
                 defaultValue={field.value}
                 onChange={(e) => {
@@ -112,17 +116,19 @@ export function OrderItemRow<T extends FieldValues>({
         />
       </div>
 
-      <Button
-        size="sm"
-        variant="danger"
-        type="button"
-        className="self-end"
-        onPress={() => onRemove(index)}
-        isDisabled={isDisabled}
-        isIconOnly
-      >
-        <TrashBin />
-      </Button>
+      <div className="flex flex-row gap-2 self-end">
+        <Button
+          size="sm"
+          variant="danger"
+          type="button"
+          onPress={() => onRemove(index)}
+          isDisabled={isDisabled}
+          isIconOnly
+        >
+          <TrashBin />
+        </Button>
+        
+      </div>
     </div>
   );
 }

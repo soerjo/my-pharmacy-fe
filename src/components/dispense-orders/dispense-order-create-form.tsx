@@ -7,6 +7,7 @@ import { useDispenseOrders } from "@/hooks/use-dispense-orders";
 import { DispenseOrderFormBody } from "./dispense-order-form-body";
 import { dispenseCreateOrderSchema, type DispenseOrderCreateFormValues } from "@/types/dispense-orders";
 import type { Product } from "@/types";
+import { Button } from "@heroui/react";
 
 interface DispenseOrderCreateFormProps {
   onClose: () => void;
@@ -73,6 +74,17 @@ export function DispenseOrderCreateForm({ onClose, formId, onDirtyChange }: Disp
         productMap={productMap}
         onProductSelect={handleProductSelect}
       />
+              {/* <Button
+          size="sm"
+          // variant="secondary"
+          type="button"
+          className="self-end"
+          onPress={() => append({ drugId: "", quantity: 1, instructions: "" })}
+          // isDisabled={isDisabled}
+        >
+          + Add Item
+        </Button> */}
+
     </form>
   );
 }
