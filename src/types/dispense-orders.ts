@@ -32,6 +32,7 @@ export interface DispenseOrderDetailItem {
   id: string;
   drugId: string;
   drugName: string;
+  categoryName: string;
   quantity: number;
   instructions: string;
   baseUnitId: string;

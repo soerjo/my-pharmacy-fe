@@ -46,6 +46,7 @@ interface DataTableProps<T extends object> {
   onAdd: () => void;
   addLabel: string;
   toolbarExtra?: ReactNode;
+  exportButton?: ReactNode;
 
   page: number;
   pageSize: number;
@@ -78,6 +79,7 @@ export function DataTable<T extends object>({
   totalPages,
   onPageChange,
   onPageSizeChange,
+  exportButton,
 }: DataTableProps<T>) {
   const modalState = useOverlayState({
     isOpen: isFormOpen,
@@ -119,6 +121,7 @@ export function DataTable<T extends object>({
         addLabel={addLabel}
         onAdd={onAdd}
         extra={toolbarExtra}
+        exportButton={exportButton}
       />
 
       <Modal state={modalState}>
@@ -142,14 +145,14 @@ export function DataTable<T extends object>({
         </ModalBackdrop>
       </Modal>
 
-      <Button
+      {/* <Button
         variant="primary"
         isIconOnly
         onPress={onAdd}
         className="fixed bottom-6 right-6 z-50 flex h-16 w-16 aspect-square items-center justify-center rounded-full shadow-lg md:hidden"
       >
         <Plus />
-      </Button>
+      </Button> */}
 
       {data.length === 0 ? (
         <div className="rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 py-12 text-center text-zinc-500">

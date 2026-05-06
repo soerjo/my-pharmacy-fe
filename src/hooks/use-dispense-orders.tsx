@@ -26,6 +26,13 @@ export function useDispenseOrders() {
     placeholderData: keepPreviousData,
   });
 
+  const ordersExportQuery = useQuery({
+    queryKey: queryKeys.dispenseOrders.list({ ...filters, isExport: true }),
+    queryFn: () =>
+      depoService.getDispenseOrders({ ...filters, isExport: true }),
+    enabled: false,
+  });
+
   const paginationMeta = ordersQuery.data
     ? {
         total: ordersQuery.data.meta.total,
@@ -116,6 +123,7 @@ export function useDispenseOrders() {
     isPreparing: prepareMutation.isPending,
     isDispensing: dispenseMutation.isPending,
     isCancelling: cancelMutation.isPending,
+    ordersExportQuery,
   };
 }
 

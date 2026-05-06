@@ -16,7 +16,7 @@ import type {
 import { DispenseOrderCreateFormValues } from "@/types/dispense-orders";
 
 export const depoService = {
-  getDispenseOrders: (params?: { search?: string; status?: string; startDate?: string; endDate?: string; page?: number; limit?: number }) => {
+  getDispenseOrders: (params?: { search?: string; status?: string; startDate?: string; endDate?: string; page?: number; limit?: number, isExport?:boolean }) => {
     const searchParams = new URLSearchParams();
     if (params?.search) searchParams.set("search", params.search);
     if (params?.status) searchParams.set("status", params.status);
@@ -24,6 +24,7 @@ export const depoService = {
     if (params?.endDate) searchParams.set("endDate", params.endDate);
     if (params?.page !== undefined) searchParams.set("page", String(params.page));
     if (params?.limit !== undefined) searchParams.set("limit", String(params.limit));
+    if (params?.isExport !== undefined) searchParams.set("isExport", String(params.isExport));
 
     return clients.depo.get<ApiResponse<PaginatedResponse<DispenseOrder>>>(
       searchParams.toString() ? `/dispense-orders?${searchParams.toString()}` : "/dispense-orders",

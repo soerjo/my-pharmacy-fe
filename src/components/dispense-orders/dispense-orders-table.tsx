@@ -25,7 +25,7 @@ import {
   useOverlayState,
   Table,
 } from "@heroui/react";
-import { Copy } from "@gravity-ui/icons";
+import { ArrowUpFromSquare, Copy } from "@gravity-ui/icons";
 import { DataTable } from "@/components/ui/data-table";
 import { useDispenseOrders } from "@/hooks/use-dispense-orders";
 import { useDispenseOrdersStore } from "@/stores/dispense-orders-store";
@@ -41,6 +41,7 @@ import {
 import { RangeDatePicker } from "../ui/range-date-picker";
 import { OrderSelectItem } from "../ui/order-select-item";
 import { today, getLocalTimeZone, type CalendarDate } from "@internationalized/date";
+import ExportCSV from "./dispense-order-export-csv";
 
 
 const UPDATE_FORM_ID = "dispense-order-update-form";
@@ -151,6 +152,7 @@ export function DispenseOrdersTable() {
   return (
     <>
       <DataTable<DispenseOrder>
+        exportButton={<ExportCSV/>}
         entityNamePlural="Dispense Orders"
         ariaLabel="Dispense orders table"
         data={dispenseOrders}

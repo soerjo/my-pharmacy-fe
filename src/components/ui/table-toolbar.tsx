@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Label, SearchField} from "@heroui/react";
 import { Button, Input } from "@heroui/react";
-import { Ellipsis, Magnifier, Plus } from "@gravity-ui/icons";
+import { Ellipsis, ArrowUpFromSquare, Plus } from "@gravity-ui/icons";
 
 interface TableToolbarProps {
   title: string;
@@ -13,6 +13,7 @@ interface TableToolbarProps {
   addLabel: string;
   onAdd: () => void;
   extra?: ReactNode;
+  exportButton?: ReactNode;
 }
 
 export function TableToolbar({
@@ -23,6 +24,7 @@ export function TableToolbar({
   addLabel,
   onAdd,
   extra,
+  exportButton,
 }: TableToolbarProps) {
   const [localSearch, setLocalSearch] = useState(searchValue);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -66,9 +68,28 @@ export function TableToolbar({
           <Ellipsis/>
         </Button>
 
+
+        <div className="hidden md:flex">
+        {exportButton}
+          {/* {addLabel} */}
+        </div>
+
         <Button variant="primary" onPress={onAdd} className="hidden md:flex">
           {addLabel}
         </Button>
+
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-4 items-end justify-end md:hidden">
+        {exportButton}
+        <Button
+          variant="primary"
+          isIconOnly
+          onPress={onAdd}
+          className="h-18 w-18 aspect-square rounded-full shadow-lg"
+        >
+          <Plus />
+        </Button>
+      </div>
+
       </div>
         <div className="flex items-center justify-end gap-2 w-full md:hidden">
           {isShowFilter && extra}
