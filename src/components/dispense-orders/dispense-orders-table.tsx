@@ -179,7 +179,7 @@ export function DispenseOrdersTable() {
               <div>
                 <p>{order.orderNumber}</p>
                 <p className="text-xs text-default-400">
-                  {order.createdAt ? formatDate(order.createdAt) : "-"}
+                  {order.orderDate ? formatDate(order.orderDate) : "-"}
                 </p>
               </div>
             </TableCell>

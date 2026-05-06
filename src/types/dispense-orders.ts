@@ -44,6 +44,7 @@ export interface DispenseOrder {
   id?: string;
   orgId?: string;
   orderNumber: string;
+  orderDate: string;
   patientId: string;
   patientName: string;
   admissionId: string;
