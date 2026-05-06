@@ -164,7 +164,7 @@ export function DispenseOrdersTable() {
             <TableColumn defaultWidth="1fr" minWidth={200}>
               Admission # <Table.ColumnResizer />
             </TableColumn>
-            <TableColumn>Patient Name</TableColumn>
+            <TableColumn defaultWidth="1fr" minWidth={160}>Patient Name</TableColumn>
             <TableColumn defaultWidth="1fr" minWidth={120}>
               Status <Table.ColumnResizer />
             </TableColumn>

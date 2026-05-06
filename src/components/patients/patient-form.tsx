@@ -1,54 +1,67 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Input, TextArea } from "@heroui/react";
-import { patientSchema, type PatientFormValues, type Patient } from "@/types";
+import { Input, TextArea, Spinner } from "@heroui/react";
+import { patientSchema, type PatientFormValues } from "@/types";
 import { GENDER_VALUES } from "@/types";
-import { usePatients } from "@/hooks/use-patients";
+import { usePatients, usePatient } from "@/hooks/use-patients";
 import { cn } from "@/utils";
 
 interface PatientFormProps {
-  patient?: Patient;
+  patientId?: string;
   onClose: () => void;
   formId: string;
+  onDirtyChange?: (dirty: boolean) => void;
+  onSubmittingChange?: (submitting: boolean) => void;
 }
 
-export function PatientForm({ patient, onClose, formId }: PatientFormProps) {
-  const { createPatient, updatePatient } =
-    usePatients();
+const EMPTY_DEFAULTS: PatientFormValues = {
+  mrn: "",
+  name: "",
+  dateOfBirth: "",
+  gender: "",
+  phone: "",
+  address: "",
+  allergies: "",
+  notes: "",
+};
+
+export function PatientForm({ patientId, onClose, formId, onDirtyChange, onSubmittingChange }: PatientFormProps) {
+  const { createPatient, updatePatient } = usePatients();
+  const { patient: patientDetail, isLoading: isLoadingDetail } = usePatient(patientId ?? "");
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const isEditing = !!patient;
+  const isEditing = !!patientId;
 
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    reset,
+    formState: { errors, isDirty },
   } = useForm<PatientFormValues>({
     resolver: zodResolver(patientSchema),
-    defaultValues: patient
-      ? {
-          mrn: patient.mrn,
-          name: patient.name,
-          dateOfBirth: patient.dateOfBirth ?? "",
-          gender: patient.gender ?? "",
-          phone: patient.phone ?? "",
-          address: patient.address ?? "",
-          allergies: patient.allergies ?? "",
-          notes: patient.notes ?? "",
-        }
-      : {
-          mrn: "",
-          name: "",
-          dateOfBirth: "",
-          gender: "",
-          phone: "",
-          address: "",
-          allergies: "",
-          notes: "",
-        },
+    defaultValues: EMPTY_DEFAULTS,
   });
+
+  useEffect(() => {
+    if (isEditing && patientDetail) {
+      reset({
+        mrn: patientDetail.mrn,
+        name: patientDetail.name,
+        dateOfBirth: patientDetail.dateOfBirth ? patientDetail.dateOfBirth.split("T")[0] : "",
+        gender: patientDetail.gender ?? "",
+        phone: patientDetail.phone ?? "",
+        address: patientDetail.address ?? "",
+        allergies: patientDetail.allergies ?? "",
+        notes: patientDetail.notes ?? "",
+      });
+    }
+  }, [isEditing, patientDetail, reset]);
+
+  useEffect(() => {
+    onDirtyChange?.(isDirty);
+  }, [isDirty, onDirtyChange]);
 
   async function onSubmit(data: PatientFormValues) {
     setSubmitError(null);
@@ -61,19 +74,31 @@ export function PatientForm({ patient, onClose, formId }: PatientFormProps) {
     };
 
     try {
-      if (isEditing && patient) {
-        await updatePatient(patient.id, payload);
+      onSubmittingChange?.(true);
+      if (isEditing && patientId) {
+        await updatePatient(patientId, payload);
       } else {
         await createPatient(payload);
       }
+      onDirtyChange?.(false);
       onClose();
     } catch {
+      onSubmittingChange?.(false);
       setSubmitError(
         isEditing
           ? "Failed to update patient. Please try again."
           : "Failed to create patient. Please try again.",
       );
     }
+  }
+
+  if (isEditing && isLoadingDetail) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-2 py-8">
+        <Spinner size="lg" />
+        <p className="text-sm text-zinc-500">Loading patient data...</p>
+      </div>
+    );
   }
 
   return (

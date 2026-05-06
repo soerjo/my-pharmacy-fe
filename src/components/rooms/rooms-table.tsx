@@ -48,10 +48,14 @@ export function RoomsTable() {
       error={error}
       columns={
         <>
-          <TableColumn isRowHeader>Code</TableColumn>
-          <TableColumn>Name</TableColumn>
-          <TableColumn>Category</TableColumn>
-          <TableColumn>Actions</TableColumn>
+          <TableColumn defaultWidth="1fr" minWidth={100} isRowHeader>
+            Code</TableColumn>
+          <TableColumn defaultWidth="1fr" minWidth={100}>
+            Name</TableColumn>
+          <TableColumn defaultWidth="1fr" minWidth={100}>
+            Category</TableColumn>
+          <TableColumn defaultWidth="1fr" minWidth={100}>
+            Actions</TableColumn>
         </>
       }
       renderRow={(room: Room) => (

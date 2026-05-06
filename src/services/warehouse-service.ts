@@ -10,10 +10,21 @@ import type {
 } from "@/types";
 
 export const warehouseService = {
-  getProducts: (params?: { isActive?: boolean; search?: string; page?: number; limit?: number }) => {
+  getProducts: (params?: {
+    isActive?: boolean;
+    search?: string;
+    productType?: string;
+    categoryId?: string;
+    manufacturerId?: string;
+    page?: number;
+    limit?: number;
+  }) => {
     const searchParams = new URLSearchParams();
     if (params?.isActive !== undefined) searchParams.set("isActive", String(params.isActive));
     if (params?.search) searchParams.set("search", params.search);
+    if (params?.productType) searchParams.set("productType", params.productType);
+    if (params?.categoryId) searchParams.set("categoryId", params.categoryId);
+    if (params?.manufacturerId) searchParams.set("manufacturerId", params.manufacturerId);
     if (params?.page !== undefined) searchParams.set("page", String(params.page));
     if (params?.limit !== undefined) searchParams.set("limit", String(params.limit));
 

@@ -224,7 +224,7 @@ export function WidgetsTable() {
 }
 ```
 
-**Form `formId` prop is critical:** `renderForm` receives `(onClose, formId)`. The form component must accept `formId` and set `id={formId}` on its `<form>` element — the modal's Save button uses `form={formId}` to submit. Without this, the Save button does nothing.
+**Form `formId` prop is critical:** `renderForm` receives `(onClose, formId, onSubmittingChange)`. The form component must accept `formId` and set `id={formId}` on its `<form>` element — the modal's Save button uses `form={formId}` to submit. Without this, the Save button does nothing. The optional `onSubmittingChange` callback lets the form toggle the Save button's loading spinner during submission.
 
 **Extra toolbar filters** (e.g., status dropdown): pass via `toolbarExtra` prop:
 ```tsx
@@ -235,7 +235,7 @@ toolbarExtra={
 }
 ```
 
-**Per-row custom modals** (e.g., detail view): render the modal trigger directly in `renderRow` inside a `TableCell` (see `DispenseOrderModal` pattern).
+**Per-row custom modals** (e.g., detail view): render the modal trigger directly in `renderRow` inside a `TableCell` (see `dispense-orders/` components for patterns like `DispenseOrderStatusConfirmModal`).
 
 **Important:** Do NOT create per-entity pagination, toolbar, or row files. All that logic is handled by `DataTable`, `TablePagination`, and `TableToolbar`. Only create `<entity>-table.tsx` (using DataTable) and `<entity>-form.tsx`.
 

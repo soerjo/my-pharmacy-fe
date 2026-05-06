@@ -55,12 +55,17 @@ export function AdmissionsTable() {
       error={error}
       columns={
         <>
-          <TableColumn isRowHeader>Patient</TableColumn>
-          <TableColumn>Ward</TableColumn>
-          <TableColumn>Diagnosis</TableColumn>
-          <TableColumn>Admission Date</TableColumn>
-          <TableColumn>Status</TableColumn>
-          <TableColumn>Actions</TableColumn>
+          <TableColumn defaultWidth="1fr" minWidth={150} isRowHeader>Patient</TableColumn>
+            <TableColumn defaultWidth="1fr" minWidth={150}>
+            Ward</TableColumn>
+            <TableColumn defaultWidth="1fr" minWidth={150}>
+            Diagnosis</TableColumn>
+            <TableColumn defaultWidth="1fr" minWidth={150}>
+            Admission Date</TableColumn>
+            <TableColumn defaultWidth="1fr" minWidth={150}>
+            Status</TableColumn>
+            <TableColumn defaultWidth="1fr" minWidth={180}>
+            Actions</TableColumn>
         </>
       }
       renderRow={(admission: Admission) => (

@@ -64,8 +64,9 @@ export function AsyncAutocomplete<T extends object>({
   }, [initialItems, items, getId]);
 
   return (
-    <div className="flex flex-col gap-1.5">
+    <div className="flex flex-col gap-1.5 w-full">
       <Autocomplete
+        fullWidth
         allowsEmptyCollection
         className={className}
         isDisabled={isDisabled}

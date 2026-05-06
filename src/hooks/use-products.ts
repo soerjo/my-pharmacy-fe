@@ -12,14 +12,18 @@ export function useProducts() {
 
   const queryClient = useQueryClient();
 
+  const queryParams = {
+    ...filters,
+    productType: filters.productType || undefined,
+    categoryId: filters.categoryId || undefined,
+    manufacturerId: filters.manufacturerId || undefined,
+    page: pagination.page,
+    limit: pagination.pageSize,
+  };
+
   const productsQuery = useQuery({
-    queryKey: queryKeys.products.list({
-      ...filters,
-      page: pagination.page,
-      limit: pagination.pageSize,
-    }),
-    queryFn: () =>
-      warehouseService.getProducts({ ...filters, page: pagination.page, limit: pagination.pageSize }),
+    queryKey: queryKeys.products.list(queryParams),
+    queryFn: () => warehouseService.getProducts(queryParams),
     select: (response) => response.data,
     placeholderData: keepPreviousData,
   });
@@ -84,5 +88,20 @@ export function useProducts() {
     isCreating: createMutation.isPending,
     isUpdating: updateMutation.isPending,
     isDeleting: deleteMutation.isPending,
+  };
+}
+
+export function useProduct(id: string) {
+  const detailQuery = useQuery({
+    queryKey: queryKeys.products.detail(id),
+    queryFn: () => warehouseService.getProduct(id),
+    select: (response) => response.data,
+    enabled: !!id,
+  });
+
+  return {
+    product: detailQuery.data ?? null,
+    isLoading: detailQuery.isLoading,
+    error: detailQuery.error,
   };
 }

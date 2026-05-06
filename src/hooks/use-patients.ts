@@ -86,3 +86,18 @@ export function usePatients() {
     isDeleting: deleteMutation.isPending,
   };
 }
+
+export function usePatient(id: string) {
+  const detailQuery = useQuery({
+    queryKey: queryKeys.patients.detail(id),
+    queryFn: () => depoService.getPatient(id),
+    select: (response) => response.data,
+    enabled: !!id,
+  });
+
+  return {
+    patient: detailQuery.data ?? null,
+    isLoading: detailQuery.isLoading,
+    error: detailQuery.error,
+  };
+}
