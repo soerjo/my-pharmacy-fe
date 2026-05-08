@@ -10,13 +10,13 @@ export function useAdmissionSearch(search: string, limit = 20) {
     queryKey: queryKeys.admissions.list({
       search: debouncedSearch,
       limit,
-      isActive: true,
+      status: "ADMITTED",
     }),
     queryFn: () =>
       depoService.getAdmissions({
         search: debouncedSearch || undefined,
         limit,
-        isActive: true,
+        status: "ADMITTED",
       }),
     select: (response) => response.data.data,
   });
