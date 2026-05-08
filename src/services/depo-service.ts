@@ -1,5 +1,5 @@
 import { clients } from "@/lib/api-client";
-import type { ApiResponse, PaginatedResponse } from "@/types";
+import type { AdmissionStatus, ApiResponse, PaginatedResponse } from "@/types";
 import type {
   Patient,
   PatientFormValues,
@@ -76,9 +76,9 @@ export const depoService = {
   deletePatient: (id: string) =>
     clients.depo.delete<ApiResponse<void>>(`/patients/${id}`),
 
-  getAdmissions: (params?: { isActive?: boolean; search?: string; page?: number; limit?: number }) => {
+  getAdmissions: (params?: { status?: AdmissionStatus; search?: string; page?: number; limit?: number }) => {
     const searchParams = new URLSearchParams();
-    if (params?.isActive !== undefined) searchParams.set("isActive", String(params.isActive));
+    if (params?.status !== undefined) searchParams.set("status", String(params.status));
     if (params?.search) searchParams.set("search", params.search);
     if (params?.page !== undefined) searchParams.set("page", String(params.page));
     if (params?.limit !== undefined) searchParams.set("limit", String(params.limit));

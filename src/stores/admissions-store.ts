@@ -1,12 +1,12 @@
 import { createEntityStore } from "@/lib/create-entity-store";
-import type { Admission } from "@/types";
+import type { Admission, AdmissionStatus } from "@/types";
 
 export interface AdmissionsFilters {
-  isActive: boolean;
+  status: AdmissionStatus;
   search: string;
 }
 
 export const useAdmissionsStore = createEntityStore<Admission, AdmissionsFilters>(
-  { isActive: true, search: "" },
+  { status: "ADMITTED", search: "" },
   "admissions-store",
 );

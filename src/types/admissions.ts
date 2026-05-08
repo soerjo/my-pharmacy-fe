@@ -16,12 +16,12 @@ export const admissionSchema = z.object({
   admissionDate: z.string().min(1, "Admission date is required"),
   dischargeDate: z.string().optional(),
   diagnosis: z.string().optional(),
-  status: z.enum(["admitted", "discharged", "transferred"]).optional(),
+  status: z.enum(["ADMITTED", "DISCHARGED"]).optional(),
   notes: z.string().optional(),
 });
 
 export type AdmissionFormValues = z.infer<typeof admissionSchema>;
-export type AdmissionStatus = "admitted" | "discharged" | "transferred";
+export type AdmissionStatus = "ADMITTED" | "DISCHARGED";
 
 export interface Admission {
   id: string;
