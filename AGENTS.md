@@ -47,7 +47,7 @@ Folder structure under `src/`:
 - `src/config/` — app config derived from env vars.
 - `src/constants/` — static values (`ROUTES`, `APP_NAME`).
 
-Every module directory has a barrel `index.ts` — import via `@/components/ui`, `@/services/auth-service`, etc., not deep paths.
+Most module directories have a barrel `index.ts` — import via `@/components/ui`, `@/stores/auth-store`, etc. Services are imported directly (e.g., `@/services/auth-service`).
 
 ## Multi-backend API architecture
 
@@ -82,6 +82,10 @@ Required:
 - `NEXT_PUBLIC_API_WAREHOUSE_SERVICE`
 - `NEXT_PUBLIC_API_DEPO_SERVICE`
 - `NEXT_PUBLIC_MAX_TOKEN_RETRY_ATTEMPTS` (default: 3)
+
+## Dev configuration
+
+`next.config.ts` has `allowedDevOrigins: ['100.64.62.59']` — update this list if you need external IP access in dev mode.
 
 ## Path alias
 
@@ -125,7 +129,7 @@ HeroUI v3's `Table` is built on `react-aria-components`. The component structure
 
 ## Package manager
 
-npm is the package manager (`package-lock.json` present). `.npmrc` sets `package-lock=false` but the lockfile exists regardless.
+npm is the package manager (`package-lock.json` present). `.npmrc` sets `package-lock=false` but the lockfile exists regardless (npm creates it by default regardless of this setting).
 
 ## React Query + Zustand patterns
 
@@ -161,70 +165,21 @@ All entity list pages use the shared `DataTable<T>` component from `@/components
 | `TablePagination` | Page size select + page navigation (replaces per-entity pagination files) |
 | `TableToolbar` | Title + debounced search + add button + optional extra slot |
 
-**How to use DataTable** (minimal example for a new entity):
+**How to use DataTable** — see any existing `*-table.tsx` in `src/components/` for a full reference (e.g., `products/products-table.tsx`). Key props:
 
-```tsx
-// src/components/widgets/widget-table.tsx
-"use client";
+| Prop | Purpose |
+|---|---|
+| `data`, `isLoading`, `error` | Query state |
+| `columns` | `<TableColumn>` fragments |
+| `renderRow` | `(item: T) => <TableRow>` |
+| `isFormOpen`, `formTitle`, `renderForm`, `onCloseForm` | Modal form control |
+| `filters`, `onSearchChange` | Toolbar search |
+| `onAdd`, `addLabel` | Add button |
+| `toolbarExtra?` | Extra filter controls (e.g., status dropdown) |
+| `exportButton?` | Optional export button rendered in toolbar (see `dispense-orders/`) |
+| `page`, `pageSize`, `totalItems`, `totalPages`, `onPageChange`, `onPageSizeChange` | Pagination |
 
-import { useShallow } from "zustand/react/shallow";
-import { Button, TableCell, TableColumn, TableRow } from "@heroui/react";
-import { DataTable } from "@/components/ui/data-table";
-import { useWidgets } from "@/hooks/use-widgets";
-import { useWidgetsStore } from "@/stores/widgets-store";
-import { WidgetForm } from "./widget-form";
-import type { Widget } from "@/types";
-
-export function WidgetsTable() {
-  const { widgets, isLoading, error, pagination, paginationMeta, setPage, setPageSize } = useWidgets();
-  const { filters, setFilters, isFormOpen, editingEntity, openCreateForm, openEditForm, closeForm } =
-    useWidgetsStore(useShallow((s) => ({
-      filters: s.filters, setFilters: s.setFilters,
-      isFormOpen: s.isFormOpen, editingEntity: s.editingEntity,
-      openCreateForm: s.openCreateForm, openEditForm: s.openEditForm, closeForm: s.closeForm,
-    })));
-
-  return (
-    <DataTable<Widget>
-      entityNamePlural="Widgets"
-      ariaLabel="Widgets table"
-      data={widgets}
-      isLoading={isLoading}
-      error={error}
-      columns={(
-        <>
-          <TableColumn isRowHeader>Name</TableColumn>
-          <TableColumn>Actions</TableColumn>
-        </>
-      )}
-      renderRow={(widget: Widget) => (
-        <TableRow key={widget.id}>
-          <TableCell>{widget.name}</TableCell>
-          <TableCell>
-            <Button size="sm" variant="secondary" onPress={() => openEditForm(widget)}>Edit</Button>
-          </TableCell>
-        </TableRow>
-      )}
-      isFormOpen={isFormOpen}
-      formTitle={editingEntity ? `Edit ${editingEntity.name}` : "New Widget"}
-      renderForm={(onClose, formId) => <WidgetForm widget={editingEntity} onClose={onClose} formId={formId} />}
-      onCloseForm={closeForm}
-      filters={filters}
-      onSearchChange={(value) => setFilters({ search: value })}
-      onAdd={openCreateForm}
-      addLabel="+ Add Widget"
-      page={pagination.page}
-      pageSize={pagination.pageSize}
-      totalItems={paginationMeta?.total ?? 0}
-      totalPages={paginationMeta?.totalPages ?? 1}
-      onPageChange={setPage}
-      onPageSizeChange={setPageSize}
-    />
-  );
-}
-```
-
-**Form `formId` prop is critical:** `renderForm` receives `(onClose, formId, onSubmittingChange)`. The form component must accept `formId` and set `id={formId}` on its `<form>` element — the modal's Save button uses `form={formId}` to submit. Without this, the Save button does nothing. The optional `onSubmittingChange` callback lets the form toggle the Save button's loading spinner during submission.
+**Form `formId` prop is critical:** `renderForm` receives `(onClose, formId, onSubmittingChange)`. The form component must accept `formId` and set `id={formId}` on its `<form>` element — the modal's Save button uses `form={formId}` to submit. Without this, the Save button does nothing. (`formId` is always `"data-table-form"` — a constant in `data-table.tsx`.) The optional `onSubmittingChange` callback lets the form toggle the Save button's loading spinner during submission.
 
 **Extra toolbar filters** (e.g., status dropdown): pass via `toolbarExtra` prop:
 ```tsx
@@ -259,29 +214,7 @@ export const useEntityStore = createEntityStore<Entity, EntityFilters>(
 );
 ```
 
-The factory produces a store with this shape:
-
-```ts
-interface EntityUIState<T, F> {
-  filters: F;
-  pagination: { page: number; pageSize: number };
-  isFormOpen: boolean;
-  editingEntity: T | undefined;       // always named "editingEntity"
-  deletingId: string | null;
-  setFilters: (partial) => void;      // resets pagination to defaults
-  resetFilters: () => void;
-  setPage: (page: number) => void;
-  setPageSize: (pageSize: number) => void;  // resets page to 1
-  openCreateForm: () => void;
-  openEditForm: (entity: T) => void;
-  closeForm: () => void;
-  setDeletingId: (id: string | null) => void;
-  resetUI: () => void;
-  resetAll: () => void;
-}
-```
-
-Default pagination: `{ page: 1, pageSize: 10 }`. Default filters vary per entity. All stores use `devtools` middleware except `app-store.ts` (sidebar toggle only).
+The factory produces a store with: `filters`, `pagination` (`{ page: 1, pageSize: 10 }`), `isFormOpen`, `editingEntity`, `deletingId`, plus setters (`setFilters`, `resetFilters`, `setPage`, `setPageSize`, `openCreateForm`, `openEditForm`, `closeForm`, `setDeletingId`, `resetUI`, `resetAll`). See `src/lib/create-entity-store.ts` for the full interface. `setFilters` resets pagination to defaults. `setPageSize` resets page to 1. All stores use `devtools` middleware except `app-store.ts` (sidebar toggle only).
 
 **Important:** The editing entity field is always `editingEntity` (not `editingPatient`, `editingRoom`, etc.). This is required by the `DataTable` component.
 
@@ -327,6 +260,8 @@ Entity search/select in forms uses `AsyncAutocomplete<T>` from `@/components/ui/
 ## Error handling in mutations
 
 `onServerError(error)` from `@/providers/error-provider` is the standard way to handle API errors in mutation `onError` callbacks. It parses `ApiError` (from `@/lib/api-client`), extracts the server message, and shows a `toast.danger`.
+
+**Global error handling**: `QueryProvider` automatically applies `onServerError` to all query and mutation errors via `QueryCache` and `MutationCache` (see `src/providers/query-provider.tsx`). Auth forms still call it explicitly, but domain mutations typically rely on the global handler.
 
 ## Auth system
 

@@ -1,9 +1,9 @@
-import { HomeHero } from "@/components/home-hero";
+import { HomeDashboard } from "@/components/home-dashboard";
 
 export default function HomePage() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <HomeHero />
+    <div className="p-6">
+      <HomeDashboard />
     </div>
   );
 }
