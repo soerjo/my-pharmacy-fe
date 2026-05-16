@@ -193,7 +193,12 @@ export function DispenseOrdersTable() {
                 </p>
               </div>
             </TableCell>
-            <TableCell>{order.patientName ?? "-"}</TableCell>
+            <TableCell>
+              <div>
+                <p>{order.patientName ?? "-"}</p>
+                <p className="text-xs text-default-400">{order.mrn ?? "-"}</p>
+              </div>
+            </TableCell>
             <TableCell>
               <span
                 className={cn(

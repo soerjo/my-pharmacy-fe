@@ -48,6 +48,7 @@ export interface DispenseOrder {
   orderDate: string;
   patientId: string;
   patientName: string;
+  mrn?: string;
   admissionId: string;
   dispensedAt: string | null;
   notes: string;
@@ -72,6 +73,7 @@ export interface DispenseOrderDetail {
   patientId: string;
   admissionId: string;
   patientName: string;
+  mrn?: string;
   dispensedAt: string | null;
   notes: string;
   cancelReason: string | null;

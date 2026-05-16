@@ -11,6 +11,7 @@ import type { DispenseOrder, DispenseOrderDetailItem } from "@/types";
 interface FlatRow {
   orderNumber: string;
   orderDate: string;
+  mrn: string;
   patientName: string;
   admissionNumber: string;
   status: string;
@@ -26,19 +27,20 @@ interface FlatRow {
 }
 
 const columns: { key: keyof FlatRow; header: string }[] = [
-  { key: "orderNumber", header: "Order #" },
+  // { key: "orderNumber", header: "Order #" },
   { key: "orderDate", header: "Order Date" },
+  { key: "mrn", header: "NRM" },
   { key: "patientName", header: "Patient Name" },
-  { key: "status", header: "Status" },
+  // { key: "status", header: "Status" },
   { key: "drugName", header: "Drug Name" },
   { key: "categoryName", header: "Drugs Category" },
   { key: "quantity", header: "Qty" },
   { key: "baseUnitName", header: "Unit" },
   { key: "instructions", header: "Instructions" },
   { key: "notes", header: "Notes" },
-  { key: "dispensedAt", header: "Dispensed At" },
-  { key: "cancelReason", header: "Cancel Reason" },
-  { key: "createdAt", header: "Created At" },
+  // { key: "dispensedAt", header: "Dispensed At" },
+  // { key: "cancelReason", header: "Cancel Reason" },
+  // { key: "createdAt", header: "Created At" },
 ];
 
 function flattenOrders(orders: DispenseOrder[]): FlatRow[] {
@@ -47,6 +49,7 @@ function flattenOrders(orders: DispenseOrder[]): FlatRow[] {
     const orderFields = {
       orderNumber: order.orderNumber ?? "",
       orderDate: order.orderDate ?? "",
+      mrn: order.mrn ?? "",
       patientName: order.patientName ?? "",
       admissionNumber: order.admissionNumber ?? "",
       status: order.status ?? "",
