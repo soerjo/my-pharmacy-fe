@@ -14,3 +14,6 @@ export { useRoomsStore } from './rooms-store';
 export type { RoomsFilters } from './rooms-store';
 export { useProductsStore } from './products-store';
 export type { ProductsFilters } from './products-store';
+export { useUsersStore } from './users-store';
+export type { UsersFilters } from './users-store';
+export { useRolesStore } from './roles-store';

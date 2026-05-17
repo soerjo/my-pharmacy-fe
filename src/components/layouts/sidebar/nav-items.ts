@@ -1,11 +1,21 @@
 import type { ComponentType, SVGProps } from "react";
-import { House, Person, Pill, Gear, HeartPulse, GeoPin, Cube } from "@gravity-ui/icons";
+import {
+  House,
+  Person,
+  Pill,
+  Gear,
+  HeartPulse,
+  GeoPin,
+  Cube,
+  Shield,
+} from "@gravity-ui/icons";
 
 export type NavItem = {
   id: string;
   label: string;
   href: string;
   icon: ComponentType<SVGProps<SVGSVGElement>>;
+  permission?: string;
 };
 
 export type NavSection = {
@@ -52,6 +62,25 @@ export const NAV_SECTIONS: NavSection[] = [
         label: "Products",
         href: "/products",
         icon: Cube,
+      },
+    ],
+  },
+  {
+    title: "Administration",
+    items: [
+      {
+        id: "users",
+        label: "Users",
+        href: "/users",
+        icon: Person,
+        permission: "users:read",
+      },
+      {
+        id: "roles",
+        label: "Roles",
+        href: "/roles",
+        icon: Shield,
+        permission: "roles:read",
       },
     ],
   },

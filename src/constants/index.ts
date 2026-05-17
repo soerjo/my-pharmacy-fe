@@ -12,4 +12,6 @@ export const ROUTES = {
   rooms: "/rooms",
   products: "/products",
   settings: "/settings",
+  users: "/users",
+  roles: "/roles",
 } as const;

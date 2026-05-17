@@ -21,3 +21,7 @@ export type { ProductTypeEntity } from "./product-types";
 export type { UnitOfMeasure } from "./unit-of-measures";
 export type { ProductCategory } from "./product-categories";
 export type { Manufacturer } from "./manufacturers";
+export { createUserSchema, updateUserSchema } from "./users";
+export type { User, UserRole, CreateUserFormValues, UpdateUserFormValues } from "./users";
+export { createRoleSchema, updateRoleSchema, assignPermissionsSchema } from "./roles";
+export type { Role, RoleWithPermissions, Permission, CreateRoleFormValues, UpdateRoleFormValues, AssignPermissionsFormValues } from "./roles";

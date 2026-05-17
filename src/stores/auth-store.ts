@@ -9,10 +9,14 @@ interface AuthState {
   isLoading: boolean;
   error: Error | null;
   isInitialized: boolean;
+  permissions: string[];
+  roles: string[];
 
   verify: () => Promise<void>;
   logout: () => void;
   setAuthenticated: (value: boolean) => void;
+  setPermissions: (permissions: string[]) => void;
+  setRoles: (roles: string[]) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -22,6 +26,8 @@ export const useAuthStore = create<AuthState>()(
       isLoading: true,
       error: null,
       isInitialized: false,
+      permissions: [],
+      roles: [],
 
       verify: async () => {
         const hasToken = typeof window !== 'undefined' && !!TokenManager.getAccessToken();
@@ -63,6 +69,14 @@ export const useAuthStore = create<AuthState>()(
 
       setAuthenticated: (value) => {
         set({ isAuthenticated: value }, false, 'setAuthenticated');
+      },
+
+      setPermissions: (permissions) => {
+        set({ permissions }, false, 'setPermissions');
+      },
+
+      setRoles: (roles) => {
+        set({ roles }, false, 'setRoles');
       },
     }),
     { name: 'auth-store' },

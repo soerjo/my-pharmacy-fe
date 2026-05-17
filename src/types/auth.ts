@@ -72,4 +72,6 @@ export interface UserProfile {
   organizationName: string;
   role: string;
   organizationId: string;
+  permissions: string[];
+  roles: string[];
 }
