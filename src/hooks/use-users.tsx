@@ -18,7 +18,11 @@ export function useUsers() {
       page: pagination.page,
       limit: pagination.pageSize,
     }),
-    queryFn: () => usersService.getAll(),
+    queryFn: () => usersService.getAll({
+        ...filters,
+        page: pagination.page,
+        limit: pagination.pageSize,
+      }),
     select: (response) => response.data,
   });
 
