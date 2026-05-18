@@ -52,4 +52,18 @@ export const queryKeys = {
     all: ["manufacturers"] as const,
     list: (params?: Record<string, unknown>) => ["manufacturers", "list", params] as const,
   },
+  users: {
+    all: ["users"] as const,
+    list: (params?: Record<string, unknown>) => ["users", "list", params] as const,
+    detail: (id: string) => ["users", "detail", id] as const,
+  },
+  roles: {
+    all: ["roles"] as const,
+    list: (params?: Record<string, unknown>) => ["roles", "list", params] as const,
+    detail: (id: string) => ["roles", "detail", id] as const,
+  },
+  permissions: {
+    all: ["permissions"] as const,
+    list: (params?: Record<string, unknown>) => ["permissions", "list", params] as const,
+  },
 } as const;

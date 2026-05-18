@@ -12,4 +12,9 @@ export const ROUTES = {
   rooms: "/rooms",
   products: "/products",
   settings: "/settings",
+  users: "/users",
+  roles: "/roles",
+  changePassword: "/settings/change-password",
+  setPassword: "/settings/set-password",
+  googleCallback: "/google/callback",
 } as const;

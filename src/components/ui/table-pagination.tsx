@@ -2,21 +2,8 @@
 
 import { useMemo } from "react";
 import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectPopover,
-  ListBox,
-  ListBoxItem,
   Pagination,
 } from "@heroui/react";
-
-const PAGE_SIZE_OPTIONS = [
-  { id: "10", label: "10 / page" },
-  { id: "25", label: "25 / page" },
-  { id: "50", label: "50 / page" },
-  { id: "100", label: "100 / page" },
-];
 
 interface TablePaginationProps {
   page: number;
@@ -29,11 +16,11 @@ interface TablePaginationProps {
 
 export function TablePagination({
   page,
-  pageSize,
-  totalItems,
+  pageSize: _pageSize,
+  totalItems: _totalItems,
   totalPages,
   onPageChange,
-  onPageSizeChange,
+  onPageSizeChange: _onPageSizeChange,
 }: TablePaginationProps) {
   const pages = useMemo(() => {
     if (totalPages <= 4) {

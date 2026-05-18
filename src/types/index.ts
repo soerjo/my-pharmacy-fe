@@ -1,7 +1,7 @@
 export type { ApiResponse, PaginatedResponse } from "./api";
 
-export { loginSchema, registerSchema, forgotPasswordSchema, resetPasswordSchema } from "./auth";
-export type { LoginFormValues, RegisterFormValues, ForgotPasswordFormValues, ResetPasswordFormValues, UserProfile } from "./auth";
+export { loginSchema, registerSchema, forgotPasswordSchema, resetPasswordSchema, changePasswordSchema, setPasswordSchema, registerApiSchema, resetPasswordApiSchema, changePasswordApiSchema, setPasswordApiSchema } from "./auth";
+export type { LoginFormValues, RegisterFormValues, ForgotPasswordFormValues, ResetPasswordFormValues, ChangePasswordFormValues, SetPasswordFormValues, RegisterApiValues, ResetPasswordApiValues, ChangePasswordApiValues, SetPasswordApiValues, UserProfile, LoginResponseUser, LoginResponseData, RefreshResponseData, VerifyResponseData } from "./auth";
 export { patientSchema } from "./patients";
 export type { Patient, PatientFormValues, Gender } from "./patients";
 export { GENDER_VALUES } from "./patients";
@@ -21,3 +21,7 @@ export type { ProductTypeEntity } from "./product-types";
 export type { UnitOfMeasure } from "./unit-of-measures";
 export type { ProductCategory } from "./product-categories";
 export type { Manufacturer } from "./manufacturers";
+export { createUserSchema, updateUserSchema } from "./users";
+export type { User, UserRole, CreateUserFormValues, UpdateUserFormValues } from "./users";
+export { createRoleSchema, updateRoleSchema, assignPermissionsSchema } from "./roles";
+export type { Role, RoleWithPermissions, Permission, CreateRoleFormValues, UpdateRoleFormValues, AssignPermissionsFormValues } from "./roles";

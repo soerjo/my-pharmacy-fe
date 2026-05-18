@@ -36,14 +36,13 @@ export function OrderItemRow<T extends FieldValues>({
   register,
   errors,
   onRemove,
-  canRemove = true,
+  canRemove: _canRemove = true,
   isDisabled = false,
   productMap,
   onProductSelect,
   initialItem,
   watchedItem,
   // append,
-  // isLastIndex,
 }: OrderItemRowProps<T>) {
   const selectedProduct = watchedItem?.drugId && productMap ? productMap.get(watchedItem.drugId) : undefined;
   const itemErrors = (errors as FieldErrors<{ items: DispenseOrderItemShape[] }>).items?.[index];

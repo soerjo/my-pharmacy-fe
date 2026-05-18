@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { Label, SearchField} from "@heroui/react";
-import { Button, Input } from "@heroui/react";
-import { Ellipsis, ArrowUpFromSquare, Plus } from "@gravity-ui/icons";
+import { SearchField} from "@heroui/react";
+import { Button } from "@heroui/react";
+import { Ellipsis, Plus } from "@gravity-ui/icons";
 
 interface TableToolbarProps {
   title: string;
@@ -18,7 +18,7 @@ interface TableToolbarProps {
 
 export function TableToolbar({
   title,
-  searchPlaceholder,
+  searchPlaceholder: _searchPlaceholder,
   searchValue,
   onSearchChange,
   addLabel,

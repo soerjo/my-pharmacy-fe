@@ -11,6 +11,7 @@ import {
 
 import { cn } from "@/utils";
 import { useAppStore, useAuthStore } from "@/stores";
+import { usePermissions } from "@/hooks/use-permissions";
 import { APP_NAME } from "@/constants";
 import { NAV_SECTIONS, type NavItem } from "./nav-items";
 import { ArrowRightFromSquare } from "@gravity-ui/icons";
@@ -20,17 +21,25 @@ export function AppSidebar() {
   const pathname = usePathname();
   const { setSidebarOpen } = useAppStore();
   const logout = useAuthStore((s) => s.logout);
+  const { hasPermission } = usePermissions();
 
   useEffect(() => {
     setSidebarOpen(false);
   }, [pathname, setSidebarOpen]);
+
+  const filteredSections = NAV_SECTIONS.map((section) => ({
+    ...section,
+    items: section.items.filter(
+      (item) => !item.permission || hasPermission(item.permission),
+    ),
+  })).filter((section) => section.items.length > 0);
 
   const navContent = (
     <ScrollShadow
       hideScrollBar
       className="flex flex-1 flex-col gap-1 overflow-y-auto px-3 py-4"
     >
-      {NAV_SECTIONS.map((section, sectionIdx) => (
+      {filteredSections.map((section, sectionIdx) => (
         <div key={section.title} className={cn(sectionIdx > 0 && "mt-2")}>
           {sectionIdx > 0 && <Separator className="mb-2" />}
           <span className="px-3 text-[11px] font-semibold uppercase tracking-wider text-default-400">
@@ -56,7 +65,7 @@ export function AppSidebar() {
         <div className="flex h-14 shrink-0 items-center border-b border-default-200 px-4 dark:border-default-100">
           <Link
             href="/"
-            className="flex  flex-row items-center gap-2 overflow-hidden whitespace-nowrap font-semibold"
+            className="flex flex-row items-center gap-2 overflow-hidden whitespace-nowrap font-semibold"
           >
             <Image src="/pwa-192x192.png" alt="Logo" width={36} height={36} priority />
             <span>{APP_NAME}</span>
@@ -73,13 +82,10 @@ export function AppSidebar() {
           <Drawer.Content placement="left">
             <Drawer.Dialog className="w-72">
               <Drawer.Header className="flex items-center gap-2">
-                {/* <span className="text-lg font-semibold">P</span> */}
-                <Drawer.Heading className="font-semibold flex  flex-row  items-center gap-2">
-                  {/* i hope i can use my icon here */}
+                <Drawer.Heading className="font-semibold flex flex-row items-center gap-2">
                   <Image src="/pwa-192x192.png" alt="Logo" width={36} height={36} priority />
                   {APP_NAME}
                 </Drawer.Heading>
-                {/* <Drawer.CloseTrigger className="ml-auto" /> */}
               </Drawer.Header>
               <Drawer.Body className="overflow-hidden p-0">
                 {navContent}
@@ -117,13 +123,13 @@ function SidebarNavItem({
         "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
         isActive
           ? "bg-default-100 text-foreground dark:bg-default-150"
-          : "text-default-500 hover:bg-default-100 hover:text-foreground dark:hover:bg-default-150"
+          : "text-default-500 hover:bg-default-100 hover:text-foreground dark:hover:bg-default-150",
       )}
     >
       <Icon
         className={cn(
           "size-5 shrink-0",
-          isActive ? "text-foreground" : "text-default-400"
+          isActive ? "text-foreground" : "text-default-400",
         )}
       />
       <span>{item.label}</span>

@@ -4,12 +4,6 @@ import { useState, useCallback, useRef, useMemo } from "react";
 import { useShallow } from "zustand/react/shallow";
 import {
   Button,
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectPopover,
-  ListBox,
-  ListBoxItem,
   Modal,
   ModalBackdrop,
   ModalContainer,
@@ -25,7 +19,7 @@ import {
   useOverlayState,
   Table,
 } from "@heroui/react";
-import { ArrowUpFromSquare, Copy } from "@gravity-ui/icons";
+import { Copy } from "@gravity-ui/icons";
 import { DataTable } from "@/components/ui/data-table";
 import { useDispenseOrders } from "@/hooks/use-dispense-orders";
 import { useDispenseOrdersStore } from "@/stores/dispense-orders-store";
@@ -97,7 +91,7 @@ export function DispenseOrdersTable() {
     );
 
   const [updateId, setUpdateId] = useState<string | null>(null);
-  const [updateOrderStatus, setUpdateOrderStatus] = useState<DispenseOrderStatus | null>(null);
+  const [_updateOrderStatus, setUpdateOrderStatus] = useState<DispenseOrderStatus | null>(null);
 
   const isCreateDirtyRef = useRef(false);
   const createChangesOverlayState = useOverlayState({ defaultOpen: false });
@@ -124,9 +118,9 @@ export function DispenseOrdersTable() {
     },
   });
 
-  function openUpdate(id: string, status: DispenseOrderStatus) {
+  function openUpdate(id: string, _status: DispenseOrderStatus) {
     setUpdateId(id);
-    setUpdateOrderStatus(status);
+    setUpdateOrderStatus(_status);
   }
 
   function closeUpdate() {

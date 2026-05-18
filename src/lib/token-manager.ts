@@ -80,4 +80,50 @@ export class TokenManager {
     if (!expirationTime) return 0;
     return Math.max(0, expirationTime - Date.now() - this.EXPIRATION_BUFFER);
   }
+
+  static getTokenPermissions(): string[] {
+    const token = this.getAccessToken();
+    if (!token) return [];
+    const payload = this.parseToken(token);
+    if (!payload) return [];
+    const permissions = payload["permissions"];
+    if (Array.isArray(permissions)) {
+      return permissions.filter((p): p is string => typeof p === "string");
+    }
+    return [];
+  }
+
+  static getTokenRoles(): string[] {
+    const token = this.getAccessToken();
+    if (!token) return [];
+    const payload = this.parseToken(token);
+    if (!payload) return [];
+    const roles = payload["roles"];
+    if (Array.isArray(roles)) {
+      return roles.filter((r): r is string => typeof r === "string");
+    }
+    return [];
+  }
+
+  static readonly STORED_USER_KEY = "storedUser";
+
+  static getStoredUser<T>(): T | null {
+    if (typeof window === "undefined") return null;
+    try {
+      const raw = localStorage.getItem(this.STORED_USER_KEY);
+      return raw ? (JSON.parse(raw) as T) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  static setStoredUser<T>(user: T): void {
+    if (typeof window === "undefined") return;
+    localStorage.setItem(this.STORED_USER_KEY, JSON.stringify(user));
+  }
+
+  static removeStoredUser(): void {
+    if (typeof window === "undefined") return;
+    localStorage.removeItem(this.STORED_USER_KEY);
+  }
 }
