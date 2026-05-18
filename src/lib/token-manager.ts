@@ -104,4 +104,26 @@ export class TokenManager {
     }
     return [];
   }
+
+  static readonly STORED_USER_KEY = "storedUser";
+
+  static getStoredUser<T>(): T | null {
+    if (typeof window === "undefined") return null;
+    try {
+      const raw = localStorage.getItem(this.STORED_USER_KEY);
+      return raw ? (JSON.parse(raw) as T) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  static setStoredUser<T>(user: T): void {
+    if (typeof window === "undefined") return;
+    localStorage.setItem(this.STORED_USER_KEY, JSON.stringify(user));
+  }
+
+  static removeStoredUser(): void {
+    if (typeof window === "undefined") return;
+    localStorage.removeItem(this.STORED_USER_KEY);
+  }
 }

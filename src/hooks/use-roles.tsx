@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query-keys";
 import { rolesService } from "@/services/roles-service";
 import { useRolesStore } from "@/stores/roles-store";
@@ -8,11 +9,20 @@ import type { CreateRoleFormValues, UpdateRoleFormValues } from "@/types";
 
 export function useRoles() {
   const queryClient = useQueryClient();
+  const filters = useRolesStore((s) => s.filters);
+  const pagination = useRolesStore((s) => s.pagination);
+
+  const params = {
+    page: pagination.page,
+    limit: pagination.pageSize,
+    search: filters.search || undefined,
+  };
 
   const rolesQuery = useQuery({
-    queryKey: queryKeys.roles.list(),
-    queryFn: () => rolesService.getAll(),
+    queryKey: queryKeys.roles.list(params),
+    queryFn: () => rolesService.getAll(params),
     select: (response) => response.data,
+    placeholderData: keepPreviousData,
   });
 
   const createMutation = useMutation({
@@ -45,7 +55,11 @@ export function useRoles() {
   });
 
   return {
-    roles: rolesQuery.data ?? [],
+    roles: rolesQuery.data?.data ?? [],
+    total: rolesQuery.data?.meta?.total ?? 0,
+    totalPages: rolesQuery.data?.meta?.totalPages ?? 1,
+    page: rolesQuery.data?.meta?.page ?? 1,
+    pageSize: rolesQuery.data?.meta?.limit ?? 10,
     isLoading: rolesQuery.isLoading,
     isFetching: rolesQuery.isFetching,
     error: rolesQuery.error,
@@ -71,6 +85,14 @@ export function useRole(id: string) {
     isLoading: detailQuery.isLoading,
     error: detailQuery.error,
   };
+}
+
+export function useAllRoles() {
+  return useQuery({
+    queryKey: queryKeys.roles.list({ all: true }),
+    queryFn: () => rolesService.getAll({ page: 1, limit: 100 }),
+    select: (response) => response.data.data,
+  });
 }
 
 export function useAllPermissions() {

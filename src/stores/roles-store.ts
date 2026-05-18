@@ -1,47 +1,33 @@
+import { createEntityStore } from "@/lib/create-entity-store";
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import type { Role } from "@/types";
 
-interface RolesState {
+export interface RolesFilters {
+  search: string;
+}
+
+export const useRolesStore = createEntityStore<Role, RolesFilters>(
+  { search: "" },
+  "roles-store",
+);
+
+interface RolesPermissionsState {
   selectedRole: Role | null;
-  isFormOpen: boolean;
   isPermissionsModalOpen: boolean;
   selectedPermissionIds: string[];
-  editingRole: Role | null;
 
-  setSelectedRole: (role: Role | null) => void;
-  openCreateForm: () => void;
-  openEditForm: (role: Role) => void;
-  closeForm: () => void;
   openPermissionsModal: (role: Role) => void;
   closePermissionsModal: () => void;
   setSelectedPermissionIds: (ids: string[]) => void;
-  resetAll: () => void;
 }
 
-const INITIAL_STATE = {
-  selectedRole: null,
-  isFormOpen: false,
-  isPermissionsModalOpen: false,
-  selectedPermissionIds: [] as string[],
-  editingRole: null as Role | null,
-};
-
-export const useRolesStore = create<RolesState>()(
+export const useRolesPermissionsStore = create<RolesPermissionsState>()(
   devtools(
     (set) => ({
-      ...INITIAL_STATE,
-
-      setSelectedRole: (role) => set({ selectedRole: role }, false, "setSelectedRole"),
-
-      openCreateForm: () =>
-        set({ isFormOpen: true, editingRole: null }, false, "openCreateForm"),
-
-      openEditForm: (role) =>
-        set({ isFormOpen: true, editingRole: role }, false, "openEditForm"),
-
-      closeForm: () =>
-        set({ isFormOpen: false, editingRole: null }, false, "closeForm"),
+      selectedRole: null,
+      isPermissionsModalOpen: false,
+      selectedPermissionIds: [],
 
       openPermissionsModal: (role) =>
         set(
@@ -59,9 +45,7 @@ export const useRolesStore = create<RolesState>()(
 
       setSelectedPermissionIds: (ids) =>
         set({ selectedPermissionIds: ids }, false, "setSelectedPermissionIds"),
-
-      resetAll: () => set({ ...INITIAL_STATE }, false, "resetAll"),
     }),
-    { name: "roles-store" },
+    { name: "roles-permissions-store" },
   ),
 );

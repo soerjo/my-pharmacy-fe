@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { authService } from '@/services/auth-service';
-import type { ResetPasswordFormValues } from '@/types';
+import { resetPasswordApiSchema, type ResetPasswordFormValues } from '@/types';
 
 interface ResetPasswordState {
   isLoading: boolean;
@@ -20,7 +20,8 @@ export const useResetPasswordStore = create<ResetPasswordState>()(
       resetPassword: async (data: ResetPasswordFormValues) => {
         set({ isLoading: true, error: null }, false, 'resetPassword/start');
         try {
-          await authService.resetPassword(data);
+          const apiData = resetPasswordApiSchema.parse(data);
+          await authService.resetPassword(apiData);
           set({ isLoading: false }, false, 'resetPassword/success');
         } catch (error) {
           set({ isLoading: false, error: error as Error }, false, 'resetPassword/error');

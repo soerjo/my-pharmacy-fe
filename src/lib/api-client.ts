@@ -75,6 +75,9 @@ class ApiClient {
       if (data.data.refreshToken) {
         TokenManager.setRefreshToken(data.data.refreshToken);
       }
+      if (data.data?.user) {
+        TokenManager.setStoredUser(data.data.user);
+      }
       return data.data.accessToken;
     }
 

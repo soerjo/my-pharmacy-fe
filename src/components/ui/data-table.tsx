@@ -4,9 +4,6 @@ import { useState, type ReactNode } from "react";
 import { Button, ModalFooter, Spinner, useOverlayState } from "@heroui/react";
 import {
   Table,
-  TableHeader,
-  TableBody,
-  TableContent,
   TableFooter,
   TableScrollContainer,
 } from "@heroui/react";
@@ -21,7 +18,7 @@ import {
 } from "@heroui/react";
 import { TablePagination } from "./table-pagination";
 import { TableToolbar } from "./table-toolbar";
-import { Plus } from "@gravity-ui/icons";
+
 
 const FORM_ID = "data-table-form";
 

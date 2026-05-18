@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import { useShallow } from "zustand/react/shallow";
 import {
   Button,
@@ -13,6 +13,7 @@ import {
 import { DataTable } from "@/components/ui/data-table";
 import { useUsers } from "@/hooks/use-users";
 import { useUsersStore } from "@/stores/users-store";
+import { useAuthStore } from "@/stores/auth-store";
 import { UserForm } from "./user-form";
 import { ChangesConfirmModal } from "@/components/ui";
 import type { User } from "@/types";
@@ -23,7 +24,7 @@ export function UsersTable() {
     users,
     isLoading,
     error,
-    pagination,
+    paginationMeta,
     setPage,
     setPageSize,
     createUser,
@@ -79,36 +80,22 @@ export function UsersTable() {
     }
   }, [deletingId, deleteUser, setDeletingId]);
 
+  const currentUser = useAuthStore((s) => s.user);
+
   const handleFormSubmit = useCallback(
     async (data: UserFormValues) => {
       if (editingEntity) {
         await updateUser(editingEntity.id, data);
       } else {
-        await createUser(data as Parameters<typeof createUser>[0]);
+        await createUser({
+          ...data,
+          password: data.password ?? '',
+          organizationId: currentUser?.organizationId ?? '',
+        });
       }
       closeForm();
     },
-    [editingEntity, createUser, updateUser, closeForm],
-  );
-
-  const filteredUsers = useMemo(() => {
-    if (!filters.search) return users;
-    const search = filters.search.toLowerCase();
-    return users.filter(
-      (u) =>
-        u.email.toLowerCase().includes(search) ||
-        `${u.firstName} ${u.lastName}`.toLowerCase().includes(search),
-    );
-  }, [users, filters.search]);
-
-  const paginatedUsers = useMemo(() => {
-    const start = (pagination.page - 1) * pagination.pageSize;
-    return filteredUsers.slice(start, start + pagination.pageSize);
-  }, [filteredUsers, pagination.page, pagination.pageSize]);
-
-  const totalPages = Math.max(
-    1,
-    Math.ceil(filteredUsers.length / pagination.pageSize),
+    [editingEntity, createUser, updateUser, closeForm, currentUser?.organizationId],
   );
 
   return (
@@ -116,12 +103,12 @@ export function UsersTable() {
       <DataTable<User>
         entityNamePlural="Users"
         ariaLabel="Users table"
-        data={paginatedUsers}
+        data={users}
         isLoading={isLoading}
         error={error}
         columns={
           <>
-            <TableColumn defaultWidth="1fr" minWidth={150}>
+            <TableColumn isRowHeader defaultWidth="1fr" minWidth={150}>
               Name
             </TableColumn>
             <TableColumn defaultWidth="1fr" minWidth={180}>
@@ -176,7 +163,7 @@ export function UsersTable() {
                   variant="danger"
                   onPress={() => handleDelete(user.id)}
                 >
-                  Delete
+                  Deactivate
                 </Button>
               </div>
             </TableCell>
@@ -192,7 +179,6 @@ export function UsersTable() {
                     email: editingEntity.email,
                     firstName: editingEntity.firstName ?? "",
                     lastName: editingEntity.lastName ?? "",
-                    organizationId: editingEntity.organizationId,
                     roleId: "",
                   }
                 : undefined
@@ -209,10 +195,10 @@ export function UsersTable() {
         onSearchChange={(value: string) => setFilters({ search: value })}
         onAdd={openCreateForm}
         addLabel="+ Add User"
-        page={pagination.page}
-        pageSize={pagination.pageSize}
-        totalItems={filteredUsers.length}
-        totalPages={totalPages}
+        page={paginationMeta?.page ?? 1}
+        pageSize={paginationMeta?.pageSize ?? 10}
+        totalItems={paginationMeta?.total ?? 0}
+        totalPages={paginationMeta?.totalPages ?? 1}
         onPageChange={setPage}
         onPageSizeChange={setPageSize}
       />

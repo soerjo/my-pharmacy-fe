@@ -1,25 +1,41 @@
 "use client";
 
 import { useMemo } from "react";
+import { useAuthStore } from "@/stores/auth-store";
 import { useUserProfile } from "@/hooks/use-user-profile";
 import { TokenManager } from "@/lib/token-manager";
 
 export function usePermissions() {
-  const { user } = useUserProfile();
+  const authUser = useAuthStore((s) => s.user);
+  const authPermissions = useAuthStore((s) => s.permissions);
+  const authUserPermissions = authUser?.permissions;
+  const authUserRole = authUser?.role;
+  const { user: profileUser } = useUserProfile();
+  const profilePermissions = profileUser?.permissions;
+  const profileRole = profileUser?.role;
 
   const permissions = useMemo(() => {
-    if (user?.permissions?.length) {
-      return user.permissions;
+    if (authUserPermissions?.length) {
+      return authUserPermissions;
+    }
+    if (authPermissions?.length) {
+      return authPermissions;
+    }
+    if (profilePermissions?.length) {
+      return profilePermissions;
     }
     return TokenManager.getTokenPermissions();
-  }, [user?.permissions]);
+  }, [authUserPermissions, authPermissions, profilePermissions]);
 
   const roles = useMemo(() => {
-    if (user?.roles?.length) {
-      return user.roles;
+    if (authUserRole) {
+      return [authUserRole];
+    }
+    if (profileRole) {
+      return [profileRole];
     }
     return TokenManager.getTokenRoles();
-  }, [user?.roles]);
+  }, [authUserRole, profileRole]);
 
   const hasPermission = (permission: string): boolean => {
     return permissions.includes(permission);

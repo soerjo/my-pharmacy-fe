@@ -1,7 +1,7 @@
 export type { ApiResponse, PaginatedResponse } from "./api";
 
-export { loginSchema, registerSchema, forgotPasswordSchema, resetPasswordSchema } from "./auth";
-export type { LoginFormValues, RegisterFormValues, ForgotPasswordFormValues, ResetPasswordFormValues, UserProfile } from "./auth";
+export { loginSchema, registerSchema, forgotPasswordSchema, resetPasswordSchema, changePasswordSchema, setPasswordSchema, registerApiSchema, resetPasswordApiSchema, changePasswordApiSchema, setPasswordApiSchema } from "./auth";
+export type { LoginFormValues, RegisterFormValues, ForgotPasswordFormValues, ResetPasswordFormValues, ChangePasswordFormValues, SetPasswordFormValues, RegisterApiValues, ResetPasswordApiValues, ChangePasswordApiValues, SetPasswordApiValues, UserProfile, LoginResponseUser, LoginResponseData, RefreshResponseData, VerifyResponseData } from "./auth";
 export { patientSchema } from "./patients";
 export type { Patient, PatientFormValues, Gender } from "./patients";
 export { GENDER_VALUES } from "./patients";

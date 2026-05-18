@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query-keys";
 import { usersService } from "@/services/users-service";
 import { useUsersStore } from "@/stores/users-store";
@@ -19,12 +19,24 @@ export function useUsers() {
       limit: pagination.pageSize,
     }),
     queryFn: () => usersService.getAll({
-        ...filters,
-        page: pagination.page,
-        limit: pagination.pageSize,
-      }),
+      ...filters,
+      page: pagination.page,
+      limit: pagination.pageSize,
+    }),
     select: (response) => response.data,
+    placeholderData: keepPreviousData,
   });
+
+  const paginationMeta = usersQuery.data
+    ? {
+        total: usersQuery.data.meta.total,
+        totalPages: usersQuery.data.meta.totalPages,
+        page: usersQuery.data.meta.page,
+        pageSize: usersQuery.data.meta.limit,
+        hasNext: usersQuery.data.meta.hasNext,
+        hasPrev: usersQuery.data.meta.hasPrev,
+      }
+    : null;
 
   const createMutation = useMutation({
     mutationFn: (data: CreateUserFormValues) => usersService.create(data),
@@ -56,12 +68,14 @@ export function useUsers() {
   });
 
   return {
-    users: usersQuery.data ?? [],
+    users: usersQuery.data?.data ?? [],
     isLoading: usersQuery.isLoading,
     isFetching: usersQuery.isFetching,
+    isPlaceholderData: usersQuery.isPlaceholderData,
     error: usersQuery.error,
     filters,
     pagination,
+    paginationMeta,
     setFilters: useUsersStore.getState().setFilters,
     resetFilters: useUsersStore.getState().resetFilters,
     setPage: useUsersStore.getState().setPage,

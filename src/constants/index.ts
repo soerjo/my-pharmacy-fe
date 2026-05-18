@@ -14,4 +14,7 @@ export const ROUTES = {
   settings: "/settings",
   users: "/users",
   roles: "/roles",
+  changePassword: "/settings/change-password",
+  setPassword: "/settings/set-password",
+  googleCallback: "/google/callback",
 } as const;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import {
   Button,
   TableCell,
@@ -18,6 +18,8 @@ import type { Role, CreateRoleFormValues } from "@/types";
 export function RolesTable() {
   const {
     roles,
+    total,
+    totalPages,
     isLoading,
     error,
     createRole,
@@ -29,14 +31,20 @@ export function RolesTable() {
   } = useRoles();
 
   const {
+    filters,
+    pagination,
     isFormOpen,
-    editingRole,
+    editingEntity: editingRole,
     openCreateForm,
     openEditForm,
     closeForm,
+    setFilters,
+    setPage,
+    setPageSize,
+    setDeletingId,
+    deletingId,
   } = useRolesStore();
 
-  const [deletingId, setDeletingId] = useState<string | null>(null);
   const deleteModalState = useOverlayState({
     isOpen: !!deletingId,
     onOpenChange: (open: boolean) => {
@@ -48,7 +56,7 @@ export function RolesTable() {
     (id: string) => {
       setDeletingId(id);
     },
-    [],
+    [setDeletingId],
   );
 
   const confirmDelete = useCallback(async () => {
@@ -56,7 +64,7 @@ export function RolesTable() {
       await deleteRole(deletingId);
       setDeletingId(null);
     }
-  }, [deletingId, deleteRole]);
+  }, [deletingId, deleteRole, setDeletingId]);
 
   const handleFormSubmit = useCallback(
     async (data: CreateRoleFormValues) => {
@@ -70,36 +78,12 @@ export function RolesTable() {
     [editingRole, createRole, updateRole, closeForm],
   );
 
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  const [search, setSearch] = useState("");
-
-  const filteredRoles = useMemo(() => {
-    if (!search) return roles;
-    const q = search.toLowerCase();
-    return roles.filter(
-      (r) =>
-        r.name.toLowerCase().includes(q) ||
-        (r.description ?? "").toLowerCase().includes(q),
-    );
-  }, [roles, search]);
-
-  const paginatedRoles = useMemo(() => {
-    const start = (page - 1) * pageSize;
-    return filteredRoles.slice(start, start + pageSize);
-  }, [filteredRoles, page, pageSize]);
-
-  const totalPages = Math.max(
-    1,
-    Math.ceil(filteredRoles.length / pageSize),
-  );
-
   return (
     <>
       <DataTable<Role>
         entityNamePlural="Roles"
         ariaLabel="Roles table"
-        data={paginatedRoles}
+        data={roles}
         isLoading={isLoading}
         error={error}
         columns={
@@ -165,18 +149,17 @@ export function RolesTable() {
           />
         )}
         onCloseForm={closeForm}
-        filters={{ search }}
-        onSearchChange={setSearch}
+        filters={{ search: filters.search }}
+        onSearchChange={(value: string) => setFilters({ search: value })}
         onAdd={openCreateForm}
         addLabel="+ Add Role"
-        page={page}
-        pageSize={pageSize}
-        totalItems={filteredRoles.length}
+        page={pagination.page}
+        pageSize={pagination.pageSize}
+        totalItems={total}
         totalPages={totalPages}
         onPageChange={setPage}
         onPageSizeChange={(size: number) => {
           setPageSize(size);
-          setPage(1);
         }}
       />
 

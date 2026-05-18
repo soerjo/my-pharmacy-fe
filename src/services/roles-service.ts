@@ -1,9 +1,18 @@
 import { clients } from "@/lib/api-client";
-import type { ApiResponse } from "@/types";
+import type { ApiResponse, PaginatedResponse } from "@/types";
 import type { Role, RoleWithPermissions, Permission, CreateRoleFormValues, UpdateRoleFormValues } from "@/types";
 
 export const rolesService = {
-  getAll: () => clients.auth.get<ApiResponse<Role[]>>("/roles"),
+  getAll: (params?: { page?: number; limit?: number; search?: string }) => {
+    const searchParams = new URLSearchParams();
+    if (params?.search) searchParams.set("search", params.search);
+    if (params?.page !== undefined) searchParams.set("page", String(params.page));
+    if (params?.limit !== undefined) searchParams.set("limit", String(params.limit));
+
+    return clients.auth.get<ApiResponse<PaginatedResponse<Role>>>(
+      searchParams.toString() ? `/roles?${searchParams.toString()}` : "/roles"
+    );
+  },
   getById: (id: string) => clients.auth.get<ApiResponse<RoleWithPermissions>>(`/roles/${id}`),
   create: (data: CreateRoleFormValues) => clients.auth.post<ApiResponse<Role>>("/roles", data),
   update: (id: string, data: UpdateRoleFormValues) => clients.auth.put<ApiResponse<Role>>(`/roles/${id}`, data),

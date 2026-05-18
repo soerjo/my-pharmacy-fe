@@ -1,9 +1,14 @@
+"use client";
+
+import { PermissionRoute } from "@/hooks/use-auth";
 import { RolesTable } from "@/components/roles/roles-table";
 
 export default function RolesPage() {
   return (
-    <div className="p-6">
-      <RolesTable />
-    </div>
+    <PermissionRoute permissions={["role:manage"]}>
+      <div className="p-6">
+        <RolesTable />
+      </div>
+    </PermissionRoute>
   );
 }

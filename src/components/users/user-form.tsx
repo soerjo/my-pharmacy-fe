@@ -1,17 +1,17 @@
 "use client";
 
 import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Input } from "@heroui/react";
+import { Input, Select, SelectTrigger, SelectValue, SelectPopover, ListBox, Label, ListBoxItem } from "@heroui/react";
+import { useAllRoles } from "@/hooks/use-roles";
 
 const userFormSchema = z.object({
   email: z.string().min(1, "Email is required").email("Invalid email address"),
   password: z.string().optional(),
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
-  organizationId: z.string().min(1, "Organization is required"),
   roleId: z.string().optional(),
 });
 
@@ -39,6 +39,7 @@ export function UserForm({
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm<UserFormValues>({
     resolver: zodResolver(userFormSchema),
@@ -47,10 +48,11 @@ export function UserForm({
       password: "",
       firstName: defaultValues?.firstName ?? "",
       lastName: defaultValues?.lastName ?? "",
-      organizationId: defaultValues?.organizationId ?? "",
       roleId: defaultValues?.roleId ?? "",
     },
   });
+
+  const { data: roles = [], isLoading: rolesLoading } = useAllRoles();
 
   useEffect(() => {
     onSubmittingChange?.(isSubmitting);
@@ -127,31 +129,32 @@ export function UserForm({
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="user-organizationId" className="text-sm font-medium">
-          Organization ID
-        </label>
-        <Input
-          id="user-organizationId"
-          placeholder="Enter organization ID"
-          {...register("organizationId")}
-          disabled={isSubmitting}
-        />
-        {errors.organizationId && (
-          <p className="text-sm text-danger">
-            {errors.organizationId.message}
-          </p>
-        )}
-      </div>
-
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="user-roleId" className="text-sm font-medium">
-          Role ID (optional)
-        </label>
-        <Input
-          id="user-roleId"
-          placeholder="Enter role ID"
-          {...register("roleId")}
-          disabled={isSubmitting}
+        <Controller
+          name="roleId"
+          control={control}
+          render={({ field }) => (
+            <Select
+              selectedKey={field.value || undefined}
+              onSelectionChange={(key) => field.onChange(key ? String(key) : "")}
+              fullWidth
+              isDisabled={isSubmitting || rolesLoading}
+            >
+              <Label>Role</Label>
+              <SelectTrigger>
+                <SelectValue />
+                <Select.Indicator />
+              </SelectTrigger>
+              <SelectPopover>
+                <ListBox items={roles}>
+                  {(role) => (
+                    <ListBoxItem key={role.id} textValue={role.name}>
+                      {role.name}
+                    </ListBoxItem>
+                  )}
+                </ListBox>
+              </SelectPopover>
+            </Select>
+          )}
         />
       </div>
     </form>
