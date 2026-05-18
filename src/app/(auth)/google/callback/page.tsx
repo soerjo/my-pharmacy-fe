@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { Spinner } from "@heroui/react";
 import { TokenManager } from "@/lib/token-manager";
 import { ROUTES } from "@/constants";
 
-export default function GoogleCallbackPage() {
+function CallbackContent() {
   const searchParams = useSearchParams();
 
   const accessToken = searchParams.get("accessToken");
@@ -41,5 +41,13 @@ export default function GoogleCallbackPage() {
     <div className="flex min-h-screen items-center justify-center">
       <Spinner size="lg" />
     </div>
+  );
+}
+
+export default function GoogleCallbackPage() {
+  return (
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center"><Spinner size="lg" /></div>}>
+      <CallbackContent />
+    </Suspense>
   );
 }
